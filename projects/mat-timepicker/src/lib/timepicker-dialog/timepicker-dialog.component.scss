@@ -1,0 +1,62 @@
+mat-dialog-content {
+  min-height: 395px;
+  padding: 0px;
+  margin-top: -24px;
+  overflow: hidden;
+}
+
+mat-dialog-actions {
+  justify-content: flex-end;
+  margin-right: -8px;
+  margin-left: -8px;
+}
+
+.root {
+  min-width: 282px;
+}
+
+.header {
+  border-top-left-radius: 2px;
+  border-top-right-radius: 2px;
+  padding: 20px 0;
+  line-height: 58px;
+  font-size: 58px;
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  user-select: none;
+  height: 98px;
+}
+
+.time {
+  transition: all 200ms ease-out;
+  cursor: pointer;
+  &:not(.select) {
+    opacity: .6;
+  }
+}
+
+.placeholder {
+  flex: 1;
+}
+
+.ampm {
+  display: flex;
+  flex-direction: column-reverse;
+  flex: 1;
+  font-size: 14px;
+  line-height: 20px;
+  margin-left: 16px;
+  font-weight: 700px;
+}
+
+.select {
+  color: white;
+}
+
+.body {
+  padding: 24px 16px;
+  padding-bottom: 20px;
+  display: flex;
+  justify-content: center;
+}

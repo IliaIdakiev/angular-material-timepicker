@@ -1,0 +1,105 @@
+.root {
+  width: 256px;
+  height: 256px;
+  cursor: default;
+}
+
+.circle {
+  width: 256px;
+  height: 256px;
+  border-radius: 50%;
+  position: relative;
+  background: #ededed;
+  cursor: pointer;
+}
+
+.number {
+  width: 32px;
+  height: 32px;
+  left: calc(50% - 16px);
+  top: calc(50% - 16px);
+  position: absolute;
+  text-align: center;
+  line-height: 32px;
+  cursor: pointer;
+  font-size: 14px;
+  pointer-events: none;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  background-color: transparent;
+  box-shadow: none;
+
+  &:not(.selected) {
+    color: rgba(0,0,0,.87);
+  }
+
+  &.minute-dot {
+    color: rgba(0, 0, 0, 0.27);
+    &.selected {
+      color: transparent;
+    }
+  }
+}
+
+.small-number {
+  font-size: 12px;
+
+  &:not(.selected) {
+    color: rgba(0,0,0,.67);
+  }
+}
+
+.pointer-container {
+  width: calc(50% - 20px);
+  height: 2;
+  position: absolute;
+  left: 50%;
+  top: calc(50% - 1px);
+  transform-origin: left center;
+  pointer-events: none;
+}
+
+.pointer {
+  height: 1px;
+}
+
+.animated-pointer {
+  transition: all 200ms ease-out;
+}
+
+.small-pointer {
+  width: calc(50% - 52px);
+}
+
+.inner-dot {
+  position: absolute;
+  top: -3px;
+  left: -4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  box-shadow: none;
+}
+
+.outer-dot {
+  width: 32px;
+  height: 32px;
+  position: absolute;
+  right: -16px;
+  box-shadow: none;
+  border-radius: 50%;
+  box-sizing: content-box;
+}
+
+.outer-dot-odd {
+  box-shadow: none;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}

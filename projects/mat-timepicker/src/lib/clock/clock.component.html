@@ -1,0 +1,41 @@
+<div class="root">
+  <div class="circle" (touchmove)="handleTouchMove($event)" (mousemove)="handleMouseMove($event)"
+    (touchstart)="disableAnimatedPointer()" (mousedown)="disableAnimatedPointer()" (touchend)="handleTouchEnd($event)"
+    (mouseup)="enableAnimatedPointer()" (click)="handleClick($event)">
+    <div class="pointer-container"
+      [ngClass]="{ 'small-pointer': mode === '24h' && (formattedValue === 0 || formattedValue > 12), 'animated-pointer': !touching }"
+      [style.transform]="'rotate(' + angle + 'deg)'">
+      <button mat-mini-fab [color]="color" class="inner-dot"></button>
+      <mat-toolbar [color]="color" class="pointer">
+        <button mat-mini-fab [color]="color" class="outer-dot"
+          [ngClass]=" { 'outer-dot-odd': mode === 'minutes' && formattedValue % 5 !== 0 }">
+          <ng-container *ngIf="mode === 'minutes' && formattedValue % 5 !== 0">·</ng-container>
+        </button>
+      </mat-toolbar>
+    </div>
+    <ng-container *ngFor="let digit of minuteDots;">
+      <button mat-mini-fab class="number minute-dot"
+        [ngClass]="{ 'selected': formattedValue === digit.display || (digit.display === 0 && formattedValue === 0) }"
+        [style.transform]="'translate(' + digit.translateX + 'px, ' + digit.translateY + 'px)'">
+        <ng-container *ngIf="digit.display % 5 !== 0">·</ng-container>
+      </button>
+    </ng-container>
+    <ng-container *ngFor="let digit of numbers;">
+      <button mat-mini-fab [color]="color" class="number"
+        [ngClass]="{ 'selected': formattedValue === digit.display || (digit.display === 60 && formattedValue === 0) }"
+        [style.transform]="'translate(' + digit.translateX + 'px, ' + digit.translateY + 'px)'">
+        <ng-template #hours>{{ digit.display }}</ng-template>
+        <ng-template #minutes>{{ digit.display === 60 ? '00' : digit.display }}</ng-template>
+        <ng-container *ngIf="mode === 'minutes' then minutes else hours;"></ng-container>
+      </button>
+
+    </ng-container>
+    <ng-container *ngFor="let digit of secondaryNumbers;">
+      <button mat-mini-fab [color]="color" class="number small-number"
+        [ngClass]="{ 'selected': formattedValue === digit.display || (digit.display === 24 && formattedValue === 0) }"
+        [style.transform]="'translate(' + digit.translateX + 'px, ' + digit.translateY + 'px)'">
+        {{ digit.display === 24 ? '00' : digit.display }}
+      </button>
+
+    </ng-container>
+  </div>

@@ -17,6 +17,14 @@
     "lib": [
       "es2018",
       "dom"
-    ]
+    ],
+    "paths": {
+      "mat-timepicker": [
+        "dist/mat-timepicker"
+      ],
+      "mat-timepicker/*": [
+        "dist/mat-timepicker/*"
+      ]
+    }
   }
 }

@@ -1,0 +1,35 @@
+<mat-dialog-content>
+  <div class="root">
+    <mat-toolbar [color]="color" class="header">
+      <div class="placeholder"></div>
+      <div>
+        <span class="time" [ngClass]="{'select': this.select === 'h' && 'active' }" (click)="editHours()">
+          {{ twoDigits(formattedHours) }}
+        </span>
+        :
+        <span class="time" [ngClass]="{ 'select': this.select === 'm' && 'active' }" (click)="editMinutes()">
+          {{ twoDigits(minutes) }}
+        </span>
+      </div>
+      <ng-container *ngIf="mode === '12h' then ampm else normal"></ng-container>
+      <ng-template #normal>
+        <div class="placeholder"></div>
+      </ng-template>
+      <ng-template #ampm>
+        <div class="ampm">
+          <span class="time" [ngClass]="{ 'select': isPm }" (click)="setPm()">PM</span>
+          <span class="time" [ngClass]="{ 'select': !isPm }" (click)="setAm()">AM</span>
+        </div>
+      </ng-template>
+    </mat-toolbar>
+    <div class="body">
+      <mat-clock [color]="color" [mode]="currentMode" (changeEvent)="handleClockChange($event)"
+        [formattedValue]="currentMode === 'minutes' ? minutes : formattedHours"
+        (mouseup)="handleClockChangeDone($event)" (touchend)="handleClockChangeDone($event)"></mat-clock>
+    </div>
+  </div>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button [color]="color" (click)="cancelClickHandler()">{{cancelLabel}}</button>
+  <button mat-button [color]="color" (click)="okClickHandler()">{{okLabel}}</button>
+</mat-dialog-actions>
