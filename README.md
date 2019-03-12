@@ -25,4 +25,16 @@
 @Input() color = 'primary';
 ```
 
-[Demo](https://stackblitz.com/github/IliaIdakiev/angular-material-timepicker)
+### Check out the [**Demo**](https://stackblitz.com/github/IliaIdakiev/angular-material-timepicker)!
+
+---
+
+Dialog View
+
+Here's our logo (hover to see the title text):
+
+Hour Select (24h): 
+![alt text](https://github.com/IliaIdakiev/angular-material-timepicker/blob/master/timepicker-hours.png?raw=true "Hour Select (24h)")
+
+Minutes Select: 
+![alt text](https://github.com/IliaIdakiev/angular-material-timepicker/blob/master/timepicker-min.png?raw=true "Hour Select (24h)")
