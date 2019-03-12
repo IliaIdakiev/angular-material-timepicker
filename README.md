@@ -8,6 +8,7 @@
 ```html
 <mat-timepicker></mat-timepicker>
 ```
+**(Yes! You can use ngModel. This control implements ControlValueAccessor)**
 
 ### Component Configuration
 ```typescript
@@ -18,12 +19,18 @@
 @Input() cancelLabel = 'Cancel';
 
 /** Sets the clock mode, 12-hour or 24-hour clocks are supported. */
-@Input() mode = '24h' // or '12h';
+@Input() mode: '12h' | '24h' = '24h';
 
+/** Disable the timepicker control */
 @Input() disabled = false;
 
+/** Set the color of the timepicker control */
 @Input() color = 'primary';
+
+/** Set the value of the timepicker control (default is current time) */
+@Input() value: Date | Moment = new Date();
 ```
+
 
 ### Check out the [**Demo**](https://stackblitz.com/github/IliaIdakiev/angular-material-timepicker)!
 
