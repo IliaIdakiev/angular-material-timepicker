@@ -22,7 +22,7 @@
     </ng-container>
     <ng-container *ngFor="let digit of numbers;">
       <button mat-mini-fab [color]="color" class="number"
-        [ngClass]="{ 'selected': formattedValue === digit.display || (digit.display === 60 && formattedValue === 0), 'disabled': !isAvailable(digit.display, 'hours')}"
+        [ngClass]="{ 'selected': formattedValue === digit.display || (digit.display === 60 && formattedValue === 0), 'disabled': !isAvailable(digit.display, mode === 'minutes' ? 'minutes' : 'hours')}"
         [style.transform]="'translate(' + digit.translateX + 'px, ' + digit.translateY + 'px)'">
         <ng-template #hours>{{ digit.display }}</ng-template>
         <ng-template #minutes>{{ digit.display === 60 ? '00' : digit.display }}</ng-template>

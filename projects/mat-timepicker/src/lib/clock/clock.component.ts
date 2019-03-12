@@ -71,7 +71,7 @@ export class ClockComponent implements OnChanges {
   handleTouchMove = (e: any) => {
     e.preventDefault(); // prevent scrolling behind the clock on iOS
     const rect = e.target.getBoundingClientRect();
-    this.movePointer(e.changedTouches[0].clientX - rect.left, e.changedTouches[0].clientY - rect.top, e);
+    this.movePointer(e.changedTouches[0].clientX - rect.left, e.changedTouches[0].clientY - rect.top);
   }
 
   handleTouchEnd(e: any) {
@@ -83,19 +83,16 @@ export class ClockComponent implements OnChanges {
     // MouseEvent.which is deprecated, but MouseEvent.buttons is not supported in Safari
     if (e.buttons === 1 || e.which === 1) {
       const rect = e.target.getBoundingClientRect();
-      this.movePointer(e.clientX - rect.left, e.clientY - rect.top, e);
+      this.movePointer(e.clientX - rect.left, e.clientY - rect.top);
     }
   }
 
   handleClick(e: any) {
     const rect = e.target.getBoundingClientRect();
-    this.movePointer(e.clientX - rect.left, e.clientY - rect.top, e);
+    this.movePointer(e.clientX - rect.left, e.clientY - rect.top);
   }
 
-  movePointer(x, y, e) {
-    if (e.target.classList.contains('disabled')) {
-      return;
-    }
+  movePointer(x, y) {
     const value = this.getPointerValue(x, y, this.mode, 256);
     if (!this.isAvailable(value)) {
       this.unavailableSelection.emit();
