@@ -1,27 +1,27 @@
-# AngularMaterialTimepicker
+# Angular Material Timepicker
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 7.3.5.
+## Timepicker Control for Angular Material
 
-## Development server
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+### Usage
+```html
+<mat-timepicker></mat-timepicker>
+```
 
-## Code scaffolding
+### Component Configuration
+```typescript
+/** Override the label of the ok button. */
+@Input() okLabel = 'Ok';
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+/** Override the label of the cancel button. */
+@Input() cancelLabel = 'Cancel';
 
-## Build
+/** Sets the clock mode, 12-hour or 24-hour clocks are supported. */
+@Input() mode = '24h' // or '12h';
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+@Input() disabled = false;
 
-## Running unit tests
+@Input() color = 'primary';
+```
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+[Demo](https://stackblitz.com/github/IliaIdakiev/angular-material-timepicker)
