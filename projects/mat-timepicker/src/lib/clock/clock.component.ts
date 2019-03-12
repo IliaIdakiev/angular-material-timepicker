@@ -11,7 +11,10 @@ export class ClockComponent implements OnChanges {
   @Input() mode: ClockType;
   @Input() color = 'primary';
   @Input() formattedValue: number;
+  @Input() minValue: { hours: number; minutes: number };
+  @Input() maxValue: { hours: number; minutes: number };
   @Output() changeEvent: EventEmitter<any> = new EventEmitter<any>();
+  @Output() unavailableSelection: EventEmitter<any> = new EventEmitter<any>();
 
   touching = false;
   angle: number;
@@ -20,6 +23,13 @@ export class ClockComponent implements OnChanges {
   minuteDots: ClockNumber[] = [];
 
   constructor() { }
+
+  isAvailable(value: number, type?: 'minutes' | 'hours') {
+    if (!this.minValue && !this.maxValue) { return true; }
+    const prop = (type || this.mode) === 'minutes' ? 'minutes' : 'hours';
+    return (!this.minValue || (this.minValue && this.minValue[prop] <= value)) &&
+      (!this.maxValue || (this.maxValue && this.maxValue[prop] >= value));
+  }
 
   ngOnChanges() {
     this.calculateAngule();
@@ -61,7 +71,7 @@ export class ClockComponent implements OnChanges {
   handleTouchMove = (e: any) => {
     e.preventDefault(); // prevent scrolling behind the clock on iOS
     const rect = e.target.getBoundingClientRect();
-    this.movePointer(e.changedTouches[0].clientX - rect.left, e.changedTouches[0].clientY - rect.top);
+    this.movePointer(e.changedTouches[0].clientX - rect.left, e.changedTouches[0].clientY - rect.top, e);
   }
 
   handleTouchEnd(e: any) {
@@ -73,17 +83,24 @@ export class ClockComponent implements OnChanges {
     // MouseEvent.which is deprecated, but MouseEvent.buttons is not supported in Safari
     if (e.buttons === 1 || e.which === 1) {
       const rect = e.target.getBoundingClientRect();
-      this.movePointer(e.clientX - rect.left, e.clientY - rect.top);
+      this.movePointer(e.clientX - rect.left, e.clientY - rect.top, e);
     }
   }
 
   handleClick(e: any) {
     const rect = e.target.getBoundingClientRect();
-    this.movePointer(e.clientX - rect.left, e.clientY - rect.top);
+    this.movePointer(e.clientX - rect.left, e.clientY - rect.top, e);
   }
 
-  movePointer(x, y) {
+  movePointer(x, y, e) {
+    if (e.target.classList.contains('disabled')) {
+      return;
+    }
     const value = this.getPointerValue(x, y, this.mode, 256);
+    if (!this.isAvailable(value)) {
+      this.unavailableSelection.emit();
+      return;
+    }
     if (value !== this.formattedValue) {
       this.changeEvent.emit(value);
     }

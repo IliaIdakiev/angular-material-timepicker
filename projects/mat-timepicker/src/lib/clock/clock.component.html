@@ -15,14 +15,14 @@
     </div>
     <ng-container *ngFor="let digit of minuteDots;">
       <button mat-mini-fab class="number minute-dot"
-        [ngClass]="{ 'selected': formattedValue === digit.display || (digit.display === 0 && formattedValue === 0) }"
+        [ngClass]="{ 'selected': formattedValue === digit.display || (digit.display === 0 && formattedValue === 0), 'disabled': !isAvailable(digit.display, 'minutes')}"
         [style.transform]="'translate(' + digit.translateX + 'px, ' + digit.translateY + 'px)'">
         <ng-container *ngIf="digit.display % 5 !== 0">·</ng-container>
       </button>
     </ng-container>
     <ng-container *ngFor="let digit of numbers;">
       <button mat-mini-fab [color]="color" class="number"
-        [ngClass]="{ 'selected': formattedValue === digit.display || (digit.display === 60 && formattedValue === 0) }"
+        [ngClass]="{ 'selected': formattedValue === digit.display || (digit.display === 60 && formattedValue === 0), 'disabled': !isAvailable(digit.display, 'hours')}"
         [style.transform]="'translate(' + digit.translateX + 'px, ' + digit.translateY + 'px)'">
         <ng-template #hours>{{ digit.display }}</ng-template>
         <ng-template #minutes>{{ digit.display === 60 ? '00' : digit.display }}</ng-template>
@@ -32,7 +32,7 @@
     </ng-container>
     <ng-container *ngFor="let digit of secondaryNumbers;">
       <button mat-mini-fab [color]="color" class="number small-number"
-        [ngClass]="{ 'selected': formattedValue === digit.display || (digit.display === 24 && formattedValue === 0) }"
+        [ngClass]="{ 'selected': formattedValue === digit.display || (digit.display === 24 && formattedValue === 0), 'disabled': !isAvailable(digit.display, 'hours')}"
         [style.transform]="'translate(' + digit.translateX + 'px, ' + digit.translateY + 'px)'">
         {{ digit.display === 24 ? '00' : digit.display }}
       </button>

@@ -23,7 +23,8 @@
       </ng-template>
     </mat-toolbar>
     <div class="body">
-      <mat-clock [color]="color" [mode]="currentMode" (changeEvent)="handleClockChange($event)"
+      <mat-clock [minValue]="minValue" [maxValue]="maxValue" [color]="color" [mode]="currentMode"
+        (changeEvent)="handleClockChange($event)" (unavailableSelection)="handleUnavailableSelection()"
         [formattedValue]="currentMode === 'minutes' ? minutes : formattedHours"
         (mouseup)="handleClockChangeDone($event)" (touchend)="handleClockChangeDone($event)"></mat-clock>
     </div>

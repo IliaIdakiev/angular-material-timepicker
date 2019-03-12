@@ -32,11 +32,15 @@
   background-color: transparent;
   box-shadow: none;
 
-  &:not(.selected) {
+  &.disabled {
+    color: rgba(1,1,1,.1);
+  }
+
+  &:not(.selected):not(.disabled) {
     color: rgba(0,0,0,.87);
   }
 
-  &.minute-dot {
+  &:not(.disabled).minute-dot {
     color: rgba(0, 0, 0, 0.27);
     &.selected {
       color: transparent;
@@ -47,7 +51,7 @@
 .small-number {
   font-size: 12px;
 
-  &:not(.selected) {
+  &:not(.selected):not(.disabled) {
     color: rgba(0,0,0,.67);
   }
 }

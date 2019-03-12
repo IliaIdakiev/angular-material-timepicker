@@ -36,6 +36,14 @@ export class MatTimepickerComponent implements OnInit, ControlValueAccessor {
   @Input() disabled = false;
   @Input() color = 'primary';
 
+  @Input() set min(value: Date | Moment) {
+    this._minValue = this.getHourMins(value);
+  }
+
+  @Input() set max(value: Date | Moment) {
+    this._maxValue = this.getHourMins(value);
+  }
+
   isMoment = false;
 
   // tslint:disable-next-line:variable-name
@@ -44,6 +52,13 @@ export class MatTimepickerComponent implements OnInit, ControlValueAccessor {
   _value: Date;
   // tslint:disable-next-line:variable-name
   _formattedValueString: string;
+  // tslint:disable-next-line:variable-name
+
+  // tslint:disable-next-line:variable-name
+  private _minValue: { minutes: number, hours: number };
+  // tslint:disable-next-line:variable-name
+  private _maxValue: { minutes: number, hours: number };
+
 
   @Input() set value(value: Date | Moment) {
     if (moment.isMoment(value)) {
@@ -80,6 +95,20 @@ export class MatTimepickerComponent implements OnInit, ControlValueAccessor {
 
   constructor(public dialog: MatDialog) { }
 
+
+  private getHourMins(value: Date | Moment) {
+    if (moment.isMoment(value)) {
+      return {
+        hours: value.hours(),
+        minutes: value.minutes()
+      };
+    }
+    return {
+      hours: value.getHours(),
+      minutes: value.getMinutes()
+    };
+  }
+
   ngOnInit() {
     if (!this.value) {
       const defaultValue = new Date();
@@ -115,7 +144,9 @@ export class MatTimepickerComponent implements OnInit, ControlValueAccessor {
         okLabel: this.okLabel,
         cancelLabel: this.cancelLabel,
         color: this.color,
-        isPm: this.isPm
+        isPm: this.isPm,
+        minValue: this._minValue,
+        maxValue: this._maxValue
       }
     });
     const instance = this.modalRef.componentInstance;

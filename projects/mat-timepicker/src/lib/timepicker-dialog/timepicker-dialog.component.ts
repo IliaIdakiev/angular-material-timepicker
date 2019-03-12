@@ -26,11 +26,17 @@ export class MatTimepickerComponentDialogComponent implements OnInit {
   minutes: any;
   color: string;
   isPm = false;
+  skipMinuteAutoSwitch = false;
+  autoSwitchID = null;
+
+  minValue: { hours: number, minutes: number };
+  maxValue: { hours: number, minutes: number };
 
   // tslint:disable-next-line:variable-name
   _formattedHours: any;
   // tslint:disable-next-line:variable-name
   _hours: any;
+
   set hours(value: any) {
     this._hours = value;
     this._formattedHours = formatHours(this.hours, this.mode).hours;
@@ -50,6 +56,8 @@ export class MatTimepickerComponentDialogComponent implements OnInit {
     this.cancelLabel = data.cancelLabel;
     this.color = data.color;
     this.isPm = data.isPm;
+    this.minValue = data.minValue;
+    this.maxValue = data.maxValue;
   }
 
   ngOnInit() {
@@ -76,12 +84,17 @@ export class MatTimepickerComponentDialogComponent implements OnInit {
     this.changeEvent.emit(newValue);
   }
 
+  handleUnavailableSelection() {
+    clearTimeout(this.autoSwitchID);
+  }
+
   handleClockChangeDone(e) {
     e.preventDefault(); // prevent mouseUp after touchEnd
 
-    if (this.select === 'h') {
-      setTimeout(() => {
+    if (this.select === 'h' && !this.skipMinuteAutoSwitch) {
+      this.autoSwitchID = setTimeout(() => {
         this.editMinutes();
+        this.autoSwitchID = null;
       }, 300);
     }
   }
