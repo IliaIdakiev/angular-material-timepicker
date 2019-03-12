@@ -2,6 +2,7 @@
 
 ## Timepicker Control for Angular Material
 
+⚠️The time picker control has [Angular Material](https://material.angular.io/) as a dependency ⚠️
 
 ### Usage
 ```html
