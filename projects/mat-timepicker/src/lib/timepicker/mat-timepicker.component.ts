@@ -98,15 +98,24 @@ export class MatTimepickerComponent implements OnInit, ControlValueAccessor {
 
 
   private parseTime(value: Date | Moment): ITimeData {
+    let hours;
     if (moment.isMoment(value)) {
+      hours = value.hours();
+      if (value.day() > (new Date()).getDay()) {
+        hours = 24;
+      }
       return {
-        hours: value.hours(),
+        hours,
         minutes: value.minutes(),
         meridiem: moment.localeData().meridiem(value.hours(), value.minutes(), false)
       };
     }
+    hours = value.getHours();
+    if (value.getDay() > (new Date()).getDay()) {
+      hours = 24;
+    }
     return {
-      hours: value.getHours(),
+      hours,
       minutes: value.getMinutes(),
       meridiem: value.toLocaleTimeString('en-US').slice(-2)
     };

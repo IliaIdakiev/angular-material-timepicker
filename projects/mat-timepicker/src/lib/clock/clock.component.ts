@@ -1,6 +1,12 @@
 import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
 import { ClockType, ClockNumber, ITimeData } from '../interfaces-and-types';
+import * as moment_ from 'moment';
 
+function addDays(date, days) {
+  const result = new Date(date);
+  result.setDate(result.getDate() + days);
+  return result;
+}
 @Component({
   selector: 'mat-clock',
   templateUrl: './clock.component.html',
@@ -26,25 +32,68 @@ export class ClockComponent implements OnChanges {
   numbers: ClockNumber[] = [];
   secondaryNumbers: ClockNumber[] = [];
   minuteDots: ClockNumber[] = [];
-  convertMinTo12 = false;
-  convertMaxTo12 = false;
   invalidMeridiemEmitted = true;
 
   constructor() { }
 
   isAvailable(value: number, type?: 'minutes' | 'hours') {
     if (!this.minValue && !this.maxValue) { return true; }
-    const prop = (type || this.mode) === 'minutes' ? 'minutes' : 'hours';
+    if (this.mode === '12h' && this.meridiem === 'AM' && value === 12) {
+      value = 0;
+    }
+    const mode = (type || this.mode);
 
-    const meridiemCheck = this.mode !== '24h' ? val => this.meridiem === val : () => true;
-    let minPropValue = this.minValue ? this.minValue[prop] : null;
-    let maxPropValue = this.maxValue ? this.maxValue[prop] : null;
+    const valueDate = new Date();
+    if (mode === 'minutes') {
+      valueDate.setHours(
+        this.meridiem === 'AM' ?
+          this.formattedHours === 12 ? 0 : this.formattedHours : this.formattedHours > 12 ? this.formattedHours + 12 : this.formattedHours
+      );
+      valueDate.setMinutes(value);
+      if (valueDate.getDay() !== (new Date()).getDay() && value !== 0) { return false; }
+    } else {
+      valueDate.setHours(this.meridiem === 'AM' ? value : value + 12);
+      valueDate.setMinutes(0);
+    }
+    valueDate.setSeconds(0);
+    valueDate.setMilliseconds(0);
 
-    if (minPropValue && this.convertMinTo12) { minPropValue = minPropValue - 12; }
-    if (maxPropValue && this.convertMaxTo12) { maxPropValue = maxPropValue - 12; }
+    let minDate: Date = null;
+    let maxDate: Date = null;
+    if (this.minValue) {
+      minDate = new Date();
+      minDate.setHours(this.minValue.hours);
+      if (mode === 'minutes') {
+        minDate.setMinutes(this.minValue.minutes);
+      } else {
+        minDate.setMinutes(0);
+      }
+      minDate.setSeconds(0);
+      minDate.setMilliseconds(0);
+    }
+    if (this.maxValue) {
+      maxDate = new Date();
+      maxDate.setHours(this.maxValue.hours);
+      if (this.maxValue.hours === 24) {
+        maxDate = addDays(maxDate, 1);
+      }
+      if (mode === 'minutes') {
+        maxDate.setMinutes(this.maxValue.minutes);
+      } else {
+        maxDate.setMinutes(0);
+      }
+      maxDate.setSeconds(0);
+      maxDate.setMilliseconds(0);
+    }
 
-    return (!this.minValue || (this.minValue && minPropValue <= value && meridiemCheck(this.minValue.meridiem))) &&
-      (!this.maxValue || (this.maxValue && maxPropValue >= value && meridiemCheck(this.maxValue.meridiem)));
+    if (
+      this.maxValue && this.maxValue.meridiem === 'PM' && ((valueDate.getDay() !== (new Date()).getDay() && value === 0) ||
+        this.maxValue.hours === 12 && value === 12 && this.meridiem === 'PM')
+    ) {
+      return true;
+    }
+
+    return ((!minDate || minDate <= valueDate) && (!maxDate || maxDate >= valueDate));
   }
 
   ngOnChanges(simpleChanges: SimpleChanges) {
@@ -52,8 +101,6 @@ export class ClockComponent implements OnChanges {
     this.setNumbers();
 
     this.meridiem = this.isPm ? 'PM' : 'AM';
-    this.convertMinTo12 = this.mode === '12h' && (this.minValue && this.minValue.hours > 12);
-    this.convertMaxTo12 = this.mode === '12h' && (this.maxValue && this.maxValue.hours > 12);
     const isAvailableHour = this.isAvailable(this.formattedHours, 'hours');
     if (isAvailableHour && this.invalidMeridiemEmitted) {
       this.clearInvalidMeridiem.emit();

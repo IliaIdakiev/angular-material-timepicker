@@ -9,15 +9,15 @@ export class AppComponent {
 
   get minValue() {
     const val = new Date();
-    val.setHours(10);
+    val.setHours(0);
     val.setMinutes(10);
     return val;
   }
 
   get maxValue() {
     const val = new Date();
-    val.setHours(10);
-    val.setMinutes(30);
+    val.setHours(12);
+    val.setMinutes(10);
     return val;
   }
 }
