@@ -14,6 +14,7 @@ export class ClockComponent implements OnChanges {
   @Input() minValue: ITimeData;
   @Input() maxValue: ITimeData;
   @Input() isPm: boolean;
+  @Input() formattedHours: number;
   @Output() changeEvent: EventEmitter<any> = new EventEmitter<any>();
   @Output() unavailableSelection: EventEmitter<any> = new EventEmitter<any>();
   @Output() invalidMeridiem: EventEmitter<any> = new EventEmitter<any>();
@@ -51,10 +52,7 @@ export class ClockComponent implements OnChanges {
     this.convertMinTo12 = this.mode === '12h' && (this.minValue && this.minValue.hours > 12);
     this.convertMaxTo12 = this.mode === '12h' && (this.maxValue && this.maxValue.hours > 12);
 
-    if (
-      simpleChanges.isPm && !simpleChanges.isPm.firstChange &&
-      (this.minValue || this.maxValue) && !this.isAvailable(this.formattedValue)
-    ) {
+    if ((this.minValue || this.maxValue) && !this.isAvailable(this.formattedHours, 'hours')) {
       this.invalidMeridiem.emit();
     }
   }

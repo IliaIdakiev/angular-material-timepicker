@@ -1,5 +1,5 @@
 import { MAT_DIALOG_DATA } from '@angular/material';
-import { Component, OnInit, EventEmitter, Output, Inject, OnChanges } from '@angular/core';
+import { Component, OnInit, EventEmitter, Output, Inject, OnChanges, SimpleChanges } from '@angular/core';
 import { ClockType } from '../interfaces-and-types';
 import { twoDigits, formatHours } from '../util';
 
@@ -8,7 +8,7 @@ import { twoDigits, formatHours } from '../util';
   templateUrl: './timepicker-dialog.component.html',
   styleUrls: ['./timepicker-dialog.component.scss']
 })
-export class MatTimepickerComponentDialogComponent implements OnInit, OnChanges {
+export class MatTimepickerComponentDialogComponent implements OnInit {
 
   twoDigits = twoDigits;
 
@@ -29,7 +29,7 @@ export class MatTimepickerComponentDialogComponent implements OnInit, OnChanges 
   skipMinuteAutoSwitch = false;
   autoSwitchID = null;
   hasInvalidMeridiem = false;
-
+  editHoursClicked = false;
 
   minValue: { hours: number, minutes: number };
   maxValue: { hours: number, minutes: number };
@@ -70,11 +70,12 @@ export class MatTimepickerComponentDialogComponent implements OnInit, OnChanges 
     this.minutes = this.timeInputValue.getMinutes();
   }
 
-  ngOnChanges() {
-    this.hasInvalidMeridiem = false;
-  }
-
   handleClockChange(value) {
+    if (this.hasInvalidMeridiem) {
+      this.isPm = !this.isPm;
+      this.hasInvalidMeridiem = false;
+    }
+
     if (this.select === 'h') {
       this.hours = value;
     } else {
@@ -108,11 +109,14 @@ export class MatTimepickerComponentDialogComponent implements OnInit, OnChanges 
   editHours() {
     this.select = 'h';
     this.currentMode = this.mode;
+    this.editHoursClicked = true;
+    setTimeout(() => { this.editHoursClicked = false; }, 0);
   }
 
   editMinutes() {
     if (this.hasInvalidMeridiem) {
       this.isPm = !this.isPm;
+      this.hasInvalidMeridiem = false;
     }
     this.select = 'm';
     this.currentMode = 'minutes';
@@ -120,6 +124,12 @@ export class MatTimepickerComponentDialogComponent implements OnInit, OnChanges 
 
 
   invalidMeridiem() {
+    if (this.mode !== 'minutes' && this.editHoursClicked) {
+      setTimeout(() => {
+        this.isPm = !this.isPm;
+      }, 0);
+      return;
+    }
     this.hasInvalidMeridiem = true;
   }
 
@@ -143,6 +153,7 @@ export class MatTimepickerComponentDialogComponent implements OnInit, OnChanges 
   okClickHandler() {
     if (this.hasInvalidMeridiem) {
       this.isPm = !this.isPm;
+      this.hasInvalidMeridiem = false;
     }
     this.okClickEvent.emit();
   }
