@@ -1,5 +1,5 @@
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { Component, OnInit, EventEmitter, Input, forwardRef } from '@angular/core';
+import { Component, OnInit, EventEmitter, Input, forwardRef, ViewChild, ElementRef } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material';
 import { ClockType, ITimeData } from '../interfaces-and-types';
 import { twoDigits, formatHours } from '../util';
@@ -108,6 +108,12 @@ export class MatTimepickerComponent implements OnInit, ControlValueAccessor {
       minutes: value.getMinutes(),
       meridiem: value.toLocaleTimeString('en-US').slice(-2)
     };
+  }
+
+  inputKeyupHandler(event: KeyboardEvent) {
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    return false;
   }
 
   ngOnInit() {

@@ -1,1 +1,2 @@
-<input matInput [disabled]="disabled" (click)="!disabled ? showDialog() : null" [value]="formattedValue" />
+<input [disabled]="disabled" (click)="!disabled ? showDialog() : null" [value]="formattedValue"
+  (keydown)="inputKeyupHandler($event)" />
