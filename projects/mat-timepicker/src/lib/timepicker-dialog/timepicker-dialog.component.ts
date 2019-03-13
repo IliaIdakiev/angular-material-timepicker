@@ -127,6 +127,7 @@ export class MatTimepickerComponentDialogComponent implements OnInit {
     if (this.mode !== 'minutes' && this.editHoursClicked) {
       setTimeout(() => {
         this.isPm = !this.isPm;
+        this.hasInvalidMeridiem = false;
       }, 0);
       return;
     }
