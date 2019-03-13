@@ -18,6 +18,7 @@ export class ClockComponent implements OnChanges {
   @Output() changeEvent: EventEmitter<any> = new EventEmitter<any>();
   @Output() unavailableSelection: EventEmitter<any> = new EventEmitter<any>();
   @Output() invalidMeridiem: EventEmitter<any> = new EventEmitter<any>();
+  @Output() clearInvalidMeridiem: EventEmitter<any> = new EventEmitter<any>();
 
   meridiem = null;
   touching = false;
@@ -27,6 +28,7 @@ export class ClockComponent implements OnChanges {
   minuteDots: ClockNumber[] = [];
   convertMinTo12 = false;
   convertMaxTo12 = false;
+  invalidMeridiemEmitted = true;
 
   constructor() { }
 
@@ -48,12 +50,18 @@ export class ClockComponent implements OnChanges {
   ngOnChanges(simpleChanges: SimpleChanges) {
     this.calculateAngule();
     this.setNumbers();
+
     this.meridiem = this.isPm ? 'PM' : 'AM';
     this.convertMinTo12 = this.mode === '12h' && (this.minValue && this.minValue.hours > 12);
     this.convertMaxTo12 = this.mode === '12h' && (this.maxValue && this.maxValue.hours > 12);
-
-    if ((this.minValue || this.maxValue) && !this.isAvailable(this.formattedHours, 'hours')) {
+    const isAvailableHour = this.isAvailable(this.formattedHours, 'hours');
+    if (isAvailableHour && this.invalidMeridiemEmitted) {
+      this.clearInvalidMeridiem.emit();
+      this.invalidMeridiemEmitted = false;
+    }
+    if ((this.minValue || this.maxValue) && !isAvailableHour) {
       this.invalidMeridiem.emit();
+      this.invalidMeridiemEmitted = true;
     }
   }
 

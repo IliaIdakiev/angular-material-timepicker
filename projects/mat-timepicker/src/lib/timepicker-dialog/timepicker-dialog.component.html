@@ -28,7 +28,7 @@
         (unavailableSelection)="handleUnavailableSelection()"
         [formattedValue]="currentMode === 'minutes' ? minutes : formattedHours" [isPm]="isPm"
         (invalidMeridiem)="invalidMeridiem()" (mouseup)="handleClockChangeDone($event)"
-        (touchend)="handleClockChangeDone($event)"></mat-clock>
+        (clearInvalidMeridiem)="clearInvalidMeridiem()" (touchend)="handleClockChangeDone($event)"></mat-clock>
     </div>
   </div>
 </mat-dialog-content>

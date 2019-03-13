@@ -91,6 +91,10 @@ export class MatTimepickerComponentDialogComponent implements OnInit {
     this.changeEvent.emit(newValue);
   }
 
+  clearInvalidMeridiem() {
+    this.hasInvalidMeridiem = false;
+  }
+
   handleUnavailableSelection() {
     clearTimeout(this.autoSwitchID);
   }
