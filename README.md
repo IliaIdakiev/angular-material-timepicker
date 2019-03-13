@@ -8,27 +8,35 @@
 ```html
 <mat-timepicker></mat-timepicker>
 ```
-**(Yes! You can use ngModel. This control implements ControlValueAccessor)**
+* **Yes! You can use ngModel. This control implements ControlValueAccessor.**
+
+* **Yes! You can use [moment.js](https://momentjs.com/) for value/min/max attributes.**
 
 ### Component Configuration
 ```typescript
-/** Override the label of the ok button. */
+/* Override the label of the ok button. */
 @Input() okLabel = 'Ok';
 
-/** Override the label of the cancel button. */
+/* Override the label of the cancel button. */
 @Input() cancelLabel = 'Cancel';
 
-/** Sets the clock mode, 12-hour or 24-hour clocks are supported. */
+/* Sets the clock mode, 12-hour or 24-hour clocks are supported. */
 @Input() mode: '12h' | '24h' = '24h';
 
-/** Disable the timepicker control */
+/* Disable the timepicker control */
 @Input() disabled = false;
 
-/** Set the color of the timepicker control */
+/* Set the color of the timepicker control */
 @Input() color = 'primary';
 
-/** Set the value of the timepicker control (default is current time) */
+/* Set the value of the timepicker control (default is current time) */
 @Input() value: Date | Moment = new Date();
+
+/* Wrapper the input with MaterialFormField */
+@Input() withFormField = false;
+
+/* Placeholder for the time input */
+@Input() placeholder: string = null;
 ```
 
 
