@@ -2,7 +2,7 @@ import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from
 import { ClockType, ClockNumber, ITimeData } from '../interfaces-and-types';
 import * as moment_ from 'moment';
 
-function addDays(date, days) {
+function addDays(date: Date, days: number) {
   const result = new Date(date);
   result.setDate(result.getDate() + days);
   return result;

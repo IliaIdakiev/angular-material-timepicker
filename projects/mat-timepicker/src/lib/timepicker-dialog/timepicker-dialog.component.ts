@@ -28,6 +28,7 @@ export class MatTimepickerComponentDialogComponent implements OnInit {
   isPm = false;
   skipMinuteAutoSwitch = false;
   autoSwitchID = null;
+  invalidMedianID = null;
   hasInvalidMeridiem = false;
   editHoursClicked = false;
 
@@ -83,7 +84,8 @@ export class MatTimepickerComponentDialogComponent implements OnInit {
     }
 
     const newValue = new Date();
-    newValue.setHours(this.hours);
+    const hours = this.isPm ? this.hours === 12 ? 0 : this.hours < 12 ? this.hours + 12 : this.hours : this.hours;
+    newValue.setHours(hours);
     newValue.setMinutes(this.minutes);
     newValue.setSeconds(0);
     newValue.setMilliseconds(0);
@@ -129,7 +131,8 @@ export class MatTimepickerComponentDialogComponent implements OnInit {
 
   invalidMeridiem() {
     if (this.mode !== 'minutes' && this.editHoursClicked) {
-      setTimeout(() => {
+      if (this.invalidMedianID) { return; }
+      this.invalidMedianID = setTimeout(() => {
         this.isPm = !this.isPm;
         this.hasInvalidMeridiem = false;
       }, 0);
