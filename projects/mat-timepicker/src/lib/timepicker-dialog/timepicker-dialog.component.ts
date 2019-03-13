@@ -1,5 +1,5 @@
 import { MAT_DIALOG_DATA } from '@angular/material';
-import { Component, OnInit, EventEmitter, Output, Inject } from '@angular/core';
+import { Component, OnInit, EventEmitter, Output, Inject, OnChanges } from '@angular/core';
 import { ClockType } from '../interfaces-and-types';
 import { twoDigits, formatHours } from '../util';
 
@@ -8,7 +8,7 @@ import { twoDigits, formatHours } from '../util';
   templateUrl: './timepicker-dialog.component.html',
   styleUrls: ['./timepicker-dialog.component.scss']
 })
-export class MatTimepickerComponentDialogComponent implements OnInit {
+export class MatTimepickerComponentDialogComponent implements OnInit, OnChanges {
 
   twoDigits = twoDigits;
 
@@ -28,6 +28,8 @@ export class MatTimepickerComponentDialogComponent implements OnInit {
   isPm = false;
   skipMinuteAutoSwitch = false;
   autoSwitchID = null;
+  hasInvalidMeridiem = false;
+
 
   minValue: { hours: number, minutes: number };
   maxValue: { hours: number, minutes: number };
@@ -68,6 +70,10 @@ export class MatTimepickerComponentDialogComponent implements OnInit {
     this.minutes = this.timeInputValue.getMinutes();
   }
 
+  ngOnChanges() {
+    this.hasInvalidMeridiem = false;
+  }
+
   handleClockChange(value) {
     if (this.select === 'h') {
       this.hours = value;
@@ -105,9 +111,18 @@ export class MatTimepickerComponentDialogComponent implements OnInit {
   }
 
   editMinutes() {
+    if (this.hasInvalidMeridiem) {
+      this.isPm = !this.isPm;
+    }
     this.select = 'm';
     this.currentMode = 'minutes';
   }
+
+
+  invalidMeridiem() {
+    this.hasInvalidMeridiem = true;
+  }
+
 
   setAm() {
     if (this.hours >= 12) {
@@ -126,6 +141,9 @@ export class MatTimepickerComponentDialogComponent implements OnInit {
   }
 
   okClickHandler() {
+    if (this.hasInvalidMeridiem) {
+      this.isPm = !this.isPm;
+    }
     this.okClickEvent.emit();
   }
 

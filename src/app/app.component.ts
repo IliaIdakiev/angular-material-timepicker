@@ -8,5 +8,6 @@ import * as moment from 'moment';
 export class AppComponent {
   title = 'angular-material-timepicker';
 
-  minValue = moment({ hour: 15, minute: 10 });
+  minValue = moment({ hour: 10, minute: 10 });
+  maxValue = moment({ hour: 10, minute: 20 });
 }
