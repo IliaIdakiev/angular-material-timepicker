@@ -34,7 +34,7 @@ export class ClockComponent implements OnChanges {
     if (!this.minValue && !this.maxValue) { return true; }
     const prop = (type || this.mode) === 'minutes' ? 'minutes' : 'hours';
 
-    const meridiemCheck = this.mode === '12h' ? val => this.meridiem === val : () => true;
+    const meridiemCheck = this.mode !== '24h' ? val => this.meridiem === val : () => true;
     let minPropValue = this.minValue ? this.minValue[prop] : null;
     let maxPropValue = this.maxValue ? this.maxValue[prop] : null;
 
