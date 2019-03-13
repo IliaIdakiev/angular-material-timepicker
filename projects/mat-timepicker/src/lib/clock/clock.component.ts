@@ -21,6 +21,7 @@ export class ClockComponent implements OnChanges {
   @Input() maxValue: ITimeData;
   @Input() isPm: boolean;
   @Input() formattedHours: number;
+  @Input() minutes: number;
   @Output() changeEvent: EventEmitter<any> = new EventEmitter<any>();
   @Output() unavailableSelection: EventEmitter<any> = new EventEmitter<any>();
   @Output() invalidMeridiem: EventEmitter<any> = new EventEmitter<any>();
@@ -36,7 +37,7 @@ export class ClockComponent implements OnChanges {
 
   constructor() { }
 
-  isAvailable(value: number, type?: 'minutes' | 'hours') {
+  isAvailable(value: number, type?: 'minutes' | 'hours', hours?: number) {
     if (!this.minValue && !this.maxValue) { return true; }
     if (this.mode === '12h' && this.meridiem === 'AM' && value === 12) {
       value = 0;
@@ -45,9 +46,10 @@ export class ClockComponent implements OnChanges {
 
     const valueDate = new Date();
     if (mode === 'minutes') {
+      hours = hours || this.formattedHours;
       valueDate.setHours(
         this.meridiem === 'AM' ?
-          this.formattedHours === 12 ? 0 : this.formattedHours : this.formattedHours < 12 ? this.formattedHours + 12 : this.formattedHours
+          hours === 12 ? 0 : hours : hours < 12 ? hours + 12 : hours
       );
       valueDate.setMinutes(value);
       if (valueDate.getDay() !== (new Date()).getDay() && value !== 0) { return false; }
@@ -175,7 +177,16 @@ export class ClockComponent implements OnChanges {
       return;
     }
     if (value !== this.formattedValue) {
-      this.changeEvent.emit(value);
+      this.changeEvent.emit({ value, type: null });
+      if (this.mode === '12h') {
+        if (!this.isAvailable(this.minutes, 'minutes', value)) {
+          if (this.minValue && this.isAvailable(this.minValue.minutes, 'minutes', value)) {
+            this.changeEvent.emit({ value: this.minValue.minutes, type: 'minutes' });
+          } else if (this.maxValue && this.isAvailable(this.maxValue.minutes, 'minutes', value)) {
+            this.changeEvent.emit({ value: this.maxValue.minutes, type: 'minutes' });
+          }
+        }
+      }
     }
   }
 

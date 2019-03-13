@@ -24,7 +24,7 @@
     </mat-toolbar>
     <div class="body">
       <mat-clock [minValue]="minValue" [maxValue]="maxValue" [color]="color" [mode]="currentMode"
-        [formattedHours]="formattedHours" (changeEvent)="handleClockChange($event)"
+        [formattedHours]="formattedHours" [minutes]="minutes" (changeEvent)="handleClockChange($event)"
         (unavailableSelection)="handleUnavailableSelection()"
         [formattedValue]="currentMode === 'minutes' ? minutes : formattedHours" [isPm]="isPm"
         (invalidMeridiem)="invalidMeridiem()" (mouseup)="handleClockChangeDone($event)"

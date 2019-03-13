@@ -71,20 +71,20 @@ export class MatTimepickerComponentDialogComponent implements OnInit {
     this.minutes = this.timeInputValue.getMinutes();
   }
 
-  handleClockChange(value) {
+  handleClockChange({ value, type }: { value: number, type: 'minutes' | 'hours' }) {
     if (this.hasInvalidMeridiem) {
       this.isPm = !this.isPm;
       this.hasInvalidMeridiem = false;
     }
 
-    if (this.select === 'h') {
+    if ((type && type === 'hours') || (!type && this.select === 'h')) {
       this.hours = value;
-    } else {
+    } else if ((type && type === 'minutes') || (!type && this.select === 'm')) {
       this.minutes = value;
     }
 
     const newValue = new Date();
-    const hours = this.isPm ? this.hours === 12 ? 0 : this.hours < 12 ? this.hours + 12 : this.hours : this.hours;
+    const hours = this.isPm ? this.hours < 12 ? this.hours + 12 : this.hours : this.hours === 12 ? 0 : this.hours;
     newValue.setHours(hours);
     newValue.setMinutes(this.minutes);
     newValue.setSeconds(0);
