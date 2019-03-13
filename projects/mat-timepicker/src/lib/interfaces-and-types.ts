@@ -5,3 +5,9 @@ export interface ClockNumber {
   translateX: number;
   translateY: number;
 }
+
+export interface ITimeData {
+  minutes: number;
+  hours: number;
+  meridiem: string;
+}

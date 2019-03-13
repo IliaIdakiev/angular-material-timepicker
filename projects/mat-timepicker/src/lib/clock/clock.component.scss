@@ -64,6 +64,12 @@
   top: calc(50% - 1px);
   transform-origin: left center;
   pointer-events: none;
+
+  &.disabled {
+    * {
+      background-color: transparent;
+    }
+  }
 }
 
 .pointer {

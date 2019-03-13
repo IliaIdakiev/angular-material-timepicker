@@ -1,5 +1,5 @@
-import { Component, Input, Output, EventEmitter, OnChanges } from '@angular/core';
-import { ClockType, ClockNumber } from '../interfaces-and-types';
+import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
+import { ClockType, ClockNumber, ITimeData } from '../interfaces-and-types';
 
 @Component({
   selector: 'mat-clock',
@@ -11,29 +11,44 @@ export class ClockComponent implements OnChanges {
   @Input() mode: ClockType;
   @Input() color = 'primary';
   @Input() formattedValue: number;
-  @Input() minValue: { hours: number; minutes: number };
-  @Input() maxValue: { hours: number; minutes: number };
+  @Input() minValue: ITimeData;
+  @Input() maxValue: ITimeData;
+  @Input() isPm: boolean;
   @Output() changeEvent: EventEmitter<any> = new EventEmitter<any>();
   @Output() unavailableSelection: EventEmitter<any> = new EventEmitter<any>();
 
+  meridiem = null;
   touching = false;
   angle: number;
   numbers: ClockNumber[] = [];
   secondaryNumbers: ClockNumber[] = [];
   minuteDots: ClockNumber[] = [];
+  convertMinTo12 = false;
+  convertMaxTo12 = false;
 
   constructor() { }
 
   isAvailable(value: number, type?: 'minutes' | 'hours') {
     if (!this.minValue && !this.maxValue) { return true; }
     const prop = (type || this.mode) === 'minutes' ? 'minutes' : 'hours';
-    return (!this.minValue || (this.minValue && this.minValue[prop] <= value)) &&
-      (!this.maxValue || (this.maxValue && this.maxValue[prop] >= value));
+
+    const meridiemCheck = this.mode === '12h' ? val => this.meridiem === val : () => true;
+    let minPropValue = this.minValue ? this.minValue[prop] : null;
+    let maxPropValue = this.maxValue ? this.maxValue[prop] : null;
+
+    if (minPropValue && this.convertMinTo12) { minPropValue = minPropValue - 12; }
+    if (maxPropValue && this.convertMaxTo12) { maxPropValue = maxPropValue - 12; }
+
+    return (!this.minValue || (this.minValue && minPropValue <= value && meridiemCheck(this.minValue.meridiem))) &&
+      (!this.maxValue || (this.maxValue && maxPropValue >= value && meridiemCheck(this.maxValue.meridiem)));
   }
 
   ngOnChanges() {
     this.calculateAngule();
     this.setNumbers();
+    this.meridiem = this.isPm ? 'PM' : 'AM';
+    this.convertMinTo12 = this.mode === '12h' && (this.minValue && this.minValue.hours > 12);
+    this.convertMaxTo12 = this.mode === '12h' && (this.maxValue && this.maxValue.hours > 12);
   }
 
   calculateAngule() {
