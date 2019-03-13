@@ -34,6 +34,8 @@ export class MatTimepickerComponent implements OnInit, ControlValueAccessor {
   @Input() mode: ClockType = '24h';
   @Input() disabled = false;
   @Input() color = 'primary';
+  @Input() placeholder: string = null;
+  @Input() withFormField = false;
 
   @Input() set min(value: Date | Moment) {
     this._minValue = this.parseTime(value);

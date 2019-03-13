@@ -1,2 +1,11 @@
-<input [disabled]="disabled" (click)="!disabled ? showDialog() : null" [value]="formattedValue"
-  (keydown)="inputKeyupHandler($event)" />
+<ng-template #withFormFieldTemplate>
+  <mat-form-field>
+    <input matInput [placeholder]="placeholder" [disabled]="disabled" (click)="!disabled ? showDialog() : null"
+      [value]="formattedValue" (keydown)="inputKeyupHandler($event)" />
+  </mat-form-field>
+</ng-template>
+<ng-template #noFormFieldTemplate>
+  <input matInput [placeholder]="placeholder" [disabled]="disabled" (click)="!disabled ? showDialog() : null"
+    [value]="formattedValue" (keydown)="inputKeyupHandler($event)" />
+</ng-template>
+<ng-container *ngIf="withFormField then withFormFieldTemplate; else noFormFieldTemplate;"></ng-container>
