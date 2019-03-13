@@ -47,12 +47,12 @@ export class ClockComponent implements OnChanges {
     if (mode === 'minutes') {
       valueDate.setHours(
         this.meridiem === 'AM' ?
-          this.formattedHours === 12 ? 0 : this.formattedHours : this.formattedHours > 12 ? this.formattedHours + 12 : this.formattedHours
+          this.formattedHours === 12 ? 0 : this.formattedHours : this.formattedHours < 12 ? this.formattedHours + 12 : this.formattedHours
       );
       valueDate.setMinutes(value);
       if (valueDate.getDay() !== (new Date()).getDay() && value !== 0) { return false; }
     } else {
-      valueDate.setHours(this.meridiem === 'AM' ? value : value + 12);
+      valueDate.setHours(this.meridiem === 'AM' ? value : value < 12 ? value + 12 : value);
       valueDate.setMinutes(0);
     }
     valueDate.setSeconds(0);
