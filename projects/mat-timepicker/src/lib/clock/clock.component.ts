@@ -1,5 +1,5 @@
-import { Component, Input, Output, EventEmitter, OnChanges } from '@angular/core';
-import { ClockType, ClockNumber } from '../interfaces-and-types';
+import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
+import { ClockType, ClockNumber, ITimeData } from '../interfaces-and-types';
 
 @Component({
   selector: 'mat-clock',
@@ -11,19 +11,50 @@ export class ClockComponent implements OnChanges {
   @Input() mode: ClockType;
   @Input() color = 'primary';
   @Input() formattedValue: number;
+  @Input() minValue: ITimeData;
+  @Input() maxValue: ITimeData;
+  @Input() isPm: boolean;
+  @Input() formattedHours: number;
   @Output() changeEvent: EventEmitter<any> = new EventEmitter<any>();
+  @Output() unavailableSelection: EventEmitter<any> = new EventEmitter<any>();
+  @Output() invalidMeridiem: EventEmitter<any> = new EventEmitter<any>();
 
+  meridiem = null;
   touching = false;
   angle: number;
   numbers: ClockNumber[] = [];
   secondaryNumbers: ClockNumber[] = [];
   minuteDots: ClockNumber[] = [];
+  convertMinTo12 = false;
+  convertMaxTo12 = false;
 
   constructor() { }
 
-  ngOnChanges() {
+  isAvailable(value: number, type?: 'minutes' | 'hours') {
+    if (!this.minValue && !this.maxValue) { return true; }
+    const prop = (type || this.mode) === 'minutes' ? 'minutes' : 'hours';
+
+    const meridiemCheck = this.mode !== '24h' ? val => this.meridiem === val : () => true;
+    let minPropValue = this.minValue ? this.minValue[prop] : null;
+    let maxPropValue = this.maxValue ? this.maxValue[prop] : null;
+
+    if (minPropValue && this.convertMinTo12) { minPropValue = minPropValue - 12; }
+    if (maxPropValue && this.convertMaxTo12) { maxPropValue = maxPropValue - 12; }
+
+    return (!this.minValue || (this.minValue && minPropValue <= value && meridiemCheck(this.minValue.meridiem))) &&
+      (!this.maxValue || (this.maxValue && maxPropValue >= value && meridiemCheck(this.maxValue.meridiem)));
+  }
+
+  ngOnChanges(simpleChanges: SimpleChanges) {
     this.calculateAngule();
     this.setNumbers();
+    this.meridiem = this.isPm ? 'PM' : 'AM';
+    this.convertMinTo12 = this.mode === '12h' && (this.minValue && this.minValue.hours > 12);
+    this.convertMaxTo12 = this.mode === '12h' && (this.maxValue && this.maxValue.hours > 12);
+
+    if ((this.minValue || this.maxValue) && !this.isAvailable(this.formattedHours, 'hours')) {
+      this.invalidMeridiem.emit();
+    }
   }
 
   calculateAngule() {
@@ -84,6 +115,10 @@ export class ClockComponent implements OnChanges {
 
   movePointer(x, y) {
     const value = this.getPointerValue(x, y, this.mode, 256);
+    if (!this.isAvailable(value)) {
+      this.unavailableSelection.emit();
+      return;
+    }
     if (value !== this.formattedValue) {
       this.changeEvent.emit(value);
     }

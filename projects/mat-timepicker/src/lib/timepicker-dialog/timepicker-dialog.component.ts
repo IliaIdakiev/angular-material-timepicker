@@ -1,5 +1,5 @@
 import { MAT_DIALOG_DATA } from '@angular/material';
-import { Component, OnInit, EventEmitter, Output, Inject } from '@angular/core';
+import { Component, OnInit, EventEmitter, Output, Inject, OnChanges, SimpleChanges } from '@angular/core';
 import { ClockType } from '../interfaces-and-types';
 import { twoDigits, formatHours } from '../util';
 
@@ -26,11 +26,19 @@ export class MatTimepickerComponentDialogComponent implements OnInit {
   minutes: any;
   color: string;
   isPm = false;
+  skipMinuteAutoSwitch = false;
+  autoSwitchID = null;
+  hasInvalidMeridiem = false;
+  editHoursClicked = false;
+
+  minValue: { hours: number, minutes: number };
+  maxValue: { hours: number, minutes: number };
 
   // tslint:disable-next-line:variable-name
   _formattedHours: any;
   // tslint:disable-next-line:variable-name
   _hours: any;
+
   set hours(value: any) {
     this._hours = value;
     this._formattedHours = formatHours(this.hours, this.mode).hours;
@@ -50,6 +58,8 @@ export class MatTimepickerComponentDialogComponent implements OnInit {
     this.cancelLabel = data.cancelLabel;
     this.color = data.color;
     this.isPm = data.isPm;
+    this.minValue = data.minValue;
+    this.maxValue = data.maxValue;
   }
 
   ngOnInit() {
@@ -61,6 +71,11 @@ export class MatTimepickerComponentDialogComponent implements OnInit {
   }
 
   handleClockChange(value) {
+    if (this.hasInvalidMeridiem) {
+      this.isPm = !this.isPm;
+      this.hasInvalidMeridiem = false;
+    }
+
     if (this.select === 'h') {
       this.hours = value;
     } else {
@@ -76,12 +91,17 @@ export class MatTimepickerComponentDialogComponent implements OnInit {
     this.changeEvent.emit(newValue);
   }
 
+  handleUnavailableSelection() {
+    clearTimeout(this.autoSwitchID);
+  }
+
   handleClockChangeDone(e) {
     e.preventDefault(); // prevent mouseUp after touchEnd
 
-    if (this.select === 'h') {
-      setTimeout(() => {
+    if (this.select === 'h' && !this.skipMinuteAutoSwitch) {
+      this.autoSwitchID = setTimeout(() => {
         this.editMinutes();
+        this.autoSwitchID = null;
       }, 300);
     }
   }
@@ -89,12 +109,31 @@ export class MatTimepickerComponentDialogComponent implements OnInit {
   editHours() {
     this.select = 'h';
     this.currentMode = this.mode;
+    this.editHoursClicked = true;
+    setTimeout(() => { this.editHoursClicked = false; }, 0);
   }
 
   editMinutes() {
+    if (this.hasInvalidMeridiem) {
+      this.isPm = !this.isPm;
+      this.hasInvalidMeridiem = false;
+    }
     this.select = 'm';
     this.currentMode = 'minutes';
   }
+
+
+  invalidMeridiem() {
+    if (this.mode !== 'minutes' && this.editHoursClicked) {
+      setTimeout(() => {
+        this.isPm = !this.isPm;
+        this.hasInvalidMeridiem = false;
+      }, 0);
+      return;
+    }
+    this.hasInvalidMeridiem = true;
+  }
+
 
   setAm() {
     if (this.hours >= 12) {
@@ -113,6 +152,10 @@ export class MatTimepickerComponentDialogComponent implements OnInit {
   }
 
   okClickHandler() {
+    if (this.hasInvalidMeridiem) {
+      this.isPm = !this.isPm;
+      this.hasInvalidMeridiem = false;
+    }
     this.okClickEvent.emit();
   }
 

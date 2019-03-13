@@ -1,13 +1,12 @@
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { Component, OnInit, EventEmitter, Input, forwardRef } from '@angular/core';
+import { Component, OnInit, EventEmitter, Input, forwardRef, ViewChild, ElementRef } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material';
-import { ClockType } from '../interfaces-and-types';
+import { ClockType, ITimeData } from '../interfaces-and-types';
 import { twoDigits, formatHours } from '../util';
 import { MatTimepickerComponentDialogComponent } from '../timepicker-dialog/timepicker-dialog.component';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
-// import * as moment_ from 'moment';
 import * as moment_ from 'moment';
 import { Moment } from 'moment';
 const moment = moment_;
@@ -35,6 +34,16 @@ export class MatTimepickerComponent implements OnInit, ControlValueAccessor {
   @Input() mode: ClockType = '24h';
   @Input() disabled = false;
   @Input() color = 'primary';
+  @Input() placeholder: string = null;
+  @Input() withFormField = false;
+
+  @Input() set min(value: Date | Moment) {
+    this._minValue = this.parseTime(value);
+  }
+
+  @Input() set max(value: Date | Moment) {
+    this._maxValue = this.parseTime(value);
+  }
 
   isMoment = false;
 
@@ -44,6 +53,13 @@ export class MatTimepickerComponent implements OnInit, ControlValueAccessor {
   _value: Date;
   // tslint:disable-next-line:variable-name
   _formattedValueString: string;
+  // tslint:disable-next-line:variable-name
+
+  // tslint:disable-next-line:variable-name
+  private _minValue: ITimeData;
+  // tslint:disable-next-line:variable-name
+  private _maxValue: ITimeData;
+
 
   @Input() set value(value: Date | Moment) {
     if (moment.isMoment(value)) {
@@ -80,11 +96,42 @@ export class MatTimepickerComponent implements OnInit, ControlValueAccessor {
 
   constructor(public dialog: MatDialog) { }
 
+
+  private parseTime(value: Date | Moment): ITimeData {
+    if (moment.isMoment(value)) {
+      return {
+        hours: value.hours(),
+        minutes: value.minutes(),
+        meridiem: moment.localeData().meridiem(value.hours(), value.minutes(), false)
+      };
+    }
+    return {
+      hours: value.getHours(),
+      minutes: value.getMinutes(),
+      meridiem: value.toLocaleTimeString('en-US').slice(-2)
+    };
+  }
+
+  inputKeyupHandler(event: KeyboardEvent) {
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    return false;
+  }
+
   ngOnInit() {
     if (!this.value) {
       const defaultValue = new Date();
-      defaultValue.setSeconds(0);
       defaultValue.setMilliseconds(0);
+      if (!this._minValue && !this._maxValue) {
+        defaultValue.setSeconds(0);
+        this.value = defaultValue;
+      } else if (!this._minValue) {
+        defaultValue.setHours(this._maxValue.hours);
+        defaultValue.setMinutes(this._maxValue.minutes);
+      } else {
+        defaultValue.setHours(this._minValue.hours);
+        defaultValue.setMinutes(this._minValue.minutes);
+      }
       this.value = defaultValue;
     }
   }
@@ -115,7 +162,9 @@ export class MatTimepickerComponent implements OnInit, ControlValueAccessor {
         okLabel: this.okLabel,
         cancelLabel: this.cancelLabel,
         color: this.color,
-        isPm: this.isPm
+        isPm: this.isPm,
+        minValue: this._minValue,
+        maxValue: this._maxValue
       }
     });
     const instance = this.modalRef.componentInstance;
@@ -127,6 +176,7 @@ export class MatTimepickerComponent implements OnInit, ControlValueAccessor {
   }
 
   handleChange = (newValue) => {
+    if (!newValue) { return; }
     this.currentValue = newValue;
   }
 
