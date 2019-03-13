@@ -37,6 +37,12 @@
 
 /* Placeholder for the time input */
 @Input() placeholder: string = null;
+
+/* Minimum time to pick from */
+@Input() min: Date | Moment;
+
+/* Maximum time to pick from */
+@Input() max: Date | Moment;
 ```
 
 
