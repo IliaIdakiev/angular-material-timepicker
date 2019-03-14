@@ -38,11 +38,11 @@ export class MatTimepickerComponent implements OnInit, OnChanges, ControlValueAc
   @Input() withFormField = false;
 
   @Input() set min(value: Date | Moment) {
-    this._minValue = this.parseTime(value);
+    this._minValue = value ? this.parseTime(value) : null;
   }
 
   @Input() set max(value: Date | Moment) {
-    this._maxValue = this.parseTime(value);
+    this._maxValue = value ? this.parseTime(value) : null;
   }
 
   isMoment = false;
