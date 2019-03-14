@@ -179,7 +179,7 @@ export class ClockComponent implements OnChanges {
     }
     if (value !== this.formattedValue) {
       this.changeEvent.emit({ value, type: null });
-      if (this.mode === '12h') {
+      if (this.mode !== 'minutes') {
         if (!this.isAvailable(this.minutes, 'minutes', value)) {
           if (this.minValue && this.isAvailable(this.minValue.minutes, 'minutes', value)) {
             this.changeEvent.emit({ value: this.minValue.minutes, type: 'minutes' });
