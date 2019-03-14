@@ -1,2 +1,11 @@
-<mat-timepicker mode="24h"></mat-timepicker>
-<mat-timepicker [min]="minValue" [max]="maxValue" mode="24h" placeholder="Time" withFormField="true"></mat-timepicker>
+<div>
+  <label for="">No form field, no min/max (24h)</label>
+  <mat-timepicker mode="24h"></mat-timepicker>
+</div>
+<br />
+<br />
+<br />
+<mat-timepicker [min]="minValue" [max]="maxValue" mode="24h" placeholder="Time 24h with min & max" withFormField="true">
+</mat-timepicker>
+<mat-timepicker [min]="minValue" [max]="maxValue" mode="12h" placeholder="Time 12h with min & max" withFormField="true">
+</mat-timepicker>
