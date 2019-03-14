@@ -54,7 +54,8 @@ export class ClockComponent implements OnChanges {
       valueDate.setMinutes(value);
       if (valueDate.getDay() !== (new Date()).getDay() && value !== 0) { return false; }
     } else {
-      valueDate.setHours(this.meridiem === 'AM' ? value : value < 12 ? value + 12 : value);
+      value = this.mode === '24h' ? value : this.meridiem === 'AM' ? value : value < 12 ? value + 12 : value;
+      valueDate.setHours(value);
       valueDate.setMinutes(0);
     }
     valueDate.setSeconds(0);
