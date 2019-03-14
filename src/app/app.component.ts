@@ -1,10 +1,10 @@
-import { Component, AfterViewInit } from '@angular/core';
+import { Component } from '@angular/core';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements AfterViewInit {
+export class AppComponent {
   title = 'angular-material-timepicker';
 
   get minValue() {
@@ -14,21 +14,10 @@ export class AppComponent implements AfterViewInit {
     return val;
   }
 
-  maxValue: Date;
-
-  constructor() {
+  get maxValue() {
     const val = new Date();
     val.setHours(23);
     val.setMinutes(30);
-    this.maxValue = val;
-  }
-
-  ngAfterViewInit() {
-    setTimeout(() => {
-      const val = new Date();
-      val.setHours(23);
-      val.setMinutes(40);
-      this.maxValue = val;
-    }, 10000);
+    return val;
   }
 }
