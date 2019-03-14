@@ -2,12 +2,14 @@
   <div class="root">
     <mat-toolbar [color]="color" class="header">
       <div class="placeholder"></div>
-      <div>
-        <span class="time" [ngClass]="{'select': this.select === 'h' && 'active' }" (click)="editHours()">
+      <div class="time-frame">
+        <span class="time fixed-font-size" [ngClass]="{'select': this.select === 'h' && 'active' }"
+          (click)="editHours()">
           {{ twoDigits(formattedHours) }}
         </span>
-        :
-        <span class="time" [ngClass]="{ 'select': this.select === 'm' && 'active' }" (click)="editMinutes()">
+        <span class="fixed-font-size">:</span>
+        <span class="time fixed-font-size" [ngClass]="{ 'select': this.select === 'm' && 'active' }"
+          (click)="editMinutes()">
           {{ twoDigits(minutes) }}
         </span>
       </div>

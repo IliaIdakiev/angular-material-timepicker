@@ -23,9 +23,17 @@ mat-dialog-actions {
   font-size: 58px;
   display: flex;
   justify-content: center;
-  align-items: baseline;
+  align-items: center;
   user-select: none;
   height: 98px;
+
+  .fixed-font-size {
+    font-size: 58px;
+  }
+
+  .time-frame {
+    height: 60px;
+  }
 }
 
 .time {
