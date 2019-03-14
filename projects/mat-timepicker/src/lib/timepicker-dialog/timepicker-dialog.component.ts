@@ -1,5 +1,5 @@
 import { MAT_DIALOG_DATA } from '@angular/material';
-import { Component, OnInit, EventEmitter, Output, Inject, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, OnInit, EventEmitter, Output, Inject, DoCheck } from '@angular/core';
 import { ClockType } from '../interfaces-and-types';
 import { twoDigits, formatHours } from '../util';
 
@@ -8,7 +8,7 @@ import { twoDigits, formatHours } from '../util';
   templateUrl: './timepicker-dialog.component.html',
   styleUrls: ['./timepicker-dialog.component.scss']
 })
-export class MatTimepickerComponentDialogComponent implements OnInit {
+export class MatTimepickerComponentDialogComponent implements OnInit, DoCheck {
 
   twoDigits = twoDigits;
 
@@ -61,6 +61,15 @@ export class MatTimepickerComponentDialogComponent implements OnInit {
     this.isPm = data.isPm;
     this.minValue = data.minValue;
     this.maxValue = data.maxValue;
+  }
+
+  ngDoCheck() {
+    this.mode = this.data.mode;
+    this.okLabel = this.data.okLabel;
+    this.cancelLabel = this.data.cancelLabel;
+    this.color = this.data.color;
+    this.minValue = this.data.minValue;
+    this.maxValue = this.data.maxValue;
   }
 
   ngOnInit() {

@@ -1,6 +1,5 @@
-import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, ChangeDetectionStrategy } from '@angular/core';
 import { ClockType, ClockNumber, ITimeData } from '../interfaces-and-types';
-import * as moment_ from 'moment';
 
 function addDays(date: Date, days: number) {
   const result = new Date(date);
@@ -10,7 +9,8 @@ function addDays(date: Date, days: number) {
 @Component({
   selector: 'mat-clock',
   templateUrl: './clock.component.html',
-  styleUrls: ['./clock.component.scss']
+  styleUrls: ['./clock.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ClockComponent implements OnChanges {
 

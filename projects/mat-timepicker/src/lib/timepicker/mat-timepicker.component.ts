@@ -1,5 +1,5 @@
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { Component, OnInit, EventEmitter, Input, forwardRef, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, EventEmitter, Input, forwardRef, ViewChild, ElementRef, OnChanges } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material';
 import { ClockType, ITimeData } from '../interfaces-and-types';
 import { twoDigits, formatHours } from '../util';
@@ -23,7 +23,7 @@ const moment = moment_;
     }
   ]
 })
-export class MatTimepickerComponent implements OnInit, ControlValueAccessor {
+export class MatTimepickerComponent implements OnInit, OnChanges, ControlValueAccessor {
   isAlive: Subject<any> = new Subject<any>();
 
   /** Override the label of the ok button. */
@@ -143,6 +143,20 @@ export class MatTimepickerComponent implements OnInit, ControlValueAccessor {
       }
       this.value = defaultValue;
     }
+  }
+
+  ngOnChanges() {
+    if (!this.modalRef || !this.modalRef.componentInstance) { return; }
+    this.modalRef.componentInstance.data = {
+      mode: this.mode,
+      value: this.currentValue,
+      okLabel: this.okLabel,
+      cancelLabel: this.cancelLabel,
+      color: this.color,
+      isPm: this.isPm,
+      minValue: this._minValue,
+      maxValue: this._maxValue
+    };
   }
 
   writeValue(value: Date): void {
