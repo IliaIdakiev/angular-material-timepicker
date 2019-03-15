@@ -27,7 +27,7 @@
 @Input() disabled = false;
 
 /* Set the color of the timepicker control */
-@Input() color = 'primary';
+@Input() color: ThemePalette = 'primary';
 
 /* Set the value of the timepicker control (default is current time) */
 @Input() value: Date | Moment = new Date();
@@ -43,6 +43,12 @@
 
 /* Maximum time to pick from */
 @Input() max: Date | Moment;
+
+/* Add material clock icon to the left */
+@Input() withIcon = false;
+
+/* Material clock icon color */
+@Input() iconColor: ThemePalette
 ```
 
 
