@@ -3,11 +3,11 @@
     <input matInput [placeholder]="placeholder" [disabled]="disabled" (click)="!disabled ? showDialog() : null"
       [value]="formattedValue" (keydown)="inputKeyupHandler($event)" />
   </mat-form-field>
-  <mat-icon [color]="iconColor">access_time</mat-icon>
+  <mat-icon *ngIf="withIcon" [color]="iconColor">access_time</mat-icon>
 </ng-template>
 <ng-template #noFormFieldTemplate>
   <input matInput [placeholder]="placeholder" [disabled]="disabled" (click)="!disabled ? showDialog() : null"
     [value]="formattedValue" (keydown)="inputKeyupHandler($event)" />
-  <mat-icon [color]="iconColor">access_time</mat-icon>
+  <mat-icon *ngIf="withIcon" [color]="iconColor">access_time</mat-icon>
 </ng-template>
 <ng-container *ngIf="withFormField then withFormFieldTemplate; else noFormFieldTemplate;"></ng-container>
