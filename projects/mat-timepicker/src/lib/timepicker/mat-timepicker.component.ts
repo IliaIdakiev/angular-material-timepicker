@@ -36,6 +36,8 @@ export class MatTimepickerComponent implements OnInit, OnChanges, ControlValueAc
   @Input() color = 'primary';
   @Input() placeholder: string = null;
   @Input() withFormField = false;
+  @Input() withIcon = false;
+  @Input() iconColor: string;
 
   @Input() set min(value: Date | Moment) {
     this._minValue = value ? this.parseTime(value) : null;
