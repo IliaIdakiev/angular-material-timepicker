@@ -81,7 +81,9 @@ export class MatTimepickerComponentDialogComponent implements OnInit, DoCheck {
   }
 
   handleClockChange({ value, type }: { value: number, type: 'minutes' | 'hours' }) {
-    if (this.hasInvalidMeridiem) {
+    const is24hoursAutoMeridiemChange = this.mode === '24h' && type === 'hours' && (
+      (this.hours >= 12 && value < 12) || (this.hours < 12 && value >= 12));
+    if ((this.hasInvalidMeridiem && this.mode === '12h') || is24hoursAutoMeridiemChange) {
       this.isPm = !this.isPm;
       this.hasInvalidMeridiem = false;
     }
