@@ -77,7 +77,7 @@ export class ClockComponent implements OnChanges {
     if (this.maxValue) {
       maxDate = new Date();
       maxDate.setHours(this.maxValue.hours);
-      if (this.maxValue.hours === 24) {
+      if (this.maxValue.hours === 24 || this.maxValue.hours < this.minValue.hours) {
         maxDate = addDays(maxDate, 1);
       }
       if (mode === 'minutes') {
@@ -94,6 +94,11 @@ export class ClockComponent implements OnChanges {
         this.maxValue.hours === 12 && value === 12 && this.meridiem === 'PM')
     ) {
       return true;
+    }
+
+    if(this.maxValue.hours < this.minValue.hours) {
+      let valueDateTomorrow = addDays(valueDate,1);
+      return ((!minDate || minDate <= valueDate) && (!maxDate || maxDate >= valueDate)) || ((!minDate || minDate <= valueDateTomorrow) && (!maxDate || maxDate >= valueDateTomorrow));
     }
 
     return ((!minDate || minDate <= valueDate) && (!maxDate || maxDate >= valueDate));
