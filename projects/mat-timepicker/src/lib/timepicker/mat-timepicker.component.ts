@@ -225,9 +225,6 @@ export class MatTimepickerComponent implements OnInit, OnChanges, AfterViewInit,
   writeValue(value: Date): void {
     if (!value) { return; }
     this.value = value;
-    if (this.isFormControl) { return; }
-    const isValid = this.checkValidity(value);
-    console.log(isValid);
   }
 
   registerOnChange(fn: any): void {

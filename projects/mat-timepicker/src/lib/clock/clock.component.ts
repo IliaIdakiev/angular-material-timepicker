@@ -45,7 +45,7 @@ export class ClockComponent implements OnChanges {
   }
 
   isAvailable(value) {
-    return this.isAvailableFn(value, this.viewType, this.isPm, this.formattedHours);
+    return this.isAvailableFn ? this.isAvailableFn(value, this.viewType, this.isPm, this.formattedHours) : true;
   }
 
   ngOnChanges(simpleChanges: SimpleChanges) {
