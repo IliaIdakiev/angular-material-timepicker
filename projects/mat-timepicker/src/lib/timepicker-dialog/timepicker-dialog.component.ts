@@ -19,6 +19,8 @@ export class MatTimepickerComponentDialogComponent implements DoCheck {
   allowed24HourMap: IAllowed24HourMap = null;
   allowed12HourMap: IAllowed12HourMap = null;
 
+  invalidSelection = false;
+
   okLabel: string;
   cancelLabel: string;
 
@@ -82,7 +84,6 @@ export class MatTimepickerComponentDialogComponent implements DoCheck {
   ngDoCheck() { this.bindData(this.data); }
 
   handleClockChange({ value, type }: { value: number, type: 'minutes' | 'hours' }) {
-
     const is24hoursAutoMeridiemChange = this.mode === '24h' && type === 'hours' && (
       (this.hours >= 12 && value < 12) || (this.hours < 12 && value >= 12));
     if ((this.hasInvalidMeridiem && this.mode === '12h') || is24hoursAutoMeridiemChange) {
@@ -137,6 +138,10 @@ export class MatTimepickerComponentDialogComponent implements DoCheck {
       this.hasInvalidMeridiem = false;
     }
     this.viewType = 'minutes';
+  }
+
+  invalidSelectionHandler(value) {
+    this.invalidSelection = value;
   }
 
 

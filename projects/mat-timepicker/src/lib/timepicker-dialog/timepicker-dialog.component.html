@@ -31,11 +31,12 @@
         (unavailableSelection)="handleUnavailableSelection()"
         [formattedValue]="viewType === 'minutes' ? minutes : formattedHours" [isPm]="isPm"
         (invalidMeridiem)="invalidMeridiem()" (mouseup)="handleClockChangeDone($event)"
-        (clearInvalidMeridiem)="clearInvalidMeridiem()" (touchend)="handleClockChangeDone($event)"></mat-clock>
+        (clearInvalidMeridiem)="clearInvalidMeridiem()" (touchend)="handleClockChangeDone($event)"
+        (invalidSelection)="invalidSelectionHandler($event)"></mat-clock>
     </div>
   </div>
 </mat-dialog-content>
 <mat-dialog-actions>
   <button mat-button [color]="color" (click)="cancelClickHandler()">{{cancelLabel}}</button>
-  <button mat-button [color]="color" (click)="okClickHandler()">{{okLabel}}</button>
+  <button mat-button [disabled]="invalidSelection" [color]="color" (click)="okClickHandler()">{{okLabel}}</button>
 </mat-dialog-actions>

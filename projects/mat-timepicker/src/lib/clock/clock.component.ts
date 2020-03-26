@@ -22,6 +22,7 @@ export class ClockComponent implements OnChanges {
   @Output() changeEvent: EventEmitter<any> = new EventEmitter<any>();
   @Output() unavailableSelection: EventEmitter<any> = new EventEmitter<any>();
   @Output() invalidMeridiem: EventEmitter<any> = new EventEmitter<any>();
+  @Output() invalidSelection: EventEmitter<any> = new EventEmitter<any>();
   @Output() clearInvalidMeridiem: EventEmitter<any> = new EventEmitter<any>();
 
   @Input() allowed12HourMap = null;
@@ -82,10 +83,8 @@ export class ClockComponent implements OnChanges {
       this.clearInvalidMeridiem.emit();
       this.invalidMeridiemEmitted = false;
     }
-    if ((this.minDate || this.maxDate) && !isAvailableHour) {
-      this.invalidMeridiem.emit();
-      this.invalidMeridiemEmitted = true;
-    }
+
+    this.invalidSelection.emit((this.minDate || this.maxDate) && !isAvailableHour);
   }
 
   calculateAngule() {
