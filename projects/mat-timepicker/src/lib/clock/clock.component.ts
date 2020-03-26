@@ -115,11 +115,11 @@ export class ClockComponent implements OnChanges {
       this.numbers = this.getNumbers(12, { size: 256, start: 5, step: 5 }, isAllowedFn);
       this.minuteDots = this.getNumbers(60, { size: 256, start: 13 }).map(digit => {
         if (digit.display <= 59) {
-          digit.allowed = isAllowedFn(digit.display);
+          digit.allowed = isAllowedFn ? isAllowedFn(digit.display) : true;
           return digit;
         }
         digit.display = digit.display - 60;
-        digit.allowed = isAllowedFn(digit.display);
+        digit.allowed = isAllowedFn ? isAllowedFn(digit.display) : true;
         return digit;
       });
       this.secondaryNumbers = [];
