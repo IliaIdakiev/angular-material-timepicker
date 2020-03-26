@@ -3,12 +3,12 @@
     <mat-toolbar [color]="color" class="header">
       <div class="placeholder"></div>
       <div class="time-frame">
-        <span class="time fixed-font-size" [ngClass]="{'select': this.select === 'h' && 'active' }"
+        <span class="time fixed-font-size" [ngClass]="{'select': this.viewType === 'hours' && 'active' }"
           (click)="editHours()">
           {{ twoDigits(formattedHours) }}
         </span>
         <span class="fixed-font-size">:</span>
-        <span class="time fixed-font-size" [ngClass]="{ 'select': this.select === 'm' && 'active' }"
+        <span class="time fixed-font-size" [ngClass]="{ 'select': this.viewType === 'minutes' && 'active' }"
           (click)="editMinutes()">
           {{ twoDigits(minutes) }}
         </span>
@@ -25,10 +25,11 @@
       </ng-template>
     </mat-toolbar>
     <div class="body">
-      <mat-clock [minValue]="minValue" [maxValue]="maxValue" [color]="color" [mode]="currentMode"
-        [formattedHours]="formattedHours" [minutes]="minutes" (changeEvent)="handleClockChange($event)"
+      <mat-clock [allowed12HourMap]="allowed12HourMap" [allowed24HourMap]="allowed24HourMap" [minDate]="minDate"
+        [maxDate]="maxDate" [color]="color" [viewType]="viewType" [mode]="mode" [formattedHours]="formattedHours"
+        [minutes]="minutes" (changeEvent)="handleClockChange($event)"
         (unavailableSelection)="handleUnavailableSelection()"
-        [formattedValue]="currentMode === 'minutes' ? minutes : formattedHours" [isPm]="isPm"
+        [formattedValue]="viewType === 'minutes' ? minutes : formattedHours" [isPm]="isPm"
         (invalidMeridiem)="invalidMeridiem()" (mouseup)="handleClockChangeDone($event)"
         (clearInvalidMeridiem)="clearInvalidMeridiem()" (touchend)="handleClockChangeDone($event)"></mat-clock>
     </div>

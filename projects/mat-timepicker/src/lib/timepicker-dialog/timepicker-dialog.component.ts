@@ -1,14 +1,14 @@
 import { MAT_DIALOG_DATA } from '@angular/material';
-import { Component, OnInit, EventEmitter, Output, Inject, DoCheck } from '@angular/core';
-import { ClockType } from '../interfaces-and-types';
-import { twoDigits, formatHours } from '../util';
+import { Component, EventEmitter, Output, Inject, DoCheck } from '@angular/core';
+import { ClockViewType, ClockMode, IAllowed24HourMap, IAllowed12HourMap } from '../interfaces-and-types';
+import { twoDigits, convertHoursForMode } from '../util';
 
 @Component({
   selector: 'mat-timepicker-dialog',
   templateUrl: './timepicker-dialog.component.html',
   styleUrls: ['./timepicker-dialog.component.scss']
 })
-export class MatTimepickerComponentDialogComponent implements OnInit, DoCheck {
+export class MatTimepickerComponentDialogComponent implements DoCheck {
 
   twoDigits = twoDigits;
 
@@ -16,13 +16,23 @@ export class MatTimepickerComponentDialogComponent implements OnInit, DoCheck {
   @Output() okClickEvent: EventEmitter<any> = new EventEmitter<any>();
   @Output() cancelClickEvent: EventEmitter<any> = new EventEmitter<any>();
 
+  allowed24HourMap: IAllowed24HourMap = null;
+  allowed12HourMap: IAllowed12HourMap = null;
+
   okLabel: string;
   cancelLabel: string;
-  value: any;
-  mode: ClockType = '12h';
-  currentMode: ClockType;
-  timeInputValue: Date;
-  select: 'h' | 'm' = 'h';
+
+  set value(value: any) {
+    this.hours = value.getHours();
+    this.minutes = value.getMinutes();
+    this._value = value;
+  }
+
+  get value() { return this._value; }
+
+  mode: ClockMode;
+  viewType: ClockViewType = 'hours';
+
   minutes: any;
   color: string;
   isPm = false;
@@ -31,56 +41,48 @@ export class MatTimepickerComponentDialogComponent implements OnInit, DoCheck {
   invalidMedianID = null;
   hasInvalidMeridiem = false;
   editHoursClicked = false;
+  isClosing = false;
 
-  minValue: { hours: number, minutes: number };
-  maxValue: { hours: number, minutes: number };
+  minDate: Date;
+  maxDate: Date;
 
   // tslint:disable-next-line:variable-name
-  _formattedHours: any;
+  _formattedHour: any;
   // tslint:disable-next-line:variable-name
   _hours: any;
+  // tslint:disable-next-line:variable-name
+  _value: Date;
 
   set hours(value: any) {
     this._hours = value;
-    this._formattedHours = formatHours(this.hours, this.mode).hours;
+    this._formattedHour = convertHoursForMode(this.hours, this.mode).hour;
   }
-  get hours() {
-    return this._hours;
-  }
+  get hours() { return this._hours; }
 
-  get formattedHours() {
-    return this._formattedHours;
-  }
+  get formattedHours() { return this._formattedHour; }
 
-  constructor(@Inject(MAT_DIALOG_DATA) public data) {
-    this.value = data.value;
-    this.mode = this.currentMode = data.mode;
+  bindData(data: any) {
+    this.mode = data.mode;
     this.okLabel = data.okLabel;
     this.cancelLabel = data.cancelLabel;
     this.color = data.color;
+    this.minDate = data.minDate;
+    this.maxDate = data.maxDate;
+    this.allowed12HourMap = data.allowed12HourMap;
+    this.allowed24HourMap = data.allowed24HourMap;
+  }
+
+  constructor(@Inject(MAT_DIALOG_DATA) public data) {
     this.isPm = data.isPm;
-    this.minValue = data.minValue;
-    this.maxValue = data.maxValue;
+    this.bindData(data);
+    // keep this always at the bottom
+    this.value = data.value;
   }
 
-  ngDoCheck() {
-    this.mode = this.data.mode;
-    this.okLabel = this.data.okLabel;
-    this.cancelLabel = this.data.cancelLabel;
-    this.color = this.data.color;
-    this.minValue = this.data.minValue;
-    this.maxValue = this.data.maxValue;
-  }
-
-  ngOnInit() {
-    this.select = 'h';
-    this.timeInputValue = this.value;
-
-    this.hours = this.timeInputValue.getHours();
-    this.minutes = this.timeInputValue.getMinutes();
-  }
+  ngDoCheck() { this.bindData(this.data); }
 
   handleClockChange({ value, type }: { value: number, type: 'minutes' | 'hours' }) {
+
     const is24hoursAutoMeridiemChange = this.mode === '24h' && type === 'hours' && (
       (this.hours >= 12 && value < 12) || (this.hours < 12 && value >= 12));
     if ((this.hasInvalidMeridiem && this.mode === '12h') || is24hoursAutoMeridiemChange) {
@@ -88,9 +90,9 @@ export class MatTimepickerComponentDialogComponent implements OnInit, DoCheck {
       this.hasInvalidMeridiem = false;
     }
 
-    if ((type && type === 'hours') || (!type && this.select === 'h')) {
+    if ((type && type === 'hours') || (!type && this.viewType === 'hours')) {
       this.hours = value;
-    } else if ((type && type === 'minutes') || (!type && this.select === 'm')) {
+    } else if ((type && type === 'minutes') || (!type && this.viewType === 'minutes')) {
       this.minutes = value;
     }
 
@@ -115,7 +117,7 @@ export class MatTimepickerComponentDialogComponent implements OnInit, DoCheck {
   handleClockChangeDone(e) {
     e.preventDefault(); // prevent mouseUp after touchEnd
 
-    if (this.select === 'h' && !this.skipMinuteAutoSwitch) {
+    if (this.viewType === 'hours' && !this.skipMinuteAutoSwitch) {
       this.autoSwitchID = setTimeout(() => {
         this.editMinutes();
         this.autoSwitchID = null;
@@ -124,8 +126,7 @@ export class MatTimepickerComponentDialogComponent implements OnInit, DoCheck {
   }
 
   editHours() {
-    this.select = 'h';
-    this.currentMode = this.mode;
+    this.viewType = 'hours';
     this.editHoursClicked = true;
     setTimeout(() => { this.editHoursClicked = false; }, 0);
   }
@@ -135,13 +136,12 @@ export class MatTimepickerComponentDialogComponent implements OnInit, DoCheck {
       this.isPm = !this.isPm;
       this.hasInvalidMeridiem = false;
     }
-    this.select = 'm';
-    this.currentMode = 'minutes';
+    this.viewType = 'minutes';
   }
 
 
   invalidMeridiem() {
-    if (this.mode !== 'minutes' && this.editHoursClicked) {
+    if (this.viewType !== 'minutes' && this.editHoursClicked) {
       if (this.invalidMedianID) { return; }
       this.invalidMedianID = setTimeout(() => {
         this.isPm = !this.isPm;
@@ -180,4 +180,5 @@ export class MatTimepickerComponentDialogComponent implements OnInit, DoCheck {
   cancelClickHandler() {
     this.cancelClickEvent.emit();
   }
+
 }
