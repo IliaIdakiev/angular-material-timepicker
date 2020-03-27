@@ -1,11 +1,7 @@
 import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, ChangeDetectionStrategy } from '@angular/core';
-import { ClockType, ClockNumber, ITimeData } from '../interfaces-and-types';
+import { ClockViewType, ClockNumber, ITimeData, ClockMode } from '../interfaces-and-types';
+import { isAllowed, getIsAvailabeFn } from '../util';
 
-function addDays(date: Date, days: number) {
-  const result = new Date(date);
-  result.setDate(result.getDate() + days);
-  return result;
-}
 @Component({
   selector: 'mat-clock',
   templateUrl: './clock.component.html',
@@ -14,18 +10,27 @@ function addDays(date: Date, days: number) {
 })
 export class ClockComponent implements OnChanges {
 
-  @Input() mode: ClockType;
+  @Input() mode: ClockMode;
+  @Input() viewType: ClockViewType;
   @Input() color = 'primary';
   @Input() formattedValue: number;
-  @Input() minValue: ITimeData;
-  @Input() maxValue: ITimeData;
+  @Input() minDate: Date;
+  @Input() maxDate: Date;
   @Input() isPm: boolean;
   @Input() formattedHours: number;
   @Input() minutes: number;
   @Output() changeEvent: EventEmitter<any> = new EventEmitter<any>();
   @Output() unavailableSelection: EventEmitter<any> = new EventEmitter<any>();
   @Output() invalidMeridiem: EventEmitter<any> = new EventEmitter<any>();
+  @Output() invalidSelection: EventEmitter<any> = new EventEmitter<any>();
   @Output() clearInvalidMeridiem: EventEmitter<any> = new EventEmitter<any>();
+
+  @Input() allowed12HourMap = null;
+  @Input() allowed24HourMap = null;
+
+  isFormattedValueAllowed = true;
+
+  isAvailableFn: ReturnType<typeof getIsAvailabeFn>;
 
   meridiem = null;
   touching = false;
@@ -35,104 +40,87 @@ export class ClockComponent implements OnChanges {
   minuteDots: ClockNumber[] = [];
   invalidMeridiemEmitted = true;
 
-  constructor() { }
+  initIsAllowedFn() {
+    if (!this.allowed12HourMap && !this.allowed24HourMap) { return; }
+    this.isAvailableFn = getIsAvailabeFn(this.allowed12HourMap, this.allowed24HourMap, this.mode);
+  }
 
-  isAvailable(value: number, type?: 'minutes' | 'hours', hours?: number) {
-    if (!this.minValue && !this.maxValue) { return true; }
-    if (this.mode === '12h' && this.meridiem === 'AM' && value === 12) {
-      value = 0;
-    }
-    const mode = (type || this.mode);
-
-    const valueDate = new Date();
-    if (mode === 'minutes') {
-      hours = hours || this.formattedHours;
-      valueDate.setHours(
-        this.meridiem === 'AM' ?
-          hours === 12 ? 0 : hours : hours < 12 ? hours + 12 : hours
-      );
-      valueDate.setMinutes(value);
-      if (valueDate.getDay() !== (new Date()).getDay() && value !== 0) { return false; }
-    } else {
-      value = this.mode === '24h' ? value : this.meridiem === 'AM' ? value : value < 12 ? value + 12 : value;
-      valueDate.setHours(value);
-      valueDate.setMinutes(0);
-    }
-    valueDate.setSeconds(0);
-    valueDate.setMilliseconds(0);
-
-    let minDate: Date = null;
-    let maxDate: Date = null;
-    if (this.minValue) {
-      minDate = new Date();
-      minDate.setHours(this.minValue.hours);
-      if (mode === 'minutes') {
-        minDate.setMinutes(this.minValue.minutes);
-      } else {
-        minDate.setMinutes(0);
-      }
-      minDate.setSeconds(0);
-      minDate.setMilliseconds(0);
-    }
-    if (this.maxValue) {
-      maxDate = new Date();
-      maxDate.setHours(this.maxValue.hours);
-      if (this.maxValue.hours === 24) {
-        maxDate = addDays(maxDate, 1);
-      }
-      if (mode === 'minutes') {
-        maxDate.setMinutes(this.maxValue.minutes);
-      } else {
-        maxDate.setMinutes(0);
-      }
-      maxDate.setSeconds(0);
-      maxDate.setMilliseconds(0);
-    }
-
-    if (
-      this.maxValue && this.maxValue.meridiem === 'PM' && ((valueDate.getDay() !== (new Date()).getDay() && value === 0) ||
-        this.maxValue.hours === 12 && value === 12 && this.meridiem === 'PM')
-    ) {
-      return true;
-    }
-
-    return ((!minDate || minDate <= valueDate) && (!maxDate || maxDate >= valueDate));
+  isAvailable(value) {
+    return this.isAvailableFn ? this.isAvailableFn(value, this.viewType, this.isPm, this.formattedHours) : true;
   }
 
   ngOnChanges(simpleChanges: SimpleChanges) {
+
+    if (
+      simpleChanges.allowed12HourMap ||
+      simpleChanges.allowed24HourMap ||
+      (simpleChanges.mode && !simpleChanges.mode.firstChange)
+    ) {
+      this.initIsAllowedFn();
+    }
+
     this.calculateAngule();
     this.setNumbers();
-
     this.meridiem = this.isPm ? 'PM' : 'AM';
-    const isAvailableHour = this.isAvailable(this.formattedHours, 'hours');
-    if (isAvailableHour && this.invalidMeridiemEmitted) {
+
+    if (simpleChanges.formattedValue && (this.allowed12HourMap || this.allowed24HourMap)) {
+      this.isFormattedValueAllowed = this.isAvailable(this.formattedValue);
+    }
+
+    const isSelectedTimeAvailable = (this.isAvailableFn) ?
+      this.isAvailableFn(this.formattedValue, 'minutes', this.isPm, this.formattedHours) : true;
+
+    if (this.mode === '24h' && this.viewType === 'minutes' && this.isAvailableFn) {
+      const areMinitesAvailable = this.isAvailableFn(this.minutes, 'minutes', this.isPm, this.formattedHours);
+      if (!areMinitesAvailable) {
+        if (this.minDate && this.minDate.getMinutes() > this.minutes) {
+          setTimeout(() => { this.changeEvent.emit({ value: this.minDate.getMinutes(), type: 'minutes' }); });
+        } else {
+          setTimeout(() => { this.changeEvent.emit({ value: this.maxDate.getMinutes(), type: 'minutes' }); });
+        }
+      }
+    }
+
+    if (isSelectedTimeAvailable && this.invalidMeridiemEmitted) {
       this.clearInvalidMeridiem.emit();
       this.invalidMeridiemEmitted = false;
     }
-    if ((this.minValue || this.maxValue) && !isAvailableHour) {
-      this.invalidMeridiem.emit();
-      this.invalidMeridiemEmitted = true;
-    }
+
+    this.invalidSelection.emit(!isSelectedTimeAvailable);
   }
 
   calculateAngule() {
-    this.angle = this.getPointerAngle(this.formattedValue, this.mode);
+    this.angle = this.getPointerAngle(this.formattedValue, this.viewType);
   }
 
   setNumbers() {
-    if (this.mode === '12h') {
-      this.numbers = this.getNumbers(12, { size: 256 });
-      this.secondaryNumbers = [];
-      this.minuteDots = [];
-    } else if (this.mode === '24h') {
-      this.numbers = this.getNumbers(12, { size: 256 });
-      this.secondaryNumbers = this.getNumbers(12, { size: 256 - 64, start: 13 });
-      this.minuteDots = [];
-    } else if (this.mode === 'minutes') {
-      this.numbers = this.getNumbers(12, { size: 256, start: 5, step: 5 });
+    if (this.viewType === 'hours') {
+      if (this.mode === '12h') {
+        const meridiem = this.isPm ? 'pm' : 'am';
+        const isAllowedFn = this.allowed12HourMap ? num => this.allowed12HourMap[meridiem][num + 1][0] : undefined;
+        this.numbers = this.getNumbers(12, { size: 256 }, isAllowedFn);
+        this.secondaryNumbers = [];
+        this.minuteDots = [];
+      } else if (this.mode === '24h') {
+        const isAllowedFn = this.allowed24HourMap ? num => this.allowed24HourMap[num][0] : undefined;
+        this.numbers = this.getNumbers(12, { size: 256 }, isAllowedFn);
+        this.secondaryNumbers = this.getNumbers(12, { size: 256 - 64, start: 13 }, isAllowedFn);
+        this.minuteDots = [];
+      }
+    } else {
+      const meridiem = this.isPm ? 'pm' : 'am';
+      const isAllowedFn =
+        !!this.allowed12HourMap ? num => this.allowed12HourMap[meridiem][this.formattedHours][num] :
+          !!this.allowed24HourMap ? num => this.allowed24HourMap[this.formattedHours][num] : undefined;
+
+      this.numbers = this.getNumbers(12, { size: 256, start: 5, step: 5 }, isAllowedFn);
       this.minuteDots = this.getNumbers(60, { size: 256, start: 13 }).map(digit => {
-        if (digit.display <= 59) { return digit; }
+        if (digit.display <= 59) {
+          digit.allowed = isAllowedFn ? isAllowedFn(digit.display) : true;
+          return digit;
+        }
         digit.display = digit.display - 60;
+        digit.allowed = isAllowedFn ? isAllowedFn(digit.display) : true;
         return digit;
       });
       this.secondaryNumbers = [];
@@ -172,70 +160,64 @@ export class ClockComponent implements OnChanges {
   }
 
   movePointer(x, y) {
-    const value = this.getPointerValue(x, y, this.mode, 256);
+    const value = this.getPointerValue(x, y, 256);
     if (!this.isAvailable(value)) {
       this.unavailableSelection.emit();
       return;
     }
     if (value !== this.formattedValue) {
-      this.changeEvent.emit({ value, type: this.mode !== 'minutes' ? 'hours' : 'minutes' });
-      if (this.mode !== 'minutes') {
-        if (!this.isAvailable(this.minutes, 'minutes', value)) {
-          if (this.minValue && this.isAvailable(this.minValue.minutes, 'minutes', value)) {
-            this.changeEvent.emit({ value: this.minValue.minutes, type: 'minutes' });
-          } else if (this.maxValue && this.isAvailable(this.maxValue.minutes, 'minutes', value)) {
-            this.changeEvent.emit({ value: this.maxValue.minutes, type: 'minutes' });
+      this.changeEvent.emit({ value, type: this.viewType !== 'minutes' ? 'hours' : 'minutes' });
+      if (this.viewType !== 'minutes') {
+        if (!this.isAvailable(value)) {
+          if (this.minDate && this.isAvailable(value)
+          ) {
+            this.changeEvent.emit({ value: this.minDate.getMinutes(), type: 'minutes' });
+          } else if (this.maxDate && this.isAvailable(value)) {
+            this.changeEvent.emit({ value: this.maxDate.getMinutes(), type: 'minutes' });
           }
         }
       }
     }
   }
 
-  getNumbers(count, { size, start = 1, step = 1 }) {
+  getNumbers(count, { size, start = 1, step = 1 }, isAllowedFn?: (num: number) => boolean) {
     return Array.apply(null, Array(count)).map((_, i) => ({
       display: i * step + start,
       translateX: (size / 2 - 20) * Math.cos(2 * Math.PI * (i - 2) / count),
-      translateY: (size / 2 - 20) * Math.sin(2 * Math.PI * (i - 2) / count)
+      translateY: (size / 2 - 20) * Math.sin(2 * Math.PI * (i - 2) / count),
+      allowed: isAllowedFn ? isAllowedFn(i) : true
     }));
   }
 
-  getPointerAngle(value, mode: ClockType) {
-    switch (mode) {
-      case '12h':
-        return 360 / 12 * (value - 3);
-      case '24h':
-        return 360 / 12 * (value % 12 - 3);
-      case 'minutes':
-        return 360 / 60 * (value - 15);
+  getPointerAngle(value, mode: ClockViewType) {
+    if (this.viewType === 'hours') {
+      return this.mode === '12h' ? 360 / 12 * (value - 3) : 360 / 12 * (value % 12 - 3);
     }
+    return 360 / 60 * (value - 15);
   }
 
-  getPointerValue(x, y, mode, size) {
+  getPointerValue(x, y, size) {
+    let value;
     let angle = Math.atan2(size / 2 - x, size / 2 - y) / Math.PI * 180;
     if (angle < 0) {
       angle = 360 + angle;
     }
 
-    switch (mode) {
-      case '12h': {
-        const value = 12 - Math.round(angle * 12 / 360);
+    if (this.viewType === 'hours') {
+      if (this.mode === '12h') {
+        value = 12 - Math.round(angle * 12 / 360);
         return value === 0 ? 12 : value;
       }
-      case '24h': {
-        const radius = Math.sqrt(Math.pow(size / 2 - x, 2) + Math.pow(size / 2 - y, 2));
-        let value = 12 - Math.round(angle * 12 / 360);
-        if (value === 0) {
-          value = 12;
-        }
-        if (radius < size / 2 - 32) {
-          value = value === 12 ? 0 : value + 12;
-        }
-        return value;
-      }
-      case 'minutes': {
-        const value = Math.round(60 - 60 * angle / 360);
-        return value === 60 ? 0 : value;
-      }
+
+      const radius = Math.sqrt(Math.pow(size / 2 - x, 2) + Math.pow(size / 2 - y, 2));
+      value = 12 - Math.round(angle * 12 / 360);
+      if (value === 0) { value = 12; }
+      if (radius < size / 2 - 32) { value = value === 12 ? 0 : value + 12; }
+      return value;
+
     }
+
+    value = Math.round(60 - 60 * angle / 360);
+    return value === 60 ? 0 : value;
   }
 }

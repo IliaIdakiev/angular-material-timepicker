@@ -1,24 +1,73 @@
-# MatTimepicker
+# Angular Material Timepicker
 
-This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 7.2.0.
+## Timepicker Control for Angular Material
 
-## Code scaffolding
+⚠️The time picker control has [Angular Material](https://material.angular.io/) as a dependency ⚠️
 
-Run `ng generate component component-name --project mat-timepicker` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module --project mat-timepicker`.
-> Note: Don't forget to add `--project mat-timepicker` or else it will be added to the default project in your `angular.json` file. 
+### Usage
+```html
+<mat-timepicker></mat-timepicker>
+```
+* **Yes! You can use ngModel. This control implements ControlValueAccessor.**
 
-## Build
+### Component Configuration
+```typescript
+/* Override the label of the ok button. */
+@Input() okLabel = 'Ok';
 
-Run `ng build mat-timepicker` to build the project. The build artifacts will be stored in the `dist/` directory.
+/* Override the label of the cancel button. */
+@Input() cancelLabel = 'Cancel';
 
-## Publishing
+/* Sets the clock mode, 12-hour or 24-hour clocks are supported. */
+@Input() mode: '12h' | '24h' = '24h';
 
-After building your library with `ng build mat-timepicker`, go to the dist folder `cd dist/mat-timepicker` and run `npm publish`.
+/* Disable the timepicker control */
+@Input() disabled = false;
 
-## Running unit tests
+/* Set the color of the timepicker control */
+@Input() color: ThemePalette = 'primary';
 
-Run `ng test mat-timepicker` to execute the unit tests via [Karma](https://karma-runner.github.io).
+/* Set the value of the timepicker control (default is current time) */
+@Input() value: Date = new Date();
 
-## Further help
+/* Wrapper the input with MaterialFormField */
+@Input() withFormField = false;
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+/* Placeholder for the time input */
+@Input() placeholder: string = null;
+
+/* Minimum time to pick from */
+@Input() minDate: Date;
+
+/* Maximum time to pick from */
+@Input() maxDate: Date;
+
+/* Add material clock icon to the left */
+@Input() withIcon = false;
+
+/* Material clock icon color */
+@Input() iconColor: ThemePalette
+
+/* Disables the dialog open when clicking the input field */
+@Input() disableDialogOpenOnInputClick = false;
+
+/* Disables the dialog open when clicking the icon if there is one */
+@Input() disableDialogOpenOnIconClick = false;
+```
+
+
+### Check out the [**Demo**](https://stackblitz.com/github/IliaIdakiev/angular-material-timepicker)!
+
+---
+
+Dialog View
+
+Here's our logo (hover to see the title text):
+
+Hour Select (24h): 
+
+![alt text](https://github.com/IliaIdakiev/angular-material-timepicker/blob/master/timepicker-hours.png?raw=true "Hour Select (24h)")
+
+Minutes Select: 
+
+![alt text](https://github.com/IliaIdakiev/angular-material-timepicker/blob/master/timepicker-min.png?raw=true "Hour Select (24h)")

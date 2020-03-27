@@ -4,12 +4,14 @@ import { CommonModule } from '@angular/common';
 import { ClockComponent } from './clock/clock.component';
 import { MatTimepickerComponent } from './timepicker/mat-timepicker.component';
 import { MatTimepickerComponentDialogComponent } from './timepicker-dialog/timepicker-dialog.component';
+import { InvalidInputComponent } from './invalid-input/invalid-input.component';
 
 @NgModule({
   declarations: [
     ClockComponent,
     MatTimepickerComponent,
-    MatTimepickerComponentDialogComponent
+    MatTimepickerComponentDialogComponent,
+    InvalidInputComponent,
   ],
   imports: [
     CommonModule,
@@ -23,7 +25,8 @@ import { MatTimepickerComponentDialogComponent } from './timepicker-dialog/timep
     MatTimepickerComponent
   ],
   entryComponents: [
-    MatTimepickerComponentDialogComponent
+    MatTimepickerComponentDialogComponent,
+    InvalidInputComponent
   ]
 })
 export class MatTimepickerModule { }
