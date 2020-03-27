@@ -90,6 +90,9 @@ export class MatTimepickerComponent implements OnInit, OnChanges, AfterViewInit,
     this._formattedValueString = this.mode === '12h' ?
       `${hour}:${twoDigits(value.getMinutes())} ${isPm ? 'pm' : 'am'}` :
       `${twoDigits(value.getHours())}:${twoDigits(value.getMinutes())}`;
+    Promise.resolve().then(() => {
+      this.renderer.setProperty(this.input.nativeElement, 'value', this._formattedValueString);
+    });
     this.currentValue = value;
   }
 
@@ -120,11 +123,46 @@ export class MatTimepickerComponent implements OnInit, OnChanges, AfterViewInit,
 
   inputChangeHandler() {
     const value = this.input.nativeElement.value as string;
-    if (!value.includes(':')) { this.writeValue(null); return; }
-    const [hours, minutes] = value.split(':');
-    const d = new Date();
+    const length = value.length;
+    if (length === 0) { this.writeValue(null); return; }
+
+    let [hours, minutes] = length === 1 ? [value, 0] :
+      length === 2 ? [value, 0] : value.includes(':') ? value.split(':') : value.split(/(\d\d)/).filter(v => v);
+
+    if (this.mode === '12h' && +hours < 1) {
+      hours = '1';
+    } else {
+      if (+hours > 24) {
+        hours = '24';
+      } else if (+hours < 0) {
+        hours = '0';
+      }
+    }
+
+
+    if (+minutes > 59) {
+      minutes = '59';
+    } else if (+minutes < 0) {
+      minutes = '0';
+    }
+
+    let d = new Date();
     d.setHours(+hours);
     d.setMinutes(+minutes);
+
+    const isLessThanMin = this.minDate && +this.minDate > +d;
+    const isMoreThanMax = this.maxDate && +this.maxDate < +d;
+    if (isLessThanMin || isMoreThanMax) {
+      if (isLessThanMin) {
+        d = this.minDate;
+      } else {
+        d = this.maxDate;
+      }
+    }
+
+    d.setSeconds(0);
+    d.setMilliseconds(0);
+
     this.writeValue(d);
   }
 
