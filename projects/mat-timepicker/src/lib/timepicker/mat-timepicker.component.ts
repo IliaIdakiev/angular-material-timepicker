@@ -84,6 +84,10 @@ export class MatTimepickerComponent implements OnInit, OnChanges, AfterViewInit,
 
 
   @Input() set value(value: Date) {
+    if (!value) {
+      this.renderer.setProperty(this.input.nativeElement, 'value', '');
+      return;
+    }
     this._value = value;
     const { hour, isPm } = convertHoursForMode(value.getHours(), this.mode);
     this._isPm = isPm;
@@ -122,12 +126,32 @@ export class MatTimepickerComponent implements OnInit, OnChanges, AfterViewInit,
   }
 
   inputChangeHandler() {
-    const value = this.input.nativeElement.value as string;
+    let value = this.input.nativeElement.value as string;
     const length = value.length;
     if (length === 0) { this.writeValue(null); return; }
 
-    let [hours, minutes] = length === 1 ? [value, 0] :
+    const meridiemResult = value.match(/am|pm/i);
+    let meridiem: string | null = null;
+    if (meridiemResult) {
+      value = value.replace(meridiemResult[0], '');
+      [meridiem] = meridiemResult;
+    }
+
+    let [hours, minutes]: any = length === 1 ? [value, 0] :
       length === 2 ? [value, 0] : value.includes(':') ? value.split(':') : value.split(/(\d\d)/).filter(v => v);
+
+    hours = +hours;
+    minutes = +minutes;
+
+    if (isNaN(hours) || isNaN(minutes)) {
+      this.writeValue(null); return;
+    }
+
+    if (hours < 12 && meridiem && meridiem.toLowerCase() === 'pm') {
+      hours += 12;
+    } else if (hours > 12 && meridiem && meridiem.toLowerCase() === 'am') {
+      hours -= 12;
+    }
 
     if (this.mode === '12h' && +hours < 1) {
       hours = '1';
@@ -261,7 +285,6 @@ export class MatTimepickerComponent implements OnInit, OnChanges, AfterViewInit,
   }
 
   writeValue(value: Date): void {
-    if (!value) { return; }
     this.value = value;
   }
 
