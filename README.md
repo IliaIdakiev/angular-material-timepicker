@@ -10,8 +10,6 @@
 ```
 * **Yes! You can use ngModel. This control implements ControlValueAccessor.**
 
-* **Yes! You can use [moment.js](https://momentjs.com/) for value/min/max attributes.**
-
 ### Component Configuration
 ```typescript
 /* Override the label of the ok button. */
@@ -30,7 +28,7 @@
 @Input() color: ThemePalette = 'primary';
 
 /* Set the value of the timepicker control (default is current time) */
-@Input() value: Date | Moment = new Date();
+@Input() value: Date = new Date();
 
 /* Wrapper the input with MaterialFormField */
 @Input() withFormField = false;
@@ -39,16 +37,22 @@
 @Input() placeholder: string = null;
 
 /* Minimum time to pick from */
-@Input() min: Date | Moment;
+@Input() minDate: Date;
 
 /* Maximum time to pick from */
-@Input() max: Date | Moment;
+@Input() maxDate: Date;
 
 /* Add material clock icon to the left */
 @Input() withIcon = false;
 
 /* Material clock icon color */
 @Input() iconColor: ThemePalette
+
+/* Disables the dialog open when clicking the input field */
+@Input() disableDialogOpenOnInputClick = false;
+
+/* Disables the dialog open when clicking the icon if there is one */
+@Input() disableDialogOpenOnIconClick = false;
 ```
 
 
