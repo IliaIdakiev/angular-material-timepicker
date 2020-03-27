@@ -20,6 +20,7 @@ import { twoDigits, convertHoursForMode, isAllowed } from '../util';
 import { MatTimepickerComponentDialogComponent } from '../timepicker-dialog/timepicker-dialog.component';
 import { Subject } from 'rxjs';
 import { takeUntil, first, min } from 'rxjs/operators';
+import { InvalidInputComponent } from '../invalid-input/invalid-input.component';
 
 @Component({
   selector: 'mat-timepicker',
@@ -108,6 +109,7 @@ export class MatTimepickerComponent implements OnInit, OnChanges, AfterViewInit,
 
   currentValue: Date;
   modalRef: MatDialogRef<MatTimepickerComponentDialogComponent>;
+  invalidInputmodalRef: MatDialogRef<InvalidInputComponent>;
   onChangeFn: any;
   onTouchedFn: any;
 
@@ -182,6 +184,11 @@ export class MatTimepickerComponent implements OnInit, OnChanges, AfterViewInit,
       } else {
         d = this.maxDate;
       }
+      this.invalidInputmodalRef = this.dialog.open(InvalidInputComponent, { data: { color: this.color }, width: '200px' });
+      this.invalidInputmodalRef.componentInstance.okClickEvent.pipe(first()).subscribe(() => {
+        this.invalidInputmodalRef.close();
+        this.invalidInputmodalRef = null;
+      });
     }
 
     d.setSeconds(0);
