@@ -3,7 +3,7 @@
     (touchstart)="disableAnimatedPointer()" (mousedown)="disableAnimatedPointer()" (touchend)="handleTouchEnd($event)"
     (mouseup)="enableAnimatedPointer()" (click)="handleClick($event)">
     <div class="pointer-container"
-      [ngClass]="{ 'small-pointer': mode === '24h' && viewType === 'hours' && (formattedValue === 0 || formattedValue > 12), 'animated-pointer': !touching, 'disabled': !isFormattedValueAllowed}"
+      [ngClass]="{ 'small-pointer': mode === '24h' && viewType === 'hours' && (formattedValue === 0 || formattedValue > 12), 'animated-pointer': !touching }"
       [style.transform]="'rotate(' + angle + 'deg)'">
       <button mat-mini-fab [color]="color" class="inner-dot"></button>
       <mat-toolbar [color]="color" class="pointer">

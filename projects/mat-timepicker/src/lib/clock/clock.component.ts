@@ -67,8 +67,10 @@ export class ClockComponent implements OnChanges {
       this.isFormattedValueAllowed = this.isAvailable(this.formattedValue);
     }
 
-    const isAvailableHour = this.isAvailableFn ? this.isAvailableFn(this.formattedHours, 'hours', this.isPm) : true;
-    if (this.viewType === 'minutes' && this.isAvailableFn) {
+    const isSelectedTimeAvailable = (this.isAvailableFn) ?
+      this.isAvailableFn(this.formattedValue, 'minutes', this.isPm, this.formattedHours) : true;
+
+    if (this.mode === '24h' && this.viewType === 'minutes' && this.isAvailableFn) {
       const areMinitesAvailable = this.isAvailableFn(this.minutes, 'minutes', this.isPm, this.formattedHours);
       if (!areMinitesAvailable) {
         if (this.minDate && this.minDate.getMinutes() > this.minutes) {
@@ -79,12 +81,12 @@ export class ClockComponent implements OnChanges {
       }
     }
 
-    if (isAvailableHour && this.invalidMeridiemEmitted) {
+    if (isSelectedTimeAvailable && this.invalidMeridiemEmitted) {
       this.clearInvalidMeridiem.emit();
       this.invalidMeridiemEmitted = false;
     }
 
-    this.invalidSelection.emit((this.minDate || this.maxDate) && !isAvailableHour);
+    this.invalidSelection.emit(!isSelectedTimeAvailable);
   }
 
   calculateAngule() {
