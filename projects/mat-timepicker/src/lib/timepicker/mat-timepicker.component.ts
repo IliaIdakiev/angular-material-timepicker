@@ -16,7 +16,7 @@ import {
 } from '@angular/core';
 import { MatDialog, MatDialogRef, MatInput } from '@angular/material';
 import { ITimeData, ClockMode, IAllowed24HourMap, IAllowed12HourMap } from '../interfaces-and-types';
-import { twoDigits, convertHoursForMode, isAllowed } from '../util';
+import { twoDigits, convertHoursForMode, isAllowed, isDateInRange } from '../util';
 import { MatTimepickerComponentDialogComponent } from '../timepicker-dialog/timepicker-dialog.component';
 import { Subject } from 'rxjs';
 import { takeUntil, first, min } from 'rxjs/operators';
@@ -32,11 +32,12 @@ import { InvalidInputComponent } from '../invalid-input/invalid-input.component'
       useExisting: forwardRef(() => MatTimepickerComponent),
       multi: true,
     },
-    {
-      provide: NG_VALIDATORS,
-      useExisting: MatTimepickerComponent,
-      multi: true
-    }
+    // currently irrelevant because if there are min or/and max and the date is out of range we set it to the min/max
+    // {
+    //   provide: NG_VALIDATORS,
+    //   useExisting: MatTimepickerComponent,
+    //   multi: true
+    // }
   ]
 })
 export class MatTimepickerComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy, ControlValueAccessor {
@@ -83,21 +84,17 @@ export class MatTimepickerComponent implements OnInit, OnChanges, AfterViewInit,
   _formattedValueString: string;
   // tslint:disable-next-line:variable-name
 
-
   @Input() set value(value: Date) {
-    if (!value) {
-      this.renderer.setProperty(this.input.nativeElement, 'value', '');
-      return;
-    }
+    if (!value) { this.setInputElementValue(''); return; }
+
     this._value = value;
     const { hour, isPm } = convertHoursForMode(value.getHours(), this.mode);
     this._isPm = isPm;
     this._formattedValueString = this.mode === '12h' ?
       `${hour}:${twoDigits(value.getMinutes())} ${isPm ? 'pm' : 'am'}` :
       `${twoDigits(value.getHours())}:${twoDigits(value.getMinutes())}`;
-    Promise.resolve().then(() => {
-      this.renderer.setProperty(this.input.nativeElement, 'value', this._formattedValueString);
-    });
+
+    this.setInputElementValue(this.formattedValueString);
     this.currentValue = value;
   }
 
@@ -109,7 +106,7 @@ export class MatTimepickerComponent implements OnInit, OnChanges, AfterViewInit,
 
   currentValue: Date;
   modalRef: MatDialogRef<MatTimepickerComponentDialogComponent>;
-  invalidInputmodalRef: MatDialogRef<InvalidInputComponent>;
+  invalidInputModalRef: MatDialogRef<InvalidInputComponent>;
   onChangeFn: any;
   onTouchedFn: any;
 
@@ -119,13 +116,15 @@ export class MatTimepickerComponent implements OnInit, OnChanges, AfterViewInit,
     this.isFormControl = !!form;
   }
 
-  validate({ value }: FormControl) {
-    return null;
-    // const isNotValid = this.answer !== Number(value);
-    // return isNotValid && {
-    //   invalid: true
-    // }
+  setInputElementValue(value: any) {
+    Promise.resolve().then(() => { this.renderer.setProperty(this.input.nativeElement, 'value', value); });
   }
+
+  // currently irrelevant because if there are min or/and max and the date is out of range we set it to the min/max
+  // validate() {
+  //   const isValueInRange = isDateInRange(this.minDate, this.maxDate, this.currentValue);
+  //   return isValueInRange ? null : { dateRange: true };
+  // }
 
   inputChangeHandler() {
     let value = this.input.nativeElement.value as string;
@@ -184,10 +183,10 @@ export class MatTimepickerComponent implements OnInit, OnChanges, AfterViewInit,
       } else {
         d = this.maxDate;
       }
-      this.invalidInputmodalRef = this.dialog.open(InvalidInputComponent, { data: { color: this.color }, width: '200px' });
-      this.invalidInputmodalRef.componentInstance.okClickEvent.pipe(first()).subscribe(() => {
-        this.invalidInputmodalRef.close();
-        this.invalidInputmodalRef = null;
+      this.invalidInputModalRef = this.dialog.open(InvalidInputComponent, { data: { color: this.color }, width: '200px' });
+      this.invalidInputModalRef.componentInstance.okClickEvent.pipe(first()).subscribe(() => {
+        this.invalidInputModalRef.close();
+        this.invalidInputModalRef = null;
       });
     }
 

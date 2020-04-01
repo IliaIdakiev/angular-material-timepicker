@@ -31,6 +31,11 @@ export function getShortestAngle(from, to) {
   return from + mod(difference + 180, 360) - 180;
 }
 
+export function isDateInRange(minDate: Date, maxDate: Date, current: Date) {
+  const unixCurrentDate = +current;
+  return (!minDate || +minDate <= unixCurrentDate) && (!maxDate || unixCurrentDate <= +maxDate);
+}
+
 // used when generating the allowed maps
 
 export function isAllowed(
@@ -56,9 +61,7 @@ export function isAllowed(
   checkDate.setSeconds(0);
   checkDate.setMilliseconds(0);
 
-  const unixCheckDate = +checkDate;
-  const result = (!minDate || +minDate <= unixCheckDate) && (!maxDate || unixCheckDate <= +maxDate);
-  return result;
+  return isDateInRange(minDate, maxDate, checkDate);
 }
 
 // used by the clock component to visually disable the not allowed values
@@ -85,75 +88,3 @@ export function getIsAvailabeFn(allowed12HourMap, allowed24HourMap, mode: ClockM
     return allowed24HourMap[hour][minutes];
   };
 }
-
-
-
-// export function isAvailable(
-//   value: number,
-//   meridiem: any,
-//   formattedHours: any,
-//   minValue: ITimeData,
-//   maxValue: ITimeData,
-//   mode: ClockViewType,
-//   hours?: number
-// ) {
-//   if (!minValue && !maxValue) { return true; }
-//   if (mode === '12h' && meridiem === 'AM' && value === 12) {
-//     value = 0;
-//   }
-
-
-//   const valueDate = new Date();
-//   if (mode === 'minutes') {
-//     hours = hours || formattedHours;
-//     valueDate.setHours(
-//       meridiem === 'AM' ?
-//         hours === 12 ? 0 : hours : hours < 12 ? hours + 12 : hours
-//     );
-//     valueDate.setMinutes(value);
-//     if (valueDate.getDay() !== (new Date()).getDay() && value !== 0) { return false; }
-//   } else {
-//     value = mode === '24h' ? value : meridiem === 'AM' ? value : value < 12 ? value + 12 : value;
-//     valueDate.setHours(value);
-//     valueDate.setMinutes(0);
-//   }
-//   valueDate.setSeconds(0);
-//   valueDate.setMilliseconds(0);
-
-//   let minDate: Date = null;
-//   let maxDate: Date = null;
-//   if (minValue) {
-//     minDate = new Date();
-//     minDate.setHours(minValue.hours);
-//     if (mode === 'minutes') {
-//       minDate.setMinutes(minValue.minutes);
-//     } else {
-//       minDate.setMinutes(0);
-//     }
-//     minDate.setSeconds(0);
-//     minDate.setMilliseconds(0);
-//   }
-//   if (maxValue) {
-//     maxDate = new Date();
-//     maxDate.setHours(maxValue.hours);
-//     if (maxValue.hours === 24) {
-//       maxDate = addDays(maxDate, 1);
-//     }
-//     if (mode === 'minutes') {
-//       maxDate.setMinutes(maxValue.minutes);
-//     } else {
-//       maxDate.setMinutes(0);
-//     }
-//     maxDate.setSeconds(0);
-//     maxDate.setMilliseconds(0);
-//   }
-
-//   if (
-//     maxValue && maxValue.meridiem === 'PM' && ((valueDate.getDay() !== (new Date()).getDay() && value === 0) ||
-//       maxValue.hours === 12 && value === 12 && meridiem === 'PM')
-//   ) {
-//     return true;
-//   }
-
-//   return ((!minDate || minDate <= valueDate) && (!maxDate || maxDate >= valueDate));
-// }
