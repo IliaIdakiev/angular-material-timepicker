@@ -194,6 +194,7 @@ export class MatTimepickerComponent implements OnInit, OnChanges, AfterViewInit,
     d.setMilliseconds(0);
 
     this.writeValue(d);
+    this.onChangeFn(this._formattedValueString);
   }
 
   ngAfterViewInit() {
