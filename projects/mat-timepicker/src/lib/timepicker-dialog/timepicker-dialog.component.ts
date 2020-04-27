@@ -25,6 +25,7 @@ export class MatTimepickerComponentDialogComponent implements DoCheck {
   cancelLabel: string;
 
   set value(value: any) {
+    value = value || this.minDate || this.maxDate || new Date();
     this.hours = value.getHours();
     this.minutes = value.getMinutes();
     this._value = value;

@@ -53,8 +53,13 @@
 
 /* Disables the dialog open when clicking the icon if there is one */
 @Input() disableDialogOpenOnIconClick = false;
+
+/* Disables the invalid value input dialog when input is invalid */
+@Input() enableInvalidInputDialog = false;
 ```
 
+### TODO:
+* implement MatFormFieldControl interface for the mat-timepicker component and remove the withFormField option so it can be used like a normal MatControl
 
 ### Check out the [**Demo**](https://stackblitz.com/github/IliaIdakiev/angular-material-timepicker)!
 
