@@ -273,7 +273,7 @@ export class MatTimepickerComponent implements OnInit, OnChanges, AfterViewInit,
         defaultValue.setMinutes(this.minDate.getMinutes());
       }
 
-      if (hasMinDate || hasMinDate) {
+      if (hasMinDate || hasMaxDate) {
         if (hasMinDate) { this.minDate.setSeconds(0); this.minDate.setMilliseconds(0); }
         if (hasMinDate) { this.maxDate.setSeconds(0); this.maxDate.setMilliseconds(0); }
         this.calculateAllowedMap();
