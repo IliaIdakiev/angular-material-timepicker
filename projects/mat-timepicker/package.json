@@ -1,10 +1,12 @@
 {
   "name": "mat-timepicker",
-  "version": "3.0.1",
+  "version": "0.0.1",
   "peerDependencies": {
-    "@angular/common": "^7.2.0",
-    "@angular/core": "^7.2.0",
-    "@angular/material": "^7.3.4"
+    "@angular/common": "^9.1.4",
+    "@angular/core": "^9.1.4",
+    "tslib": "^1.10.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@angular/material": "^9.2.1"
+  }
 }

@@ -1,5 +1,5 @@
 import { Component, OnInit, EventEmitter, Output, Inject } from '@angular/core';
-import { MAT_DIALOG_DATA } from '@angular/material';
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 @Component({
   selector: 'mat-invalid-input',

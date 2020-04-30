@@ -15,12 +15,14 @@ import {
   SimpleChanges,
   NgZone
 } from '@angular/core';
-import { MatDialog, MatDialogRef, MatInput, MatFormField } from '@angular/material';
-import { ITimeData, ClockMode, IAllowed24HourMap, IAllowed12HourMap } from '../interfaces-and-types';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MatInput } from '@angular/material/input';
+import { MatFormField } from '@angular/material/form-field';
+import { ClockMode, IAllowed24HourMap, IAllowed12HourMap } from '../interfaces-and-types';
 import { twoDigits, convertHoursForMode, isAllowed, isDateInRange } from '../util';
 import { MatTimepickerComponentDialogComponent } from '../timepicker-dialog/timepicker-dialog.component';
 import { Subject } from 'rxjs';
-import { takeUntil, first, min } from 'rxjs/operators';
+import { takeUntil, first } from 'rxjs/operators';
 import { InvalidInputComponent } from '../invalid-input/invalid-input.component';
 
 @Component({
@@ -388,7 +390,7 @@ export class MatTimepickerComponent implements OnInit, OnChanges, AfterViewInit,
     instance.changeEvent.pipe(takeUntil(this.isAlive)).subscribe(this.handleChange);
     instance.okClickEvent.pipe(takeUntil(this.isAlive)).subscribe(this.handleOk);
     instance.cancelClickEvent.pipe(takeUntil(this.isAlive)).subscribe(this.handleCancel);
-    this.modalRef.beforeClose().pipe(first()).subscribe(() => instance.isClosing = true);
+    this.modalRef.beforeClosed().pipe(first()).subscribe(() => instance.isClosing = true);
     this.modalRef.afterClosed().pipe(first()).subscribe(() => {
       this.modalRef = null;
       if (this.onTouchedFn) { this.onTouchedFn(); }

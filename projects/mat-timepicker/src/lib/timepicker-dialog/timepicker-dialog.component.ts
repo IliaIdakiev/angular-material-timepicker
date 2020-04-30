@@ -1,4 +1,4 @@
-import { MAT_DIALOG_DATA } from '@angular/material';
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Component, EventEmitter, Output, Inject, DoCheck } from '@angular/core';
 import { ClockViewType, ClockMode, IAllowed24HourMap, IAllowed12HourMap } from '../interfaces-and-types';
 import { twoDigits, convertHoursForMode } from '../util';

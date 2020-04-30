@@ -10,7 +10,7 @@ describe('workspace-project App', () => {
 
   it('should display welcome message', () => {
     page.navigateTo();
-    expect(page.getTitleText()).toEqual('Welcome to angular-material-timepicker!');
+    expect(page.getTitleText()).toEqual('angular-material-timepicker app is running!');
   });
 
   afterEach(async () => {
