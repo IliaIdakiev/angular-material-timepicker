@@ -6,18 +6,22 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'angular-material-timepicker';
+  minValue: Date;
+  maxValue: Date;
 
-  get minValue() {
-    const val = new Date();
-    val.setHours(6);
-    val.setMinutes(10);
-    return val;
-  }
+  // errors = {
+  //   'INVALID': () => true
+  // }
 
-  get maxValue() {
-    const val = new Date();
-    val.setHours(18);
-    val.setMinutes(10);
-    return val;
+  constructor() {
+    const minValue = new Date();
+    minValue.setHours(6);
+    minValue.setMinutes(10);
+    this.minValue = minValue;
+
+    const maxValue = new Date();
+    maxValue.setHours(18);
+    maxValue.setMinutes(10);
+    this.maxValue = maxValue;
   }
 }

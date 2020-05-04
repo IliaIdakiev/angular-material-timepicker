@@ -1,4 +1,4 @@
-import { ControlValueAccessor, NG_VALUE_ACCESSOR, NG_VALIDATORS, NgForm } from '@angular/forms';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR, NG_VALIDATORS, NgForm, NgControl, FormBuilder, Validator } from '@angular/forms';
 import {
   Component,
   OnInit,
@@ -13,38 +13,89 @@ import {
   OnDestroy,
   Optional,
   SimpleChanges,
-  NgZone
+  NgZone,
+  HostBinding,
+  Self,
+  Inject
 } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatInput } from '@angular/material/input';
-import { MatFormField } from '@angular/material/form-field';
+import { MatFormField, MatFormFieldControl } from '@angular/material/form-field';
 import { ClockMode, IAllowed24HourMap, IAllowed12HourMap } from '../interfaces-and-types';
 import { twoDigits, convertHoursForMode, isAllowed, isDateInRange } from '../util';
 import { MatTimepickerComponentDialogComponent } from '../timepicker-dialog/timepicker-dialog.component';
 import { Subject } from 'rxjs';
 import { takeUntil, first } from 'rxjs/operators';
 import { InvalidInputComponent } from '../invalid-input/invalid-input.component';
+import { FocusMonitor } from '@angular/cdk/a11y';
+import { coerceBooleanProperty } from '@angular/cdk/coercion';
 
 @Component({
   selector: 'mat-timepicker',
   templateUrl: './mat-timepicker.component.html',
   styleUrls: ['./mat-timepicker.component.scss'],
   providers: [
-    {
-      provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(() => MatTimepickerComponent),
-      multi: true,
-    },
-    // currently irrelevant because if there are min or/and max and the date is out of range we set it to the min/max
-    {
-      provide: NG_VALIDATORS,
-      useExisting: MatTimepickerComponent,
-      multi: true
-    }
+    // {
+    //   provide: NG_VALUE_ACCESSOR,
+    //   useExisting: forwardRef(() => MatTimepickerComponent),
+    //   multi: true,
+    // },
+    // {
+    //   provide: NG_VALIDATORS,
+    //   useExisting: MatTimepickerComponent,
+    //   multi: true
+    // },
+    { provide: MatFormFieldControl, useExisting: MatTimepickerComponent }
   ]
 })
-export class MatTimepickerComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy, ControlValueAccessor {
+export class MatTimepickerComponent implements
+  OnInit,
+  OnChanges,
+  AfterViewInit,
+  OnDestroy,
+  ControlValueAccessor,
+  MatFormFieldControl<any>
+{
+  static nextId = 0;
+  @HostBinding() id = `example-tel-input-${MatTimepickerComponent.nextId++}`;
+  @HostBinding('class.floating') get shouldLabelFloat() {
+    return this.focused || !this.empty;
+  }
+  @HostBinding('attr.aria-describedby') describedBy = '';
+
+  @Input()
+  get required() {
+    return this._required;
+  }
+  set required(req) {
+    this._required = coerceBooleanProperty(req);
+    this.stateChanges.next();
+  }
+  // tslint:disable-next-line:variable-name
+  private _required = false;
+
+  get disabled(): boolean { return this._disabled; }
+  set disabled(value: boolean) {
+    this._disabled = coerceBooleanProperty(value);
+    this.stateChanges.next();
+  }
+  // tslint:disable-next-line:variable-name
+  private _disabled = false;
+
+  @Input()
+  get placeholder() {
+    return this._placeholder;
+  }
+  set placeholder(plh) {
+    this._placeholder = plh;
+    this.stateChanges.next();
+  }
+  // tslint:disable-next-line:variable-name
+  private _placeholder: string;
+  focused = false;
+
   isAlive: Subject<any> = new Subject<any>();
+  stateChanges = new Subject<void>();
   isFormControl = false;
 
   allowed24HourMap: IAllowed24HourMap = null;
@@ -62,9 +113,7 @@ export class MatTimepickerComponent implements OnInit, OnChanges, AfterViewInit,
 
   /** Sets the clock mode, 12-hour or 24-hour clocks are supported. */
   @Input() mode: ClockMode = '24h';
-  @Input() disabled = false;
   @Input() color = 'primary';
-  @Input() placeholder: string = null;
   @Input() withFormField = false;
   @Input() withIcon = false;
   @Input() iconColor: string;
@@ -72,7 +121,11 @@ export class MatTimepickerComponent implements OnInit, OnChanges, AfterViewInit,
   @Input() disableDialogOpenOnIconClick = false;
   @Input() enableInvalidInputDialog = false;
 
-  formFieldErrorMessages: string[];
+  errorState = false;
+  controlType = 'angular-material-timepicker';
+  // get errorState() {
+  //   return this.syncValidations.reduce((acc, curr) => acc);
+  // }
 
   listeners: (() => void)[] = [];
 
@@ -109,11 +162,16 @@ export class MatTimepickerComponent implements OnInit, OnChanges, AfterViewInit,
 
     if (!this.isInputFocused) { this.setInputElementValue(this.formattedValueString); }
     this.currentValue = value;
+    this.stateChanges.next();
   }
 
   get value() { return this._value; }
 
   get isPm() { return this._isPm; }
+
+  get empty() {
+    return !(this.currentValue instanceof Date);
+  }
 
   get formattedValueString() { return this._formattedValueString; }
 
@@ -127,12 +185,32 @@ export class MatTimepickerComponent implements OnInit, OnChanges, AfterViewInit,
   changeEvent: EventEmitter<any> = new EventEmitter<any>();
 
   constructor(
+    @Optional() @Self() public ngControl: NgControl,
     public dialog: MatDialog,
     private renderer: Renderer2,
     @Optional() form: NgForm,
-    private zone: NgZone
+    private zone: NgZone,
+    private fm: FocusMonitor,
+    private elRef: ElementRef<HTMLElement>,
+    // tslint:disable-next-line:ban-types
+    @Optional() @Inject(NG_VALIDATORS) private syncValidations: (Function | Validator)[] = []
   ) {
+    if (this.ngControl != null) { this.ngControl.valueAccessor = this; }
+    fm.monitor(elRef.nativeElement, true).subscribe(origin => {
+      this.focused = !!origin;
+      this.stateChanges.next();
+    });
     this.isFormControl = !!form;
+  }
+
+  setDescribedByIds(ids: string[]) {
+    this.describedBy = ids.join(' ');
+  }
+
+  onContainerClick(event: MouseEvent) {
+    if ((event.target as Element).tagName.toLowerCase() !== 'input') {
+      this.elRef.nativeElement.querySelector('input').focus();
+    }
   }
 
 
@@ -424,6 +502,8 @@ export class MatTimepickerComponent implements OnInit, OnChanges, AfterViewInit,
   ngOnDestroy() {
     this.isAlive.next();
     this.isAlive.complete();
+    this.stateChanges.complete();
+    this.fm.stopMonitoring(this.elRef.nativeElement);
 
     this.listeners.forEach(l => l());
   }

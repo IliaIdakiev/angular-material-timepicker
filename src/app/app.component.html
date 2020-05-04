@@ -1,15 +1,21 @@
-<div>
+<!-- <div>
   <label for="">No form field, no min/max (24h)</label>
   <br />
   <mat-timepicker id="timepicker-example-1" mode="24h"></mat-timepicker>
 </div>
 <br />
 <br />
-<br />
-<mat-timepicker id="timepicker-example-2" [minDate]="minValue" [maxDate]="maxValue" mode="24h"
-  placeholder="Time 24h with min, max and icon" withFormField="true" [withIcon]="true"
-  [disableDialogOpenOnInputClick]="true">
-</mat-timepicker>
+<br /> -->
+<form #f="ngForm">
+  <mat-form-field>
+    <mat-timepicker id="timepicker-example-2" #time="ngModel" [minDate]="minValue" [ngModel]="maxValue"
+      [maxDate]="maxValue" mode="24h" placeholder="Time 24h with min, max and icon" name="time" [withIcon]="true">
+    </mat-timepicker>
+  </mat-form-field>
+</form>
+<div>Errors: {{time.errors | json}}</div>
+<div>Value: {{f.value | json}}</div>
+<!-- 
 <mat-timepicker id="timepicker-example-3" [minDate]="minValue" [maxDate]="maxValue" mode="12h"
   placeholder="Time 12h with min & max" withFormField="true" [disableDialogOpenOnInputClick]="true" [withIcon]="true">
-</mat-timepicker>
+</mat-timepicker> -->
