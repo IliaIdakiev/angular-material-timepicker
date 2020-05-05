@@ -67,7 +67,12 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "angular-material-timepicker:build"
+            "browserTarget": "angular-material-timepicker:build",
+            "sourceMap": {
+              "vendor": true,
+              "scripts": true,
+              "styles": true
+            }
           },
           "configurations": {
             "production": {

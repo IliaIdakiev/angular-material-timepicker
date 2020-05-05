@@ -1,4 +1,4 @@
-import { ControlValueAccessor, NG_VALUE_ACCESSOR, NG_VALIDATORS, NgForm, NgControl, FormBuilder, Validator } from '@angular/forms';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR, NG_VALIDATORS, NgForm, NgControl, FormBuilder, Validator, FormGroupDirective } from '@angular/forms';
 import {
   Component,
   OnInit,
@@ -29,26 +29,35 @@ import { takeUntil, first } from 'rxjs/operators';
 import { InvalidInputComponent } from '../invalid-input/invalid-input.component';
 import { FocusMonitor } from '@angular/cdk/a11y';
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
+import { ErrorStateMatcher, CanUpdateErrorStateCtor, mixinErrorState } from '@angular/material/core';
+
+
+class MatTimepickerBase {
+  constructor(
+    // tslint:disable-next-line:variable-name
+    public _defaultErrorStateMatcher: ErrorStateMatcher,
+    // tslint:disable-next-line:variable-name
+    public _parentForm: NgForm,
+    // tslint:disable-next-line:variable-name
+    public _parentFormGroup: FormGroupDirective,
+    /** @docs-private */
+    public ngControl: NgControl
+  ) { }
+}
+
+// tslint:disable-next-line:variable-name
+const _MatTimepickerMixinBase: CanUpdateErrorStateCtor & typeof MatTimepickerBase = mixinErrorState(MatTimepickerBase);
 
 @Component({
   selector: 'mat-timepicker',
   templateUrl: './mat-timepicker.component.html',
   styleUrls: ['./mat-timepicker.component.scss'],
   providers: [
-    // {
-    //   provide: NG_VALUE_ACCESSOR,
-    //   useExisting: forwardRef(() => MatTimepickerComponent),
-    //   multi: true,
-    // },
-    // {
-    //   provide: NG_VALIDATORS,
-    //   useExisting: MatTimepickerComponent,
-    //   multi: true
-    // },
     { provide: MatFormFieldControl, useExisting: MatTimepickerComponent }
-  ]
+  ],
+  exportAs: 'matTimepicker'
 })
-export class MatTimepickerComponent implements
+export class MatTimepickerComponent extends _MatTimepickerMixinBase implements
   OnInit,
   OnChanges,
   AfterViewInit,
@@ -57,11 +66,14 @@ export class MatTimepickerComponent implements
   MatFormFieldControl<any>
 {
   static nextId = 0;
+
+  isAlive: Subject<any> = new Subject<any>();
+  stateChanges = new Subject<void>();
+
   @HostBinding() id = `example-tel-input-${MatTimepickerComponent.nextId++}`;
-  @HostBinding('class.floating') get shouldLabelFloat() {
-    return this.focused || !this.empty;
-  }
+  @HostBinding('class.floating') get shouldLabelFloat() { return this.focused || !this.empty; }
   @HostBinding('attr.aria-describedby') describedBy = '';
+
 
   @Input()
   get required() {
@@ -74,6 +86,8 @@ export class MatTimepickerComponent implements
   // tslint:disable-next-line:variable-name
   private _required = false;
 
+
+  @Input()
   get disabled(): boolean { return this._disabled; }
   set disabled(value: boolean) {
     this._disabled = coerceBooleanProperty(value);
@@ -81,6 +95,7 @@ export class MatTimepickerComponent implements
   }
   // tslint:disable-next-line:variable-name
   private _disabled = false;
+
 
   @Input()
   get placeholder() {
@@ -92,11 +107,8 @@ export class MatTimepickerComponent implements
   }
   // tslint:disable-next-line:variable-name
   private _placeholder: string;
-  focused = false;
 
-  isAlive: Subject<any> = new Subject<any>();
-  stateChanges = new Subject<void>();
-  isFormControl = false;
+  focused = false;
 
   allowed24HourMap: IAllowed24HourMap = null;
   allowed12HourMap: IAllowed12HourMap = null;
@@ -104,7 +116,7 @@ export class MatTimepickerComponent implements
   isInputFocused = false;
 
   @ViewChild(MatInput, { read: ElementRef }) input: ElementRef;
-  @ViewChild(MatFormField, { read: ElementRef }) formField: ElementRef;
+  // @ViewChild(MatFormField, { read: ElementRef }) formField: ElementRef;
 
   /** Override the label of the ok button. */
   @Input() okLabel = 'Ok';
@@ -122,6 +134,7 @@ export class MatTimepickerComponent implements
   @Input() enableInvalidInputDialog = false;
 
   errorState = false;
+
   controlType = 'angular-material-timepicker';
   // get errorState() {
   //   return this.syncValidations.reduce((acc, curr) => acc);
@@ -149,6 +162,7 @@ export class MatTimepickerComponent implements
   @Input() set value(value: Date) {
     this._value = value;
     if (!value) {
+      this._formattedValueString = null;
       this.setInputElementValue(value);
       this.currentValue = value;
       return;
@@ -188,19 +202,23 @@ export class MatTimepickerComponent implements
     @Optional() @Self() public ngControl: NgControl,
     public dialog: MatDialog,
     private renderer: Renderer2,
-    @Optional() form: NgForm,
     private zone: NgZone,
+    // tslint:disable-next-line:variable-name
+    _defaultErrorStateMatcher: ErrorStateMatcher,
     private fm: FocusMonitor,
     private elRef: ElementRef<HTMLElement>,
-    // tslint:disable-next-line:ban-types
-    @Optional() @Inject(NG_VALIDATORS) private syncValidations: (Function | Validator)[] = []
+    // @Optional() private formField: MatFormField,
+    // tslint:disable-next-line:variable-name
+    @Optional() _parentForm: NgForm,
+    // tslint:disable-next-line:variable-name
+    @Optional() _parentFormGroup: FormGroupDirective,
   ) {
+    super(_defaultErrorStateMatcher, _parentForm, _parentFormGroup, ngControl);
     if (this.ngControl != null) { this.ngControl.valueAccessor = this; }
     fm.monitor(elRef.nativeElement, true).subscribe(origin => {
       this.focused = !!origin;
       this.stateChanges.next();
     });
-    this.isFormControl = !!form;
   }
 
   setDescribedByIds(ids: string[]) {
@@ -215,6 +233,7 @@ export class MatTimepickerComponent implements
 
 
   focusHandler() { this.isInputFocused = true; }
+
   blurHandler() {
     this.isInputFocused = false;
     this.setInputElementValue(this.formattedValueString);
@@ -232,13 +251,13 @@ export class MatTimepickerComponent implements
   // currently irrelevant because if there are min or/and max and the date is out of range we set it to the min/max
   validate() {
     const isValueInRange = isDateInRange(this.minDate, this.maxDate, this.currentValue);
-    if (this.formField) {
-      if (isValueInRange) {
-        this.renderer.removeClass(this.formField.nativeElement, 'mat-form-field-invalid');
-      } else {
-        this.renderer.addClass(this.formField.nativeElement, 'mat-form-field-invalid');
-      }
-    }
+    // if (this.formField) {
+    //   if (isValueInRange) {
+    //     this.renderer.removeClass(this.formField.nativeElement, 'mat-form-field-invalid');
+    //   } else {
+    //     this.renderer.addClass(this.formField.nativeElement, 'mat-form-field-invalid');
+    //   }
+    // }
     return isValueInRange ? null : { dateRange: true };
   }
 
@@ -247,7 +266,7 @@ export class MatTimepickerComponent implements
     const length = value.length;
     if (length === 0) {
       this.writeValue(null);
-      this.onChangeFn(null);
+      if (this.onChangeFn) { this.onChangeFn(null); }
       return;
     }
 
@@ -318,7 +337,7 @@ export class MatTimepickerComponent implements
     d.setMilliseconds(0);
 
     this.writeValue(d);
-    this.onChangeFn(d);
+    if (this.onChangeFn) { this.onChangeFn(d); }
   }
 
   ngAfterViewInit() {
@@ -472,7 +491,7 @@ export class MatTimepickerComponent implements
     this.modalRef.afterClosed().pipe(first()).subscribe(() => {
       this.modalRef = null;
       if (this.onTouchedFn) { this.onTouchedFn(); }
-      setTimeout(() => { this.input.nativeElement.blur(); });
+      setTimeout(() => { this.elRef.nativeElement.querySelector('input').focus(); });
     });
 
     this.currentValue = this.value as Date;

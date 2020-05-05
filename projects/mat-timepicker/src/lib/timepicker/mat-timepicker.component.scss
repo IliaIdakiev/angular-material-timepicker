@@ -1,21 +1,21 @@
 :host {
-  position: relative;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
+  // position: relative;
+  display: inline-block;;
+  // flex-direction: row;
+  // align-items: center;
+  // justify-content: center;
 
-  mat-form-field {
-    & + mat-icon {
-      height: 20px;
-      width: 20px;
-      font-size: 20px !important;
-      margin-top: -4px;
-      margin-left: -23px;
-      color: #949494;
-      z-index: 2;
-      cursor: pointer;
-    }
-  }
+  // mat-form-field {
+    // & + mat-icon {
+    //   height: 20px;
+    //   width: 20px;
+    //   font-size: 20px !important;
+    //   margin-top: -4px;
+    //   margin-left: -23px;
+    //   color: #949494;
+    //   z-index: 2;
+    //   cursor: pointer;
+    // }
+  // }
 }
 
