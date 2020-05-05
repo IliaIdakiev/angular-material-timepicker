@@ -5,8 +5,10 @@ import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { MatTimepickerModule } from 'mat-timepicker';
+import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 
 @NgModule({
   declarations: [
@@ -17,7 +19,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
     FormsModule,
     BrowserAnimationsModule,
     MatTimepickerModule,
-    MatFormFieldModule
+    MatFormFieldModule,
+    MatIconModule,
+    MatInputModule
   ],
   providers: [],
   bootstrap: [AppComponent]

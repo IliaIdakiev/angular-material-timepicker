@@ -7,15 +7,76 @@
 <br />
 <br /> -->
 <form #f="ngForm">
-  <mat-form-field>
-    <mat-timepicker id="timepicker-example-2" #time="ngModel" [minDate]="minValue" [ngModel]="maxValue"
-      [maxDate]="maxValue" mode="24h" placeholder="Time 24h with min, max and icon" name="time" [withIcon]="true">
-    </mat-timepicker>
-  </mat-form-field>
+  <fieldset>
+    <legend>Timepicker with input click dialog</legend>
+    <p>
+      <mat-form-field appearance="fill">
+        <mat-label>24 TIMEPICKER</mat-label>
+        <mat-timepicker #t1="matTimepicker" #time1="ngModel" [minDate]="minValue" id="timepicker-example-1" mode="24h"
+          ngModel placeholder="Please select time..." name="time-1" required>
+        </mat-timepicker>
+        <mat-icon matSuffix (click)="t1.showDialog()">access_time</mat-icon>
+        <mat-error *ngIf="time1.touched && time1.invalid">Invalid Date</mat-error>
+      </mat-form-field>
+    </p>
+    <p>
+      <mat-form-field appearance="fill">
+        <mat-label>12 TIMEPICKER</mat-label>
+        <mat-timepicker #t2="matTimepicker" #time2="ngModel" [minDate]="minValue" id="timepicker-example-2" mode="12h"
+          ngModel placeholder="Please select time..." name="time-2">
+        </mat-timepicker>
+        <mat-icon matSuffix (click)="t2.showDialog()">access_time</mat-icon>
+        <mat-error *ngIf="time2.touched && time2.invalid">Invalid Date</mat-error>
+      </mat-form-field>
+    </p>
+  </fieldset>
+  <fieldset>
+    <legend>Timepicker with icon click dialog</legend>
+    <p>
+      <mat-form-field appearance="fill">
+        <mat-label>24 TIMEPICKER</mat-label>
+        <mat-timepicker #t3="matTimepicker" #time3="ngModel" [minDate]="minValue" id="timepicker-example-1" mode="24h"
+          ngModel placeholder="Please select time..." name="time-3" [disableDialogOpenOnInputClick]="true" required>
+        </mat-timepicker>
+        <mat-icon matSuffix (click)="t3.showDialog()">access_time</mat-icon>
+        <mat-error *ngIf="time3.touched && time3.invalid">Invalid Date</mat-error>
+      </mat-form-field>
+    </p>
+    <p>
+      <mat-form-field appearance="fill">
+        <mat-label>12 TIMEPICKER</mat-label>
+        <mat-timepicker #t4="matTimepicker" #time4="ngModel" [minDate]="minValue" id="timepicker-example-2" mode="12h"
+          ngModel placeholder="Please select time..." name="time-4" [disableDialogOpenOnInputClick]="true">
+        </mat-timepicker>
+        <mat-icon matSuffix (click)="t4.showDialog()">access_time</mat-icon>
+        <mat-error *ngIf="time4.touched && time4.invalid">Invalid Date</mat-error>
+      </mat-form-field>
+    </p>
+  </fieldset>
+  <fieldset>
+    <legend>Timepicker with icon click dialog with ShowOnDirtyErrorStateMatcher</legend>
+    <p>
+      <mat-form-field appearance="fill">
+        <mat-label>24 TIMEPICKER</mat-label>
+        <mat-timepicker #t5="matTimepicker" #time5="ngModel" [minDate]="minValue" id="timepicker-example-1" mode="24h"
+          ngModel placeholder="Please select time..." name="time-5" [disableDialogOpenOnInputClick]="true"
+          [errorStateMatcher]="ShowOnDirtyErrorStateMatcher" required>
+        </mat-timepicker>
+        <mat-icon matSuffix (click)="t5.showDialog()">access_time</mat-icon>
+        <mat-error *ngIf="time5.touched && time5.invalid">Invalid Date</mat-error>
+      </mat-form-field>
+    </p>
+    <p>
+      <mat-form-field appearance="fill">
+        <mat-label>12 TIMEPICKER</mat-label>
+        <mat-timepicker #t6="matTimepicker" #time6="ngModel" [minDate]="minValue" id="timepicker-example-2" mode="12h"
+          ngModel placeholder="Please select time..." name="time-6" [errorStateMatcher]="ShowOnDirtyErrorStateMatcher"
+          [disableDialogOpenOnInputClick]="true">
+        </mat-timepicker>
+        <mat-icon matSuffix (click)="t6.showDialog()">access_time</mat-icon>
+        <mat-error *ngIf="time6.touched && time6.invalid">Invalid Date</mat-error>
+      </mat-form-field>
+    </p>
+  </fieldset>
 </form>
-<div>Errors: {{time.errors | json}}</div>
 <div>Value: {{f.value | json}}</div>
-<!-- 
-<mat-timepicker id="timepicker-example-3" [minDate]="minValue" [maxDate]="maxValue" mode="12h"
-  placeholder="Time 12h with min & max" withFormField="true" [disableDialogOpenOnInputClick]="true" [withIcon]="true">
-</mat-timepicker> -->

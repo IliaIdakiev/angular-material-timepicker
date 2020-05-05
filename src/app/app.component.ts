@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { ShowOnDirtyErrorStateMatcher } from '@angular/material/core';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -9,9 +10,7 @@ export class AppComponent {
   minValue: Date;
   maxValue: Date;
 
-  // errors = {
-  //   'INVALID': () => true
-  // }
+  ShowOnDirtyErrorStateMatcher = new ShowOnDirtyErrorStateMatcher();
 
   constructor() {
     const minValue = new Date();
