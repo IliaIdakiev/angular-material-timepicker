@@ -12,8 +12,8 @@
     <p>
       <mat-form-field appearance="fill">
         <mat-label>24 TIMEPICKER</mat-label>
-        <mat-timepicker #t1="matTimepicker" #time1="ngModel" [minDate]="minValue" id="timepicker-example-1" mode="24h"
-          ngModel placeholder="Please select time..." name="time-1" required>
+        <mat-timepicker #t1="matTimepicker" #time1="ngModel" [minDate]="minValue" [maxDate]="maxValue"
+          id="timepicker-example-1" mode="24h" ngModel placeholder="Please select time..." name="time-1" required>
         </mat-timepicker>
         <mat-icon matSuffix (click)="t1.showDialog()">access_time</mat-icon>
         <mat-error *ngIf="time1.touched && time1.invalid">Invalid Date</mat-error>
@@ -22,8 +22,8 @@
     <p>
       <mat-form-field appearance="fill">
         <mat-label>12 TIMEPICKER</mat-label>
-        <mat-timepicker #t2="matTimepicker" #time2="ngModel" [minDate]="minValue" id="timepicker-example-2" mode="12h"
-          ngModel placeholder="Please select time..." name="time-2">
+        <mat-timepicker #t2="matTimepicker" #time2="ngModel" [minDate]="minValue" [maxDate]="maxValue"
+          id="timepicker-example-2" mode="12h" ngModel placeholder="Please select time..." name="time-2">
         </mat-timepicker>
         <mat-icon matSuffix (click)="t2.showDialog()">access_time</mat-icon>
         <mat-error *ngIf="time2.touched && time2.invalid">Invalid Date</mat-error>
@@ -35,8 +35,9 @@
     <p>
       <mat-form-field appearance="fill">
         <mat-label>24 TIMEPICKER</mat-label>
-        <mat-timepicker #t3="matTimepicker" #time3="ngModel" [minDate]="minValue" id="timepicker-example-1" mode="24h"
-          ngModel placeholder="Please select time..." name="time-3" [disableDialogOpenOnInputClick]="true" required>
+        <mat-timepicker #t3="matTimepicker" #time3="ngModel" [minDate]="minValue" [maxDate]="maxValue"
+          id="timepicker-example-3" mode="24h" ngModel placeholder="Please select time..." name="time-3"
+          [disableDialogOpenOnInputClick]="true" required>
         </mat-timepicker>
         <mat-icon matSuffix (click)="t3.showDialog()">access_time</mat-icon>
         <mat-error *ngIf="time3.touched && time3.invalid">Invalid Date</mat-error>
@@ -45,8 +46,9 @@
     <p>
       <mat-form-field appearance="fill">
         <mat-label>12 TIMEPICKER</mat-label>
-        <mat-timepicker #t4="matTimepicker" #time4="ngModel" [minDate]="minValue" id="timepicker-example-2" mode="12h"
-          ngModel placeholder="Please select time..." name="time-4" [disableDialogOpenOnInputClick]="true">
+        <mat-timepicker #t4="matTimepicker" #time4="ngModel" [minDate]="minValue" [maxDate]="maxValue"
+          id="timepicker-example-4" mode="12h" ngModel placeholder="Please select time..." name="time-4"
+          [disableDialogOpenOnInputClick]="true">
         </mat-timepicker>
         <mat-icon matSuffix (click)="t4.showDialog()">access_time</mat-icon>
         <mat-error *ngIf="time4.touched && time4.invalid">Invalid Date</mat-error>
@@ -58,9 +60,9 @@
     <p>
       <mat-form-field appearance="fill">
         <mat-label>24 TIMEPICKER</mat-label>
-        <mat-timepicker #t5="matTimepicker" #time5="ngModel" [minDate]="minValue" id="timepicker-example-1" mode="24h"
-          ngModel placeholder="Please select time..." name="time-5" [disableDialogOpenOnInputClick]="true"
-          [errorStateMatcher]="ShowOnDirtyErrorStateMatcher" required>
+        <mat-timepicker #t5="matTimepicker" #time5="ngModel" [minDate]="minValue" [maxDate]="maxValue"
+          id="timepicker-example-5" mode="24h" ngModel placeholder="Please select time..." name="time-5"
+          [disableDialogOpenOnInputClick]="true" [errorStateMatcher]="showOnDirtyErrorStateMatcher" required>
         </mat-timepicker>
         <mat-icon matSuffix (click)="t5.showDialog()">access_time</mat-icon>
         <mat-error *ngIf="time5.touched && time5.invalid">Invalid Date</mat-error>
@@ -69,12 +71,38 @@
     <p>
       <mat-form-field appearance="fill">
         <mat-label>12 TIMEPICKER</mat-label>
-        <mat-timepicker #t6="matTimepicker" #time6="ngModel" [minDate]="minValue" id="timepicker-example-2" mode="12h"
-          ngModel placeholder="Please select time..." name="time-6" [errorStateMatcher]="ShowOnDirtyErrorStateMatcher"
-          [disableDialogOpenOnInputClick]="true">
+        <mat-timepicker #t6="matTimepicker" #time6="ngModel" [minDate]="minValue" [maxDate]="maxValue"
+          id="timepicker-example-6" mode="12h" ngModel placeholder="Please select time..." name="time-6"
+          [errorStateMatcher]="showOnDirtyErrorStateMatcher" [disableDialogOpenOnInputClick]="true">
         </mat-timepicker>
         <mat-icon matSuffix (click)="t6.showDialog()">access_time</mat-icon>
         <mat-error *ngIf="time6.touched && time6.invalid">Invalid Date</mat-error>
+      </mat-form-field>
+    </p>
+  </fieldset>
+  <fieldset>
+    <legend>Timepicker with icon click dialog with custom error matcher (look into the source code of the example app)
+    </legend>
+    <p>
+      <mat-form-field appearance="fill">
+        <mat-label>24 TIMEPICKER</mat-label>
+        <mat-timepicker #t7="matTimepicker" #time7="ngModel" [minDate]="minValue" [maxDate]="maxValue"
+          id="timepicker-example-7" mode="24h" ngModel placeholder="Please select time..." name="time-7"
+          [disableDialogOpenOnInputClick]="true" [errorStateMatcher]="customErrorStateMatcher" required>
+        </mat-timepicker>
+        <mat-icon matSuffix (click)="t7.showDialog()">access_time</mat-icon>
+        <mat-error *ngIf="time7.touched && time7.invalid">Invalid Date</mat-error>
+      </mat-form-field>
+    </p>
+    <p>
+      <mat-form-field appearance="fill">
+        <mat-label>12 TIMEPICKER</mat-label>
+        <mat-timepicker #t8="matTimepicker" #time8="ngModel" [minDate]="minValue" [maxDate]="maxValue"
+          id="timepicker-example-8" mode="12h" ngModel placeholder="Please select time..." name="time-8"
+          [errorStateMatcher]="customErrorStateMatcher" [disableDialogOpenOnInputClick]="true">
+        </mat-timepicker>
+        <mat-icon matSuffix (click)="t8.showDialog()">access_time</mat-icon>
+        <mat-error *ngIf="time8.touched && time8.invalid">Invalid Date</mat-error>
       </mat-form-field>
     </p>
   </fieldset>

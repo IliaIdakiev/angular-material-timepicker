@@ -1,5 +1,14 @@
 import { Component } from '@angular/core';
-import { ShowOnDirtyErrorStateMatcher } from '@angular/material/core';
+import { ShowOnDirtyErrorStateMatcher, ErrorStateMatcher } from '@angular/material/core';
+import { FormControl } from '@angular/forms';
+
+
+class CustomErrorStateMatcher implements ErrorStateMatcher {
+  isErrorState(control: FormControl | null) {
+    return control.invalid;
+  }
+}
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -10,7 +19,8 @@ export class AppComponent {
   minValue: Date;
   maxValue: Date;
 
-  ShowOnDirtyErrorStateMatcher = new ShowOnDirtyErrorStateMatcher();
+  showOnDirtyErrorStateMatcher = new ShowOnDirtyErrorStateMatcher();
+  customErrorStateMatcher = new CustomErrorStateMatcher();
 
   constructor() {
     const minValue = new Date();

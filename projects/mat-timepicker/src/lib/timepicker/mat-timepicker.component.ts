@@ -20,7 +20,7 @@ import {
 } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatInput } from '@angular/material/input';
-import { MatFormFieldControl } from '@angular/material/form-field';
+import { MatFormFieldControl, MatFormField } from '@angular/material/form-field';
 import { ClockMode, IAllowed24HourMap, IAllowed12HourMap } from '../interfaces-and-types';
 import { twoDigits, convertHoursForMode, isAllowed, isDateInRange } from '../util';
 import { MatTimepickerComponentDialogComponent } from '../timepicker-dialog/timepicker-dialog.component';
@@ -36,7 +36,6 @@ import { ErrorStateMatcher } from '@angular/material/core';
   templateUrl: './mat-timepicker.component.html',
   styleUrls: ['./mat-timepicker.component.scss'],
   providers: [
-    // { provide: NG_VALIDATORS, useExisting: forwardRef(() => MatTimepickerComponent), multi: true },
     { provide: MatFormFieldControl, useExisting: MatTimepickerComponent }
   ],
   exportAs: 'matTimepicker'
@@ -118,6 +117,19 @@ export class MatTimepickerComponent implements
 
   isInputFocused = false;
 
+  // tslint:disable-next-line:variable-name
+  _isActive = false;
+  set isActive(value) {
+    if (this._isActive === value) { return; }
+    this._isActive = value;
+    const target = this._matFormFiled ? this._matFormFiled._elementRef.nativeElement : this.elRef.nativeElement;
+    if (value) {
+      this.renderer.addClass(target, 'mat-focused');
+      return;
+    }
+    this.renderer.removeClass(target, 'mat-focused');
+  }
+
   @ViewChild(MatInput, { read: ElementRef }) input: ElementRef;
   // @ViewChild(MatFormField, { read: ElementRef }) formField: ElementRef;
 
@@ -185,7 +197,7 @@ export class MatTimepickerComponent implements
   invalidInputModalRef: MatDialogRef<InvalidInputComponent>;
   onChangeFn: any;
   onTouchedFn: any;
-  defaultValueSetupId = null;
+  // defaultValueSetupId = null;
   combination: string[] = [];
 
   changeEvent: EventEmitter<any> = new EventEmitter<any>();
@@ -199,6 +211,8 @@ export class MatTimepickerComponent implements
     private elRef: ElementRef<HTMLElement>,
     // tslint:disable-next-line:variable-name
     @Optional() private _parentForm: NgForm,
+    // tslint:disable-next-line:variable-name
+    @Optional() private _matFormFiled: MatFormField,
     // tslint:disable-next-line:variable-name
     @Optional() private _parentFormGroup: FormGroupDirective,
     // tslint:disable-next-line:variable-name
@@ -241,11 +255,14 @@ export class MatTimepickerComponent implements
     }
   }
 
+  focusHandler() {
+    this.isInputFocused = true;
+    this.isActive = true;
+  }
 
-  focusHandler() { this.isInputFocused = true; }
-
-  blurHandler() {
+  focusoutHandler() {
     this.isInputFocused = false;
+    this.isActive = false;
     this.setInputElementValue(this.formattedValueString);
     if (this.onTouchedFn && this.disableDialogOpenOnInputClick) { this.onTouchedFn(); }
   }
@@ -352,35 +369,24 @@ export class MatTimepickerComponent implements
 
   ngAfterViewInit() {
     this.listeners.push(
-      this.renderer.listen(this.input.nativeElement, 'focus', this.inputFocus)
+      this.renderer.listen(
+        this._matFormFiled ? this._matFormFiled._elementRef.nativeElement : this.elRef.nativeElement
+        , 'click', this.clickHandler)
     );
     this.listeners.push(
       this.renderer.listen(this.input.nativeElement, this.enableInvalidInputDialog ? 'change' : 'input', this.inputChangeHandler)
     );
   }
 
-  inputFocus = (e: FocusEvent) => {
+  clickHandler = (e: FocusEvent) => {
     if ((this.modalRef && this.modalRef.componentInstance.isClosing) || this.disabled || this.disableDialogOpenOnInputClick) { return; }
-    this.showDialog();
+    if (!this.modalRef && !this.disableDialogOpenOnInputClick) { this.showDialog(); }
   }
 
   ngOnInit() {
     if (!this.value) {
-      const defaultValue = new Date();
-
-      defaultValue.setSeconds(0);
-      defaultValue.setMilliseconds(0);
-
-      if (!this.minDate && !this.maxDate) { this.value = defaultValue; return; }
       const hasMaxDate = !!this.maxDate;
       const hasMinDate = !!this.minDate;
-      if (hasMaxDate && (+defaultValue > +this.maxDate)) {
-        defaultValue.setHours(this.maxDate.getHours());
-        defaultValue.setMinutes(this.maxDate.getMinutes());
-      } else if (!!hasMinDate && (+defaultValue < +this.minDate)) {
-        defaultValue.setHours(this.minDate.getHours());
-        defaultValue.setMinutes(this.minDate.getMinutes());
-      }
 
       if (hasMinDate || hasMaxDate) {
         if (hasMinDate) { this.minDate.setSeconds(0); this.minDate.setMilliseconds(0); }
@@ -391,11 +397,6 @@ export class MatTimepickerComponent implements
           (this.ngControl as any)._rawValidators.push(this);
         }
       }
-
-      this.defaultValueSetupId = setTimeout(() => {
-        this.defaultValueSetupId = null;
-        this.value = defaultValue;
-      }, 0);
     }
   }
 
@@ -459,10 +460,10 @@ export class MatTimepickerComponent implements
   }
 
   writeValue(value: Date): void {
-    if (this.defaultValueSetupId) {
-      clearTimeout(this.defaultValueSetupId);
-      this.defaultValueSetupId = null;
-    }
+    // if (this.defaultValueSetupId) {
+    //   clearTimeout(this.defaultValueSetupId);
+    //   this.defaultValueSetupId = null;
+    // }
     if (value) {
       value.setSeconds(0);
       value.setMilliseconds(0);
@@ -485,6 +486,8 @@ export class MatTimepickerComponent implements
 
   showDialog() {
     if (this.disabled) { return; }
+    this.isInputFocused = false;
+    setTimeout(() => this.isActive = true); // set isActive after the focusout is fired
     this.modalRef = this.dialog.open(MatTimepickerComponentDialogComponent, {
       autoFocus: false,
       data: {
@@ -506,9 +509,11 @@ export class MatTimepickerComponent implements
     instance.cancelClickEvent.pipe(takeUntil(this.isAlive)).subscribe(this.handleCancel);
     this.modalRef.beforeClosed().pipe(first()).subscribe(() => instance.isClosing = true);
     this.modalRef.afterClosed().pipe(first()).subscribe(() => {
-      this.modalRef = null;
       if (this.onTouchedFn) { this.onTouchedFn(); }
-      setTimeout(() => { this.elRef.nativeElement.querySelector('input').focus(); });
+      // setTimeout(() => {
+      this.modalRef = null;
+      this.elRef.nativeElement.querySelector('input').focus();
+      // });
     });
 
     this.currentValue = this.value as Date;
@@ -522,8 +527,8 @@ export class MatTimepickerComponent implements
   handleOk = () => {
     if (this.onChangeFn) { this.onChangeFn(this.currentValue); }
     this.changeEvent.emit(this.currentValue);
-    this.modalRef.close();
     this.value = this.currentValue;
+    this.modalRef.close();
   }
 
   handleCancel = () => {
