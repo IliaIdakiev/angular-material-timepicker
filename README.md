@@ -44,9 +44,13 @@ export class AppModule { }
 
 ### MatTimepicker Directive API
 
-**Keep in mind that this are only the inputs for the timepicker. Since it's a directive that can be used on an input element you can still use all input inputs like disabled, placeholder and so on...**
+**Keep in mind that this are only the inputs for the timepicker.**
 
 ```typescript
+@Input() required = false;
+@Input() disabled = false;
+@Input() placeholder = null;
+
 /* Override the label of the ok button. */
 @Input() okLabel = 'Ok';
 
@@ -71,6 +75,13 @@ export class AppModule { }
 
 /* Disables the dialog open when clicking the input field */
 @Input() disableDialogOpenOnClick = false;
+
+/* Input that allows you to control when the control is in an errored state */
+/* (check out the demo app) */
+@Input() errorStateMatcher: ErrorStateMatcher;
+
+/* Strict mode checks the full date (Day/Month/Year Hours:Minutes) when doing the minDate maxDate validation. If you need to check only the Hours:Minutes then you can set it to false */
+@Input() strict = true;
 
 /* Emits when time has changed */
 @Output() timeChange: EventEmitter<any> = new EventEmitter<any>();

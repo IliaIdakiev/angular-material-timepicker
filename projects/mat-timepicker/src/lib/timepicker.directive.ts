@@ -18,7 +18,6 @@ import {
   HostListener
 } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { MatInput } from '@angular/material/input';
 import { MatFormFieldControl, MatFormField } from '@angular/material/form-field';
 import { ClockMode, IAllowed24HourMap, IAllowed12HourMap } from './interfaces-and-types';
 import { twoDigits, convertHoursForMode, isAllowed, isDateInRange, isTimeInRange } from './util';
@@ -133,7 +132,7 @@ export class MatTimepickerDirective implements
 
   // tslint:disable-next-line:variable-name
   private _isActive = false;
-  set isActive(value) {
+  private set isActive(value) {
     if (this._isActive === value) { return; }
     this._isActive = value;
     const target = this._matFormFiled ? this._matFormFiled._elementRef.nativeElement : this.elRef.nativeElement;
@@ -204,7 +203,7 @@ export class MatTimepickerDirective implements
     return !(this.currentValue instanceof Date);
   }
 
-  get formattedValueString() { return this._formattedValueString; }
+  private get formattedValueString() { return this._formattedValueString; }
 
   private currentValue: Date;
   private modalRef: MatDialogRef<MatTimepickerComponentDialogComponent>;
