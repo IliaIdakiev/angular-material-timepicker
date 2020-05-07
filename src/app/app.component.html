@@ -108,5 +108,13 @@
       </mat-form-field>
     </p>
   </fieldset>
+  <div>Template Form Value: {{f.value | json}}</div>
 </form>
-<div>Value: {{f.value | json}}</div>
+<h1>Reactive Form</h1>
+<form [formGroup]="form">
+  <mat-form-field class="example-full-width">
+    <mat-label>Time</mat-label>
+    <input formControlName="time" matTimepicker>
+  </mat-form-field>
+  <div>Reactive Form Value: {{form.value | json}}</div>
+</form>

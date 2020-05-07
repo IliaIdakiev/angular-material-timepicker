@@ -1,5 +1,12 @@
 # Angular Material Timepicker
 
+## Features:
+
+  * Clock view dialog for selecting hour and minutes and options for dialog toggle customizations.
+  * Input time editing.
+  * Validations: minDate / maxDate (options: strict - datetime check / non-strict - time check).
+  * The timepicker can be used with template and reactive forms.
+
 ## Configuration and usage
 **Keep in mind that the selector for the timepicker directive is *`input[matTimepicker]`***
 
@@ -14,7 +21,7 @@ import { MatTimepickerModule } from 'mat-timepicker';
   ],
   ...
 })
-export class AppModule { }
+export class YourModule { }
 ```
 
 ## Simple Case
@@ -43,8 +50,6 @@ export class AppModule { }
 ```
 
 ### MatTimepicker Directive API
-
-**Keep in mind that this are only the inputs for the timepicker.**
 
 ```typescript
 @Input() required = false;
@@ -95,8 +100,6 @@ export class AppModule { }
 ---
 
 Dialog View
-
-Here's our logo (hover to see the title text):
 
 Hour Select (24h): 
 

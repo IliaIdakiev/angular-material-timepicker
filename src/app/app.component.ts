@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { ShowOnDirtyErrorStateMatcher, ErrorStateMatcher } from '@angular/material/core';
-import { FormControl } from '@angular/forms';
+import { FormControl, FormBuilder, FormGroup } from '@angular/forms';
 
 
 class CustomErrorStateMatcher implements ErrorStateMatcher {
@@ -23,7 +23,10 @@ export class AppComponent {
   showOnDirtyErrorStateMatcher = new ShowOnDirtyErrorStateMatcher();
   customErrorStateMatcher = new CustomErrorStateMatcher();
 
-  constructor() {
+
+  form: FormGroup;
+
+  constructor(private formBuilder: FormBuilder) {
     const minValue = new Date();
     minValue.setHours(6);
     minValue.setMinutes(10);
@@ -42,6 +45,11 @@ export class AppComponent {
     d.setSeconds(1);
     d.setMilliseconds(10);
     this.defaultValue = d;
+
+
+    this.form = this.formBuilder.group({
+      time: [d]
+    });
   }
 
   timeChangeHandler(data) {
