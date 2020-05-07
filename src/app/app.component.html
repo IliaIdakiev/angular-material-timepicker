@@ -40,7 +40,8 @@
       <mat-form-field appearance="fill">
         <mat-label>24 TIMEPICKER</mat-label>
         <input matTimepicker #t3="matTimepicker" #time3="ngModel" [minDate]="minValue" [maxDate]="maxValue"
-          id="timepicker-example-3" mode="24h" ngModel placeholder="Please select time..." name="time-3" required>
+          id="timepicker-example-3" mode="24h" ngModel placeholder="Please select time..." name="time-3"
+          [disableDialogOpenOnClick]="true" required>
         <mat-icon matSuffix (click)="t3.showDialog()">access_time</mat-icon>
         <mat-error *ngIf="time3.touched && time3.invalid">Invalid Date</mat-error>
       </mat-form-field>

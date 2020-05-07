@@ -130,19 +130,6 @@ export class MatTimepickerDirective implements
 
   private isInputFocused = false;
 
-  // tslint:disable-next-line:variable-name
-  private _isActive = false;
-  private set isActive(value) {
-    if (this._isActive === value) { return; }
-    this._isActive = value;
-    const target = this._matFormFiled ? this._matFormFiled._elementRef.nativeElement : this.elRef.nativeElement;
-    if (value) {
-      this.renderer.addClass(target, 'mat-focused');
-      return;
-    }
-    this.renderer.removeClass(target, 'mat-focused');
-  }
-
   /** Override the label of the ok button. */
   @Input() okLabel = 'Ok';
   /** Override the label of the cancel button. */
@@ -305,14 +292,12 @@ export class MatTimepickerDirective implements
 
   @HostListener('focus', ['$event']) focusHandler() {
     this.isInputFocused = true;
-    this.isActive = true;
   }
 
   @HostListener('focusout', ['$event']) focusoutHandler() {
     this.isInputFocused = false;
-    this.isActive = false;
     this.setInputElementValue(this.formattedValueString);
-    if (this.onTouchedFn && this.disableDialogOpenOnClick) { this.onTouchedFn(); }
+    if (this.onTouchedFn && !this.modalRef) { this.onTouchedFn(); }
   }
 
   constructor(
@@ -507,7 +492,6 @@ export class MatTimepickerDirective implements
   showDialog() {
     if (this.disabled) { return; }
     this.isInputFocused = false;
-    setTimeout(() => this.isActive = true); // set isActive after the focusout is fired
     this.modalRef = this.dialog.open(MatTimepickerComponentDialogComponent, {
       autoFocus: false,
       data: {
