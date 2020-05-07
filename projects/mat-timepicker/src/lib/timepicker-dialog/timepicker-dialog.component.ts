@@ -158,21 +158,30 @@ export class MatTimepickerComponentDialogComponent implements DoCheck {
     this.hasInvalidMeridiem = true;
   }
 
+  meridiemChange(hours) {
+    const changeData = {
+      type: this.viewType,
+      value: this.viewType === 'hours' ? hours : this.value.getMinutes()
+    };
+    this.handleClockChange(changeData);
+  }
+
 
   setAm() {
     if (this.hours >= 12) {
       this.hours = this.hours - 12;
-      this.changeEvent.emit();
     }
     this.isPm = false;
+
+    this.meridiemChange(this.hours);
   }
 
   setPm() {
     if (this.hours < 12) {
       this.hours = this.hours + 12;
-      this.changeEvent.emit();
     }
     this.isPm = true;
+    this.meridiemChange(this.hours);
   }
 
   okClickHandler() {

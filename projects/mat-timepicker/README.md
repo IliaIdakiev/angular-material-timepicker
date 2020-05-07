@@ -1,16 +1,51 @@
 # Angular Material Timepicker
 
-## Timepicker Control for Angular Material
+## Configuration and usage
+**Keep in mind that the selector for the timepicker directive is *`input[matTimepicker]`***
 
-⚠️The time picker control has [Angular Material](https://material.angular.io/) as a dependency ⚠️
+your.module.ts
+```typescript
+import { MatTimepickerModule } from 'mat-timepicker';
 
-### Usage
-```html
-<mat-timepicker></mat-timepicker>
+@NgModule({
+  declarations: [...],
+  imports: [
+    MatTimepickerModule 
+  ],
+  ...
+})
+export class AppModule { }
 ```
-* **Yes! You can use ngModel. This control implements ControlValueAccessor.**
 
-### Component Configuration
+## Simple Case
+
+```html
+<input matTimepicker>
+```
+
+### More Complex Case
+```html
+<mat-form-field appearance="fill">
+  <mat-label>TIMEPICKER</mat-label>
+
+  <!-- The timepicker input -->
+  <input matTimepicker #t="matTimepicker" #time="ngModel" [minDate]="minValue" [maxDate]="maxValue"
+    [strict]="false" id="timepicker-example" mode="24h" [ngModel]="defaultValue"
+    placeholder="Please select time..." name="time" [errorStateMatcher]="customErrorStateMatcher" required
+    (timeChange)="timeChangeHandler($event)" (invalidInput)="invalidInputHandler()">
+
+  <!-- An icon for the timepicker input that will open the timepicker dialog when clicked -->
+  <mat-icon matSuffix (click)="t.showDialog()">access_time</mat-icon>
+
+  <!-- Error that will be shown when the input date is invalid -->
+  <mat-error *ngIf="time.touched && time.invalid">Invalid Date</mat-error>
+</mat-form-field>
+```
+
+### MatTimepicker Directive API
+
+**Keep in mind that this are only the inputs for the timepicker. Since it's a directive that can be used on an input element you can still use all input inputs like disabled, placeholder and so on...**
+
 ```typescript
 /* Override the label of the ok button. */
 @Input() okLabel = 'Ok';
@@ -21,20 +56,12 @@
 /* Sets the clock mode, 12-hour or 24-hour clocks are supported. */
 @Input() mode: '12h' | '24h' = '24h';
 
-/* Disable the timepicker control */
-@Input() disabled = false;
-
 /* Set the color of the timepicker control */
 @Input() color: ThemePalette = 'primary';
 
-/* Set the value of the timepicker control (default is current time) */
-@Input() value: Date = new Date();
-
-/* Wrapper the input with MaterialFormField */
-@Input() withFormField = false;
-
-/* Placeholder for the time input */
-@Input() placeholder: string = null;
+/* Set the value of the timepicker control */
+/* ⚠️(when using template driven forms then you should use [ngModel]="someValue")⚠️ */
+@Input() value: Date = new Date(); 
 
 /* Minimum time to pick from */
 @Input() minDate: Date;
@@ -42,24 +69,15 @@
 /* Maximum time to pick from */
 @Input() maxDate: Date;
 
-/* Add material clock icon to the left */
-@Input() withIcon = false;
-
-/* Material clock icon color */
-@Input() iconColor: ThemePalette
-
 /* Disables the dialog open when clicking the input field */
-@Input() disableDialogOpenOnInputClick = false;
+@Input() disableDialogOpenOnClick = false;
 
-/* Disables the dialog open when clicking the icon if there is one */
-@Input() disableDialogOpenOnIconClick = false;
+/* Emits when time has changed */
+@Output() timeChange: EventEmitter<any> = new EventEmitter<any>();
 
-/* Disables the invalid value input dialog when input is invalid */
-@Input() enableInvalidInputDialog = false;
+/* Emits when the input is invalid */
+@Output() invalidInput: EventEmitter<any> = new EventEmitter<any>();
 ```
-
-### TODO:
-* implement MatFormFieldControl interface for the mat-timepicker component and remove the withFormField option so it can be used like a normal MatControl
 
 ### Check out the [**Demo**](https://stackblitz.com/github/IliaIdakiev/angular-material-timepicker)!
 

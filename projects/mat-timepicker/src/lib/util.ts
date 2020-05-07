@@ -36,6 +36,35 @@ export function isDateInRange(minDate: Date, maxDate: Date, current: Date) {
   return (!minDate || +minDate <= unixCurrentDate) && (!maxDate || unixCurrentDate <= +maxDate);
 }
 
+export function isTimeInRange(minDate: Date, maxDate: Date, current: Date) {
+  if (minDate instanceof Date) {
+    const newMinDate = new Date();
+    newMinDate.setHours(minDate.getHours());
+    newMinDate.setMinutes(minDate.getMinutes());
+    newMinDate.setSeconds(0);
+    newMinDate.setMilliseconds(0);
+    minDate = newMinDate;
+  }
+  if (maxDate instanceof Date) {
+    const newMaxDate = new Date();
+    newMaxDate.setHours(maxDate.getHours());
+    newMaxDate.setMinutes(maxDate.getMinutes());
+    newMaxDate.setSeconds(0);
+    newMaxDate.setMilliseconds(0);
+    maxDate = newMaxDate;
+  }
+  if (current instanceof Date) {
+    const newCurrent = new Date();
+    newCurrent.setHours(current.getHours());
+    newCurrent.setMinutes(current.getMinutes());
+    newCurrent.setSeconds(0);
+    newCurrent.setMilliseconds(0);
+    current = newCurrent;
+  }
+  const unixCurrentDate = +current;
+  return (!minDate || +minDate <= unixCurrentDate) && (!maxDate || unixCurrentDate <= +maxDate);
+}
+
 // used when generating the allowed maps
 
 export function isAllowed(
