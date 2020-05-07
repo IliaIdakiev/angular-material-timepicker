@@ -1,10 +1,9 @@
 import { ControlValueAccessor, NgForm, NgControl, FormGroupDirective, FormControl } from '@angular/forms';
 import {
-  Component,
+  Directive,
   OnInit,
   EventEmitter,
   Input,
-  ViewChild,
   ElementRef,
   OnChanges,
   Renderer2,
@@ -15,30 +14,48 @@ import {
   NgZone,
   HostBinding,
   Self,
-  Output
+  Output,
+  HostListener
 } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatInput } from '@angular/material/input';
 import { MatFormFieldControl, MatFormField } from '@angular/material/form-field';
-import { ClockMode, IAllowed24HourMap, IAllowed12HourMap } from '../interfaces-and-types';
-import { twoDigits, convertHoursForMode, isAllowed, isDateInRange, isTimeInRange } from '../util';
-import { MatTimepickerComponentDialogComponent } from '../timepicker-dialog/timepicker-dialog.component';
+import { ClockMode, IAllowed24HourMap, IAllowed12HourMap } from './interfaces-and-types';
+import { twoDigits, convertHoursForMode, isAllowed, isDateInRange, isTimeInRange } from './util';
+import { MatTimepickerComponentDialogComponent } from './timepicker-dialog/timepicker-dialog.component';
 import { Subject } from 'rxjs';
 import { takeUntil, first } from 'rxjs/operators';
 import { FocusMonitor } from '@angular/cdk/a11y';
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
 import { ErrorStateMatcher } from '@angular/material/core';
 
-@Component({
-  selector: 'mat-timepicker',
-  templateUrl: './mat-timepicker.component.html',
-  styleUrls: ['./mat-timepicker.component.scss'],
+@Directive({
+  selector: 'input[matTimepicker]',
   providers: [
-    { provide: MatFormFieldControl, useExisting: MatTimepickerComponent }
+    { provide: MatFormFieldControl, useExisting: MatTimepickerDirective }
   ],
+  // tslint:disable-next-line:no-host-metadata-property
+  host: {
+    /**
+     * @breaking-change 8.0.0 remove .mat-form-field-autofill-control in favor of AutofillMonitor.
+     */
+    // tslint:disable-next-line:object-literal-key-quotes
+    'class': 'mat-input-element mat-form-field-autofill-control',
+    '[class.mat-input-server]': '_isServer',
+    // Native input properties that are overwritten by Angular inputs need to be synced with
+    // the native input element. Otherwise property bindings for those don't work.
+    '[attr.id]': 'id',
+    '[attr.placeholder]': 'placeholder',
+    '[disabled]': 'disabled',
+    '[required]': 'required',
+    '[attr.readonly]': 'readonly && !_isNativeSelect || null',
+    '[attr.aria-describedby]': '_ariaDescribedby || null',
+    '[attr.aria-invalid]': 'errorState',
+    '[attr.aria-required]': 'required.toString()',
+  },
   exportAs: 'matTimepicker'
 })
-export class MatTimepickerComponent implements
+export class MatTimepickerDirective implements
   OnInit,
   OnChanges,
   AfterViewInit,
@@ -67,7 +84,7 @@ export class MatTimepickerComponent implements
   private isAlive: Subject<any> = new Subject<any>();
   stateChanges = new Subject<void>();
 
-  @HostBinding() id = `example-tel-input-${MatTimepickerComponent.nextId++}`;
+  @HostBinding() id = `example-tel-input-${MatTimepickerDirective.nextId++}`;
   @HostBinding('class.floating') get shouldLabelFloat() { return this.focused || !this.empty; }
   @HostBinding('attr.aria-describedby') describedBy = '';
 
@@ -127,8 +144,6 @@ export class MatTimepickerComponent implements
     this.renderer.removeClass(target, 'mat-focused');
   }
 
-  @ViewChild(MatInput, { read: ElementRef }) input: ElementRef;
-
   /** Override the label of the ok button. */
   @Input() okLabel = 'Ok';
   /** Override the label of the cancel button. */
@@ -154,6 +169,9 @@ export class MatTimepickerComponent implements
   // tslint:disable-next-line:variable-name
   private _formattedValueString: string;
 
+  // tslint:disable-next-line:variable-name
+  private _skipValueChangeEmission = true;
+
   @Input() set value(value: Date) {
     if (value === this._value) { return; }
     this._value = value;
@@ -173,6 +191,8 @@ export class MatTimepickerComponent implements
     if (!this.isInputFocused) { this.setInputElementValue(this.formattedValueString); }
     this.currentValue = value;
     this.stateChanges.next();
+
+    if (this._skipValueChangeEmission) { return; }
     this.timeChange.emit(this.currentValue);
   }
 
@@ -196,93 +216,11 @@ export class MatTimepickerComponent implements
   @Output() timeChange: EventEmitter<any> = new EventEmitter<any>();
   @Output() invalidInput: EventEmitter<any> = new EventEmitter<any>();
 
-  constructor(
-    @Optional() @Self() public ngControl: NgControl,
-    public dialog: MatDialog,
-    private renderer: Renderer2,
-    private zone: NgZone,
-    private fm: FocusMonitor,
-    private elRef: ElementRef<HTMLElement>,
-    // tslint:disable-next-line:variable-name
-    @Optional() private _parentForm: NgForm,
-    // tslint:disable-next-line:variable-name
-    @Optional() private _matFormFiled: MatFormField,
-    // tslint:disable-next-line:variable-name
-    @Optional() private _parentFormGroup: FormGroupDirective,
-    // tslint:disable-next-line:variable-name
-    _defaultErrorStateMatcher: ErrorStateMatcher,
-  ) {
-    this.errorStateMatcher = _defaultErrorStateMatcher;
-    if (this.ngControl != null) { this.ngControl.valueAccessor = this; }
-
-    fm.monitor(elRef.nativeElement, true).subscribe(origin => {
-      this.focused = !!origin;
-      this.stateChanges.next();
-    });
-  }
-
-  keydownHandler(event: any) {
-    if (event.metaKey || event.ctrlKey || event.altKey) {
-      this.combination = this.combination.concat(event.code);
-      return;
-    }
-    if (!/^[0-9a-zA-Z\s]{0,1}$/.test(event.key)) { return; }
-    const target = event.target;
-    const tValue = target.value;
-    const value = `${tValue.slice(0, target.selectionStart)}${event.key}${tValue.slice(target.selectionEnd)}`;
-    if (value.match(this.pattern) || this.combination.length > 0) { return true; }
-    event.preventDefault();
-    event.stopImmediatePropagation();
-  }
-
-  keyupHandler(event: any) {
-    this.combination = this.combination.filter(v => v !== event.code);
-  }
-
-  setDescribedByIds(ids: string[]) {
-    this.describedBy = ids.join(' ');
-  }
-
-  onContainerClick(event: MouseEvent) {
-    if ((event.target as Element).tagName.toLowerCase() !== 'input') {
-      this.elRef.nativeElement.querySelector('input').focus();
-    }
-  }
-
-  focusHandler() {
-    this.isInputFocused = true;
-    this.isActive = true;
-  }
-
-  focusoutHandler() {
-    this.isInputFocused = false;
-    this.isActive = false;
-    this.setInputElementValue(this.formattedValueString);
-    if (this.onTouchedFn && this.disableDialogOpenOnClick) { this.onTouchedFn(); }
-  }
-
-  setInputElementValue(value: any) {
-    if (!this.input) { return; }
-    Promise.resolve().then(() => {
-      this.zone.runOutsideAngular(() => {
-        this.renderer.setProperty(this.input.nativeElement, 'value', value);
-      });
-    });
-  }
-
-  validate() {
-    const isValueInRange = this.strict ?
-      isDateInRange(this.minDate, this.maxDate, this.currentValue) :
-      isTimeInRange(this.minDate, this.maxDate, this.currentValue);
-
-    return isValueInRange ? null : { dateRange: true };
-  }
-
-  inputHandler = () => {
-    let value = this.input.nativeElement.value as string;
+  @HostListener('input', ['$event']) inputHandler() {
+    let value = (this.elRef.nativeElement as any).value as string;
     const length = value.length;
     if (length === 0) {
-      this.writeValue(null);
+      this.writeValue(null, true);
       if (this.onChangeFn) { this.onChangeFn(null); }
       return;
     }
@@ -308,7 +246,7 @@ export class MatTimepickerComponent implements
     minutes = +minutes;
 
     if (isNaN(hours) || isNaN(minutes)) {
-      this.writeValue(null); return;
+      this.writeValue(null, true); return;
     }
 
     if (hours < 12 && meridiem && meridiem.toLowerCase() === 'pm') {
@@ -344,8 +282,89 @@ export class MatTimepickerComponent implements
     if (!isValueInRange) { this.invalidInput.emit(); }
 
 
-    this.writeValue(d);
+    this.writeValue(d, true);
     if (this.onChangeFn) { this.onChangeFn(d); }
+  }
+
+  @HostListener('keydown', ['$event']) keydownHandler(event: any) {
+    if (event.metaKey || event.ctrlKey || event.altKey) {
+      this.combination = this.combination.concat(event.code);
+      return;
+    }
+    if (!/^[0-9a-zA-Z\s]{0,1}$/.test(event.key)) { return; }
+    const target = event.target;
+    const tValue = target.value;
+    const value = `${tValue.slice(0, target.selectionStart)}${event.key}${tValue.slice(target.selectionEnd)}`;
+    if (value.match(this.pattern) || this.combination.length > 0) { return true; }
+    event.preventDefault();
+    event.stopImmediatePropagation();
+  }
+
+  @HostListener('keyup', ['$event']) keyupHandler(event: any) {
+    this.combination = this.combination.filter(v => v !== event.code);
+  }
+
+  @HostListener('focus', ['$event']) focusHandler() {
+    this.isInputFocused = true;
+    this.isActive = true;
+  }
+
+  @HostListener('focusout', ['$event']) focusoutHandler() {
+    this.isInputFocused = false;
+    this.isActive = false;
+    this.setInputElementValue(this.formattedValueString);
+    if (this.onTouchedFn && this.disableDialogOpenOnClick) { this.onTouchedFn(); }
+  }
+
+  constructor(
+    @Optional() @Self() public ngControl: NgControl,
+    public dialog: MatDialog,
+    private renderer: Renderer2,
+    private zone: NgZone,
+    private fm: FocusMonitor,
+    private elRef: ElementRef<HTMLElement>,
+    // tslint:disable-next-line:variable-name
+    @Optional() private _parentForm: NgForm,
+    // tslint:disable-next-line:variable-name
+    @Optional() private _matFormFiled: MatFormField,
+    // tslint:disable-next-line:variable-name
+    @Optional() private _parentFormGroup: FormGroupDirective,
+    // tslint:disable-next-line:variable-name
+    _defaultErrorStateMatcher: ErrorStateMatcher,
+  ) {
+    this.errorStateMatcher = _defaultErrorStateMatcher;
+    if (this.ngControl != null) { this.ngControl.valueAccessor = this; }
+
+    fm.monitor(elRef.nativeElement, true).subscribe(origin => {
+      this.focused = !!origin;
+      this.stateChanges.next();
+    });
+  }
+
+  setDescribedByIds(ids: string[]) {
+    this.describedBy = ids.join(' ');
+  }
+
+  onContainerClick(event: MouseEvent) {
+    if ((event.target as Element).tagName.toLowerCase() !== 'input') {
+      this.elRef.nativeElement.focus();
+    }
+  }
+
+  setInputElementValue(value: any) {
+    Promise.resolve().then(() => {
+      this.zone.runOutsideAngular(() => {
+        this.renderer.setProperty(this.elRef.nativeElement, 'value', value);
+      });
+    });
+  }
+
+  validate() {
+    const isValueInRange = this.strict ?
+      isDateInRange(this.minDate, this.maxDate, this.currentValue) :
+      isTimeInRange(this.minDate, this.maxDate, this.currentValue);
+
+    return isValueInRange ? null : { dateRange: true };
   }
 
   ngAfterViewInit() {
@@ -353,9 +372,6 @@ export class MatTimepickerComponent implements
       this.renderer.listen(
         this._matFormFiled ? this._matFormFiled._elementRef.nativeElement : this.elRef.nativeElement
         , 'click', this.clickHandler)
-    );
-    this.listeners.push(
-      this.renderer.listen(this.input.nativeElement, 'input', this.inputHandler)
     );
   }
 
@@ -379,6 +395,7 @@ export class MatTimepickerComponent implements
         }
       }
     }
+    this._skipValueChangeEmission = false;
   }
 
   generateAllowedMap() {
@@ -461,7 +478,13 @@ export class MatTimepickerComponent implements
     return isAllowed(hour, minutes, this.minDate, this.maxDate, this.mode, meridiem);
   }
 
-  writeValue(value: Date): void {
+  writeValue(value: Date, isInnerCall = false): void {
+
+    if (!isInnerCall) {
+      this._skipValueChangeEmission = true;
+      Promise.resolve().then(() => this._skipValueChangeEmission = false);
+    }
+
     if (value) {
       value.setSeconds(0);
       value.setMilliseconds(0);
@@ -509,7 +532,7 @@ export class MatTimepickerComponent implements
     this.modalRef.afterClosed().pipe(first()).subscribe(() => {
       if (this.onTouchedFn) { this.onTouchedFn(); }
       this.modalRef = null;
-      this.elRef.nativeElement.querySelector('input').focus();
+      this.elRef.nativeElement.focus();
     });
 
     this.currentValue = this.value as Date;
@@ -520,6 +543,8 @@ export class MatTimepickerComponent implements
     const v = this.value instanceof Date ? new Date(this.value.getTime()) : new Date();
     v.setHours(newValue.getHours());
     v.setMinutes(newValue.getMinutes());
+    v.setSeconds(0);
+    v.setMilliseconds(0);
     this.currentValue = v;
   }
 

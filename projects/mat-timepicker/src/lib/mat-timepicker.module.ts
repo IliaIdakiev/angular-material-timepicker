@@ -7,13 +7,13 @@ import { MatInputModule } from '@angular/material/input';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ClockComponent } from './clock/clock.component';
-import { MatTimepickerComponent } from './timepicker/mat-timepicker.component';
 import { MatTimepickerComponentDialogComponent } from './timepicker-dialog/timepicker-dialog.component';
+import { MatTimepickerDirective } from './timepicker.directive';
 
 @NgModule({
   declarations: [
     ClockComponent,
-    MatTimepickerComponent,
+    MatTimepickerDirective,
     MatTimepickerComponentDialogComponent
   ],
   imports: [
@@ -25,7 +25,7 @@ import { MatTimepickerComponentDialogComponent } from './timepicker-dialog/timep
     MatInputModule
   ],
   exports: [
-    MatTimepickerComponent
+    MatTimepickerDirective
   ],
   entryComponents: [
     MatTimepickerComponentDialogComponent
