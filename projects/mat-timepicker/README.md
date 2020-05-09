@@ -95,7 +95,7 @@ export class YourModule { }
 @Output() invalidInput: EventEmitter<any> = new EventEmitter<any>();
 ```
 
-### Check out the [**Demo**](https://stackblitz.com/github/IliaIdakiev/angular-material-timepicker)!
+### Check out the [**Demo App**](https://stackblitz.com/github/IliaIdakiev/angular-material-timepicker)! (Please note that stackblitz sometimes fails to run Angular applications properly and that doesn't mean that the library is broken)
 
 ---
 
