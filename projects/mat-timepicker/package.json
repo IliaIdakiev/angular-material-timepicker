@@ -1,6 +1,6 @@
 {
   "name": "mat-timepicker",
-  "version": "4.0.4",
+  "version": "4.0.5",
   "peerDependencies": {
     "@angular/common": "^9.1.4",
     "@angular/core": "^9.1.4",
@@ -17,5 +17,21 @@
     "rxjs": "^6.5.5",
     "tslib": "^1.11.1",
     "zone.js": "^0.10.3"
-  }
+  },
+  "keywords": [
+    "time",
+    "picker",
+    "timepicker",
+    "material timepicker",
+    "angular material",
+    "angular",
+    "angular 2",
+    "angular 3",
+    "angular 4",
+    "angular 5",
+    "angular 6",
+    "angular 7",
+    "angular 8",
+    "angular 9"
+  ]
 }
