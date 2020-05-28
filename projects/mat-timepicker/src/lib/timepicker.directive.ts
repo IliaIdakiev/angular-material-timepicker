@@ -27,6 +27,7 @@ import { takeUntil, first } from 'rxjs/operators';
 import { FocusMonitor } from '@angular/cdk/a11y';
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
 import { ErrorStateMatcher } from '@angular/material/core';
+import { Platform } from '@angular/cdk/platform';
 
 @Directive({
   selector: 'input[matTimepicker]',
@@ -47,8 +48,7 @@ import { ErrorStateMatcher } from '@angular/material/core';
     '[attr.placeholder]': 'placeholder',
     '[disabled]': 'disabled',
     '[required]': 'required',
-    '[attr.readonly]': 'readonly && !_isNativeSelect || null',
-    '[attr.aria-describedby]': '_ariaDescribedby || null',
+    '[attr.readonly]': 'readonly || null',
     '[attr.aria-invalid]': 'errorState',
     '[attr.aria-required]': 'required.toString()',
   },
@@ -63,6 +63,10 @@ export class MatTimepickerDirective implements
   MatFormFieldControl<any>
 {
   static nextId = 0;
+
+  /** Whether the component is being rendered on the server. */
+  // tslint:disable-next-line:variable-name
+  readonly _isServer: boolean;
 
   // tslint:disable-next-line:variable-name
   _errorState = false;
@@ -80,19 +84,50 @@ export class MatTimepickerDirective implements
     return newState;
   }
 
+  @Input()
+  get disabled(): boolean {
+    if (this.ngControl && this.ngControl.disabled !== null) {
+      return this.ngControl.disabled;
+    }
+    return this._disabled;
+  }
+  set disabled(value: boolean) {
+    this._disabled = coerceBooleanProperty(value);
+
+    // Browsers may not fire the blur event if the input is disabled too quickly.
+    // Reset from here to ensure that the element doesn't become stuck.
+    if (this.focused) {
+      this.focused = false;
+      this.stateChanges.next();
+    }
+  }
+  // tslint:disable-next-line:variable-name
+  protected _disabled = false;
+
+  @Input() get id(): string { return this._id; }
+  set id(value: string) { this._id = value || this._uid; }
+  // tslint:disable-next-line:variable-name
+  protected _id: string;
+
+  @Input() get readonly(): boolean { return this._readonly; }
+  set readonly(value: boolean) { this._readonly = coerceBooleanProperty(value); }
+  // tslint:disable-next-line:variable-name
+  private _readonly = false;
+
   private isAlive: Subject<any> = new Subject<any>();
   stateChanges = new Subject<void>();
 
-  @HostBinding() id = `example-tel-input-${MatTimepickerDirective.nextId++}`;
+  // tslint:disable-next-line:variable-name
+  protected _uid = `mat-input-${MatTimepickerDirective.nextId++}`;
   @HostBinding('class.floating') get shouldLabelFloat() { return this.focused || !this.empty; }
   @HostBinding('attr.aria-describedby') describedBy = '';
 
   @Input() errorStateMatcher: ErrorStateMatcher;
 
-  @Input()
-  get required() {
+  @Input() get required() {
     return this._required;
   }
+
   set required(req) {
     this._required = coerceBooleanProperty(req);
     this.stateChanges.next();
@@ -100,19 +135,7 @@ export class MatTimepickerDirective implements
   // tslint:disable-next-line:variable-name
   private _required = false;
 
-
-  @Input()
-  get disabled(): boolean { return this._disabled; }
-  set disabled(value: boolean) {
-    this._disabled = coerceBooleanProperty(value);
-    this.stateChanges.next();
-  }
-  // tslint:disable-next-line:variable-name
-  private _disabled = false;
-
-
-  @Input()
-  get placeholder() {
+  @Input() get placeholder() {
     return this._placeholder;
   }
   set placeholder(plh) {
@@ -202,7 +225,7 @@ export class MatTimepickerDirective implements
   @Output() timeChange: EventEmitter<any> = new EventEmitter<any>();
   @Output() invalidInput: EventEmitter<any> = new EventEmitter<any>();
 
-  @HostListener('input', ['$event']) inputHandler() {
+  @HostListener('input') inputHandler() {
     let value = (this.elRef.nativeElement as any).value as string;
     const length = value.length;
     if (length === 0) {
@@ -290,11 +313,11 @@ export class MatTimepickerDirective implements
     this.combination = this.combination.filter(v => v !== event.code);
   }
 
-  @HostListener('focus', ['$event']) focusHandler() {
+  @HostListener('focus') focusHandler() {
     this.isInputFocused = true;
   }
 
-  @HostListener('focusout', ['$event']) focusoutHandler() {
+  @HostListener('focusout') focusoutHandler() {
     this.isInputFocused = false;
     this.setInputElementValue(this.formattedValueString);
     if (this.onTouchedFn && !this.modalRef) { this.onTouchedFn(); }
@@ -307,6 +330,9 @@ export class MatTimepickerDirective implements
     private zone: NgZone,
     private fm: FocusMonitor,
     private elRef: ElementRef<HTMLElement>,
+    private ngZone: NgZone,
+    // tslint:disable-next-line:variable-name
+    protected _platform: Platform,
     // tslint:disable-next-line:variable-name
     @Optional() private _parentForm: NgForm,
     // tslint:disable-next-line:variable-name
@@ -316,13 +342,28 @@ export class MatTimepickerDirective implements
     // tslint:disable-next-line:variable-name
     _defaultErrorStateMatcher: ErrorStateMatcher,
   ) {
+    this.id = this.id;
+
     this.errorStateMatcher = _defaultErrorStateMatcher;
     if (this.ngControl != null) { this.ngControl.valueAccessor = this; }
 
-    fm.monitor(elRef.nativeElement, true).subscribe(origin => {
-      this.focused = !!origin;
-      this.stateChanges.next();
-    });
+    if (_platform.IOS) {
+      ngZone.runOutsideAngular(() => {
+        elRef.nativeElement.addEventListener('keyup', (event: Event) => {
+          const el = event.target as HTMLInputElement;
+          if (!el.value && !el.selectionStart && !el.selectionEnd) {
+            // Note: Just setting `0, 0` doesn't fix the issue. Setting
+            // `1, 1` fixes it for the first time that you type text and
+            // then hold delete. Toggling to `1, 1` and then back to
+            // `0, 0` seems to completely fix it.
+            el.setSelectionRange(1, 1);
+            el.setSelectionRange(0, 0);
+          }
+        });
+      });
+    }
+
+    this._isServer = !this._platform.isBrowser;
   }
 
   setDescribedByIds(ids: string[]) {
@@ -365,6 +406,13 @@ export class MatTimepickerDirective implements
   }
 
   ngOnInit() {
+    if (this._platform.isBrowser) {
+      this.fm.monitor(this.elRef.nativeElement, true).subscribe(origin => {
+        this.focused = !!origin;
+        this.stateChanges.next();
+      });
+
+    }
     if (!this.value) {
       const hasMaxDate = !!this.maxDate;
       const hasMinDate = !!this.minDate;
@@ -545,7 +593,10 @@ export class MatTimepickerDirective implements
     this.isAlive.next();
     this.isAlive.complete();
     this.stateChanges.complete();
-    this.fm.stopMonitoring(this.elRef.nativeElement);
+
+    if (this._platform.isBrowser) {
+      this.fm.stopMonitoring(this.elRef.nativeElement);
+    }
 
     this.listeners.forEach(l => l());
   }

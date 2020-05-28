@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+  <file source-language="en-US" datatype="plaintext" original="ng2.template">
+    <body>
+      <trans-unit id="61935f4429dd6d2d9f2c600dae3523b3a22547b0" datatype="html">
+        <source><x id="INTERPOLATION" equiv-text="{{cancelLabel}}"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">dist/mat-timepicker/lib/timepicker-dialog/timepicker-dialog.component.d.ts</context>
+          <context context-type="linenumber">41</context>
+        </context-group>
+        <note priority="1" from="description">Material Timepicker Cancel Button Text</note>
+        <note priority="1" from="meaning">mat-timepicker</note>
+      </trans-unit>
+      <trans-unit id="6b9bc53d4851cd32162f49e4cf849fb09ffd4d45" datatype="html">
+        <source><x id="INTERPOLATION" equiv-text="{{okLabel}}"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">dist/mat-timepicker/lib/timepicker-dialog/timepicker-dialog.component.d.ts</context>
+          <context context-type="linenumber">43</context>
+        </context-group>
+        <note priority="1" from="description">Material Timepicker Ok Button Text</note>
+        <note priority="1" from="meaning">mat-timepicker</note>
+      </trans-unit>
+      <trans-unit id="e8b2a3f1757d9bbf6a1cc9d7a64db3f5adeed03e" datatype="html">
+        <source>24 TIMEPICKER</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.html</context>
+          <context context-type="linenumber">20</context>
+        </context-group>
+        <note priority="1" from="description">test1</note>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>
