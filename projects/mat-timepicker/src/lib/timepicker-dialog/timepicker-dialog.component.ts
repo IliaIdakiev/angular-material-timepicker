@@ -24,6 +24,9 @@ export class MatTimepickerComponentDialogComponent implements DoCheck {
   okLabel: string;
   cancelLabel: string;
 
+  anteMeridiemAbbreviation: string;
+  postMeridiemAbbreviation: string;
+
   set value(value: any) {
     value = value || this.minDate || this.maxDate || new Date();
     this.hours = value.getHours();
@@ -68,6 +71,8 @@ export class MatTimepickerComponentDialogComponent implements DoCheck {
     this.mode = data.mode;
     this.okLabel = data.okLabel;
     this.cancelLabel = data.cancelLabel;
+    this.anteMeridiemAbbreviation = data.anteMeridiemAbbreviation;
+    this.postMeridiemAbbreviation = data.postMeridiemAbbreviation;
     this.color = data.color;
     this.minDate = data.minDate;
     this.maxDate = data.maxDate;

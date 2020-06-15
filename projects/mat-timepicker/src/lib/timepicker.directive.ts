@@ -157,6 +157,10 @@ export class MatTimepickerDirective implements
   @Input() okLabel = 'Ok';
   /** Override the label of the cancel button. */
   @Input() cancelLabel = 'Cancel';
+  /** Override the ante meridiem abbreviation. */
+  @Input() anteMeridiemAbbreviation = 'am';
+  /** Override the post meridiem abbreviation. */
+  @Input() postMeridiemAbbreviation = 'pm';
 
   /** Sets the clock mode, 12-hour or 24-hour clocks are supported. */
   @Input() mode: ClockMode = '24h';
@@ -194,7 +198,7 @@ export class MatTimepickerDirective implements
     const { hour, isPm } = convertHoursForMode(value.getHours(), this.mode);
     this._isPm = isPm;
     this._formattedValueString = this.mode === '12h' ?
-      `${hour}:${twoDigits(value.getMinutes())} ${isPm ? 'pm' : 'am'}` :
+      `${hour}:${twoDigits(value.getMinutes())} ${isPm ? this.postMeridiemAbbreviation : this.anteMeridiemAbbreviation}` :
       `${twoDigits(value.getHours())}:${twoDigits(value.getMinutes())}`;
 
     if (!this.isInputFocused) { this.setInputElementValue(this.formattedValueString); }
@@ -493,12 +497,14 @@ export class MatTimepickerDirective implements
       value: this.currentValue,
       okLabel: this.okLabel,
       cancelLabel: this.cancelLabel,
+      anteMeridiemAbbreviation: this.anteMeridiemAbbreviation,
+      postMeridiemAbbreviation: this.postMeridiemAbbreviation,
       color: this.color,
       isPm: this.isPm,
       minDate: this.minDate,
       maxDate: this.maxDate,
       allowed12HourMap: this.allowed12HourMap,
-      allowed24HourMap: this.allowed24HourMap
+      allowed24HourMap: this.allowed24HourMap,
     };
   }
 
@@ -547,6 +553,8 @@ export class MatTimepickerDirective implements
         value: this.currentValue,
         okLabel: this.okLabel,
         cancelLabel: this.cancelLabel,
+        anteMeridiemAbbreviation: this.anteMeridiemAbbreviation,
+        postMeridiemAbbreviation: this.postMeridiemAbbreviation,
         color: this.color,
         isPm: this.isPm,
         minDate: this.minDate,

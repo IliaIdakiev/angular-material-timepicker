@@ -19,8 +19,10 @@
       </ng-template>
       <ng-template #ampm>
         <div class="ampm">
-          <span class="time" [ngClass]="{ 'select': isPm }" (click)="setPm()">PM</span>
-          <span class="time" [ngClass]="{ 'select': !isPm }" (click)="setAm()">AM</span>
+          <span class="time" [ngClass]="{ 'select': isPm }"
+            (click)="setPm()">{{postMeridiemAbbreviation | uppercase }}</span>
+          <span class="time" [ngClass]="{ 'select': !isPm }"
+            (click)="setAm()">{{anteMeridiemAbbreviation | uppercase }}</span>
         </div>
       </ng-template>
     </mat-toolbar>
