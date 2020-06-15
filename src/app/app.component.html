@@ -28,8 +28,7 @@
       <mat-form-field appearance="fill">
         <mat-label>12 TIMEPICKER</mat-label>
         <input matTimepicker #t2="matTimepicker" #time2="ngModel" [minDate]="minValue" [maxDate]="maxValue"
-          anteMeridiemAbbreviation="t.s." postMeridiemAbbreviation="b.s." id="timepicker-example-2" mode="12h" ngModel
-          placeholder="Please select time..." name="time-2">
+          id="timepicker-example-2" mode="12h" ngModel placeholder="Please select time..." name="time-2">
         <mat-icon matSuffix (click)="t2.showDialog()">access_time</mat-icon>
         <mat-error *ngIf="time2.touched && time2.invalid">Invalid Date</mat-error>
       </mat-form-field>

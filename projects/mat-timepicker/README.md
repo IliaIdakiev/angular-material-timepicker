@@ -62,6 +62,12 @@ export class YourModule { }
 /* Override the label of the cancel button. */
 @Input() cancelLabel = 'Cancel';
 
+/** Override the ante meridiem abbreviation. */
+@Input() anteMeridiemAbbreviation = 'am';
+
+/** Override the post meridiem abbreviation. */
+@Input() postMeridiemAbbreviation = 'pm';
+
 /* Sets the clock mode, 12-hour or 24-hour clocks are supported. */
 @Input() mode: '12h' | '24h' = '24h';
 
