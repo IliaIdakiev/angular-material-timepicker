@@ -1,6 +1,6 @@
 {
   "name": "mat-timepicker",
-  "version": "4.0.7",
+  "version": "4.1.0",
   "peerDependencies": {
     "@angular/common": "^9.1.4",
     "@angular/core": "^9.1.4",
