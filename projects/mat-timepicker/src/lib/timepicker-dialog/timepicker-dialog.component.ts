@@ -13,7 +13,7 @@ export class MatTimepickerComponentDialogComponent implements DoCheck {
   twoDigits = twoDigits;
 
   @Output() changeEvent: EventEmitter<any> = new EventEmitter<any>();
-  @Output() okClickEvent: EventEmitter<any> = new EventEmitter<any>();
+  @Output() okClickEvent: EventEmitter<any> = new EventEmitter<Date>();
   @Output() cancelClickEvent: EventEmitter<any> = new EventEmitter<any>();
 
   allowed24HourMap: IAllowed24HourMap = null;
@@ -194,7 +194,7 @@ export class MatTimepickerComponentDialogComponent implements DoCheck {
       this.isPm = !this.isPm;
       this.hasInvalidMeridiem = false;
     }
-    this.okClickEvent.emit();
+    this.okClickEvent.emit(this.value);
   }
 
   cancelClickHandler() {

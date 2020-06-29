@@ -68,18 +68,19 @@ export class ClockComponent implements OnChanges {
     }
 
     const isSelectedTimeAvailable = (this.isAvailableFn) ?
-      this.isAvailableFn(this.formattedValue, 'minutes', this.isPm, this.formattedHours) : true;
+      // when calling isAvailableFn here we should always set the viewType to minutes because we want to check the hours and the minutes
+      this.isAvailableFn(this.minutes, 'minutes', this.isPm, this.formattedHours) : true;
 
-    if (this.mode === '24h' && this.viewType === 'minutes' && this.isAvailableFn) {
-      const areMinitesAvailable = this.isAvailableFn(this.minutes, 'minutes', this.isPm, this.formattedHours);
-      if (!areMinitesAvailable) {
-        if (this.minDate && this.minDate.getMinutes() > this.minutes) {
-          setTimeout(() => { this.changeEvent.emit({ value: this.minDate.getMinutes(), type: 'minutes' }); });
-        } else {
-          setTimeout(() => { this.changeEvent.emit({ value: this.maxDate.getMinutes(), type: 'minutes' }); });
-        }
-      }
-    }
+    // if (this.mode === '24h' && this.viewType === 'minutes' && this.isAvailableFn) {
+    //   const areMinitesAvailable = this.isAvailableFn(this.minutes, 'minutes', this.isPm, this.formattedHours);
+    //   if (!areMinitesAvailable) {
+    //     if (this.minDate && this.minDate.getMinutes() > this.minutes) {
+    //       setTimeout(() => { this.changeEvent.emit({ value: this.minDate.getMinutes(), type: 'minutes' }); });
+    //     } else {
+    //       setTimeout(() => { this.changeEvent.emit({ value: this.maxDate.getMinutes(), type: 'minutes' }); });
+    //     }
+    //   }
+    // }
 
     if (isSelectedTimeAvailable && this.invalidMeridiemEmitted) {
       this.clearInvalidMeridiem.emit();
@@ -166,7 +167,7 @@ export class ClockComponent implements OnChanges {
       return;
     }
     if (value !== this.formattedValue) {
-      this.changeEvent.emit({ value, type: this.viewType !== 'minutes' ? 'hours' : 'minutes' });
+      this.changeEvent.emit({ value, type: this.viewType });
       if (this.viewType !== 'minutes') {
         if (!this.isAvailable(value)) {
           if (this.minDate && this.isAvailable(value)

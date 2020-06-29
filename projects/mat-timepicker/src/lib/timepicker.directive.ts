@@ -190,7 +190,7 @@ export class MatTimepickerDirective implements
     this._value = value;
     if (!value) {
       this._formattedValueString = null;
-      this.setInputElementValue(value);
+      this.setInputElementValue('');
       this.currentValue = value;
       return;
     }
@@ -587,7 +587,8 @@ export class MatTimepickerDirective implements
     this.currentValue = v;
   }
 
-  handleOk = () => {
+  handleOk = (value) => {
+    if (!this.currentValue && value) { this.currentValue = value; }
     if (this.onChangeFn) { this.onChangeFn(this.currentValue); }
     this.value = this.currentValue;
     this.modalRef.close();
