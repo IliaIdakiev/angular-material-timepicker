@@ -3,9 +3,8 @@
   "version": "4.1.2",
   "peerDependencies": {
     "@angular/common": "^9.1.4",
-    "@angular/core": "^9.1.4",
-    "tslib": "^1.10.0"
-  },
+    "@angular/core": "^9.1.4"
+},
   "dependencies": {
     "@angular/animations": "^9.1.4",
     "@angular/cdk": "^9.2.1",
@@ -15,7 +14,7 @@
     "@angular/material": "^9.2.1",
     "@angular/platform-browser": "^9.1.4",
     "rxjs": "^6.5.5",
-    "tslib": "^1.11.1",
+    "tslib": "^2.0.0",
     "zone.js": "^0.10.3"
   },
   "author": {
