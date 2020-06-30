@@ -3,18 +3,5 @@
   "dest": "../../dist/mat-timepicker",
   "lib": {
     "entryFile": "src/public-api.ts"
-  },
-  "whitelistedNonPeerDependencies": [
-    "@angular/material",
-    "@angular/animations",
-    "@angular/cdk",
-    "@angular/common",
-    "@angular/core",
-    "@angular/forms",
-    "@angular/material",
-    "@angular/platform-browser",
-    "rxjs",
-    "tslib",
-    "zone.js"
-  ]
+  }
 }
