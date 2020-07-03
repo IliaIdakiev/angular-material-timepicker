@@ -98,8 +98,7 @@
     </p>
     <p>
       <mat-form-field appearance="fill">
-        <mat-label>12 TIMEPICKER (strict mode by default is set to true so we are checking if the datetime is between
-          the min and max since the dates are different we will always be in an error state)</mat-label>
+        <mat-label>12 TIMEPICKER</mat-label>
         <input matTimepicker #t8="matTimepicker" #time8="ngModel" [minDate]="minValue" [maxDate]="maxValue"
           id="timepicker-example-8" mode="12h" [ngModel]="defaultValue" placeholder="Please select time..."
           name="time-8" [errorStateMatcher]="customErrorStateMatcher" [disableDialogOpenOnClick]="true"
@@ -107,6 +106,8 @@
         <mat-icon matSuffix (click)="t8.showDialog()">access_time</mat-icon>
         <mat-error *ngIf="time8.touched && time8.invalid">Invalid Date</mat-error>
       </mat-form-field>
+    <p>(strict mode by default is set to true so we are checking if the datetime is between
+      the min and max since the dates are different we will always be in an error state)</p>
     </p>
   </fieldset>
   <div>Template Form Value: {{f.value | json}}</div>
