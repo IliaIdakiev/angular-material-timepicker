@@ -381,6 +381,7 @@ export class MatTimepickerDirective implements
   }
 
   setInputElementValue(value: any) {
+    if (value === null || value === undefined) { value = ''; }
     Promise.resolve().then(() => {
       this.zone.runOutsideAngular(() => {
         this.renderer.setProperty(this.elRef.nativeElement, 'value', value);
