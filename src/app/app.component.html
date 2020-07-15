@@ -1,21 +1,7 @@
-<!-- <div>
-  <label for="">No form field, no min/max (24h)</label>
-  <br />
-  <mat-timepicker id="timepicker-example-1" mode="24h"></mat-timepicker>
-</div>
-<br />
-<br />
-<br /> -->
 <form #f="ngForm">
-  <!-- <mat-form-field appearance="fill">
-    <input matTimepicker #t1="matTimepicker" #time1="ngModel" [minDate]="minValue" [maxDate]="maxValue"
-      id="timepicker-example-1" mode="24h" ngModel placeholder="Please select time..." name="time-1" required>
-    <mat-icon matSuffix (click)="t1.showDialog()">access_time</mat-icon>
-    <mat-error *ngIf="time1.touched && time1.invalid">Invalid Date</mat-error>
-  </mat-form-field> -->
   <fieldset>
     <legend>Timepickers with on click dialog</legend>
-    <p>
+    <div>
       <mat-form-field appearance="fill">
         <mat-label i18n="test1">24 TIMEPICKER</mat-label>
         <input matTimepicker #t1="matTimepicker" #time1="ngModel" [minDate]="minValue" [maxDate]="maxValue"
@@ -23,8 +9,8 @@
         <mat-icon matSuffix (click)="t1.showDialog()">access_time</mat-icon>
         <mat-error *ngIf="time1.touched && time1.invalid">Invalid Date</mat-error>
       </mat-form-field>
-    </p>
-    <p>
+    </div>
+    <div>
       <mat-form-field appearance="fill">
         <mat-label>12 TIMEPICKER</mat-label>
         <input matTimepicker #t2="matTimepicker" #time2="ngModel" [minDate]="minValue" [maxDate]="maxValue"
@@ -32,11 +18,11 @@
         <mat-icon matSuffix (click)="t2.showDialog()">access_time</mat-icon>
         <mat-error *ngIf="time2.touched && time2.invalid">Invalid Date</mat-error>
       </mat-form-field>
-    </p>
+    </div>
   </fieldset>
   <fieldset>
     <legend>Timepickers with icon on click dialog</legend>
-    <p>
+    <div>
       <mat-form-field appearance="fill">
         <mat-label>24 TIMEPICKER</mat-label>
         <input matTimepicker #t3="matTimepicker" #time3="ngModel" [minDate]="minValue" [maxDate]="maxValue"
@@ -45,8 +31,8 @@
         <mat-icon matSuffix (click)="t3.showDialog()">access_time</mat-icon>
         <mat-error *ngIf="time3.touched && time3.invalid">Invalid Date</mat-error>
       </mat-form-field>
-    </p>
-    <p>
+    </div>
+    <div>
       <mat-form-field appearance="fill">
         <mat-label>12 TIMEPICKER</mat-label>
         <input matTimepicker #t4="matTimepicker" #time4="ngModel" [minDate]="minValue" [maxDate]="maxValue"
@@ -55,11 +41,11 @@
         <mat-icon matSuffix (click)="t4.showDialog()">access_time</mat-icon>
         <mat-error *ngIf="time4.touched && time4.invalid">Invalid Date</mat-error>
       </mat-form-field>
-    </p>
+    </div>
   </fieldset>
   <fieldset>
     <legend>Timepickers with icon on click dialog and ShowOnDirtyErrorStateMatcher</legend>
-    <p>
+    <div>
       <mat-form-field appearance="fill">
         <mat-label>24 TIMEPICKER</mat-label>
         <input matTimepicker #t5="matTimepicker" #time5="ngModel" [minDate]="minValue" [maxDate]="maxValue"
@@ -68,8 +54,8 @@
         <mat-icon matSuffix (click)="t5.showDialog()">access_time</mat-icon>
         <mat-error *ngIf="time5.touched && time5.invalid">Invalid Date</mat-error>
       </mat-form-field>
-    </p>
-    <p>
+    </div>
+    <div>
       <mat-form-field appearance="fill">
         <mat-label>12 TIMEPICKER</mat-label>
         <input matTimepicker #t6="matTimepicker" #time6="ngModel" [minDate]="minValue" [maxDate]="maxValue"
@@ -78,14 +64,14 @@
         <mat-icon matSuffix (click)="t6.showDialog()">access_time</mat-icon>
         <mat-error *ngIf="time6.touched && time6.invalid">Invalid Date</mat-error>
       </mat-form-field>
-    </p>
+    </div>
   </fieldset>
   <fieldset>
     <legend>Timepickers with default value, icon on click dialog and custom error matcher (look into the source code of
       the example
       app)
     </legend>
-    <p>
+    <div>
       <mat-form-field appearance="fill">
         <mat-label>24 TIMEPICKER</mat-label>
         <input matTimepicker #t7="matTimepicker" #time7="ngModel" [minDate]="minValue" [maxDate]="maxValue"
@@ -95,8 +81,8 @@
         <mat-icon matSuffix (click)="t7.showDialog()">access_time</mat-icon>
         <mat-error *ngIf="time7.touched && time7.invalid">Invalid Date</mat-error>
       </mat-form-field>
-    </p>
-    <p>
+    </div>
+    <div>
       <mat-form-field appearance="fill">
         <mat-label>12 TIMEPICKER</mat-label>
         <input matTimepicker #t8="matTimepicker" #time8="ngModel" [minDate]="minValue" [maxDate]="maxValue"
@@ -106,9 +92,10 @@
         <mat-icon matSuffix (click)="t8.showDialog()">access_time</mat-icon>
         <mat-error *ngIf="time8.touched && time8.invalid">Invalid Date</mat-error>
       </mat-form-field>
-    <p>(strict mode by default is set to true so we are checking if the datetime is between
-      the min and max since the dates are different we will always be in an error state)</p>
-    </p>
+      <p>(strict mode by default is set to true so we are checking if the datetime is between the min and max since
+        the
+        dates are different we will always be in an error state)</p>
+    </div>
   </fieldset>
   <div>Template Form Value: {{f.value | json}}</div>
 </form>

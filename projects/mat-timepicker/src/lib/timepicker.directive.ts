@@ -483,11 +483,11 @@ export class MatTimepickerDirective implements
     this.pattern = this.mode === '24h' ? /^[0-9]{1,2}:?([0-9]{1,2})?$/ : /^[0-9]{1,2}:?([0-9]{1,2})?\s?(a|p)?m?$/;
 
     if (
-      (simpleChanges.minDate && !simpleChanges.minDate.isFirstChange &&
+      (simpleChanges.minDate && !simpleChanges.minDate.isFirstChange() &&
         +simpleChanges.minDate.currentValue !== simpleChanges.minDate.previousValue) ||
-      (simpleChanges.maxDate && !simpleChanges.maxDate.isFirstChange &&
+      (simpleChanges.maxDate && !simpleChanges.maxDate.isFirstChange() &&
         +simpleChanges.maxDate.currentValue !== simpleChanges.maxDate.previousValue) ||
-      (simpleChanges.disableLimitBase && !simpleChanges.disableLimitBase.isFirstChange &&
+      (simpleChanges.disableLimitBase && !simpleChanges.disableLimitBase.isFirstChange() &&
         +simpleChanges.disableLimitBase.currentValue !== simpleChanges.disableLimitBase.previousValue)
     ) { this.generateAllowedMap(); }
 
