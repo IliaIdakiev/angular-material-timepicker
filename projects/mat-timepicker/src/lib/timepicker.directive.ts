@@ -390,6 +390,8 @@ export class MatTimepickerDirective implements
   }
 
   validate() {
+    if (this.currentValue === null || this.currentValue === undefined) { return null; }
+
     const isValueInRange = this.strict ?
       isDateInRange(this.minDate, this.maxDate, this.currentValue) :
       isTimeInRange(this.minDate, this.maxDate, this.currentValue);
@@ -418,20 +420,21 @@ export class MatTimepickerDirective implements
       });
 
     }
-    if (!this.value) {
-      const hasMaxDate = !!this.maxDate;
-      const hasMinDate = !!this.minDate;
 
-      if (hasMinDate || hasMaxDate) {
-        if (hasMinDate) { this.minDate.setSeconds(0); this.minDate.setMilliseconds(0); }
-        if (hasMaxDate) { this.maxDate.setSeconds(0); this.maxDate.setMilliseconds(0); }
-        Promise.resolve().then(() => this.generateAllowedMap());
+    const hasMaxDate = !!this.maxDate;
+    const hasMinDate = !!this.minDate;
 
-        if (!(this.ngControl as any)._rawValidators.find(v => v === this)) {
-          (this.ngControl as any)._rawValidators.push(this);
-        }
+    if (hasMinDate || hasMaxDate) {
+      if (hasMinDate) { this.minDate.setSeconds(0); this.minDate.setMilliseconds(0); }
+      if (hasMaxDate) { this.maxDate.setSeconds(0); this.maxDate.setMilliseconds(0); }
+      Promise.resolve().then(() => this.generateAllowedMap());
+
+      if (!(this.ngControl as any)._rawValidators.find(v => v === this)) {
+        this.ngControl.control.setValidators(((this.ngControl as any)._rawValidators as any[]).concat(this));
+        this.ngControl.control.updateValueAndValidity();
       }
     }
+
     this._skipValueChangeEmission = false;
   }
 
@@ -489,7 +492,10 @@ export class MatTimepickerDirective implements
         +simpleChanges.maxDate.currentValue !== simpleChanges.maxDate.previousValue) ||
       (simpleChanges.disableLimitBase && !simpleChanges.disableLimitBase.isFirstChange() &&
         +simpleChanges.disableLimitBase.currentValue !== simpleChanges.disableLimitBase.previousValue)
-    ) { this.generateAllowedMap(); }
+    ) {
+      this.generateAllowedMap();
+      this.ngControl.control.updateValueAndValidity();
+    }
 
     if (!this.modalRef || !this.modalRef.componentInstance) { return; }
 

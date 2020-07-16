@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { ShowOnDirtyErrorStateMatcher, ErrorStateMatcher } from '@angular/material/core';
-import { FormControl, FormBuilder, FormGroup } from '@angular/forms';
+import { FormControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 
 class CustomErrorStateMatcher implements ErrorStateMatcher {
@@ -48,7 +48,7 @@ export class AppComponent {
 
 
     this.form = this.formBuilder.group({
-      time: [d]
+      time: [this.defaultValue, Validators.required]
     });
   }
 
@@ -58,5 +58,12 @@ export class AppComponent {
 
   invalidInputHandler() {
     console.log('invalid input');
+  }
+
+  changeMaxValue() {
+    const maxValue = new Date();
+    maxValue.setHours(20);
+    maxValue.setMinutes(10);
+    this.maxValue = maxValue;
   }
 }
