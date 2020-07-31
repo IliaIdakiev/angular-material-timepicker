@@ -1,5 +1,8 @@
 # Angular Material Timepicker
 
+## Installations
+  *  `npm install mat-timepicker` || ` yarn add mat-timepicker`
+
 ## Features:
 
   * Clock view dialog for selecting hour and minutes and options for dialog toggle customizations.
