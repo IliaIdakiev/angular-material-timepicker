@@ -1,6 +1,6 @@
 # Angular Material Timepicker
 
-## Installations
+## Installation
   *  `npm install mat-timepicker` || ` yarn add mat-timepicker`
 
 ## Features:
