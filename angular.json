@@ -10,6 +10,12 @@
           "style": "scss"
         }
       },
+      "i18n": {
+        "sourceLocale": "en-US",
+        "locales": {
+          "bg": "bg-messages.xlf"
+        }
+      },
       "root": "",
       "sourceRoot": "src",
       "prefix": "app",
@@ -23,6 +29,7 @@
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.app.json",
             "aot": true,
+            "localize": false,
             "assets": [
               "src/favicon.ico",
               "src/assets"
@@ -34,6 +41,11 @@
             "scripts": []
           },
           "configurations": {
+            "bg": {
+              "localize": [
+                "bg"
+              ]
+            },
             "production": {
               "fileReplacements": [
                 {
@@ -77,6 +89,9 @@
           "configurations": {
             "production": {
               "browserTarget": "angular-material-timepicker:build:production"
+            },
+            "bg": {
+              "browserTarget": "angular-material-timepicker:build:bg"
             }
           }
         },

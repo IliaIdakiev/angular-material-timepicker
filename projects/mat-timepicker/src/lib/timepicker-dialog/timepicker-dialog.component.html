@@ -39,8 +39,6 @@
   </div>
 </mat-dialog-content>
 <mat-dialog-actions>
-  <button mat-button i18n="mat-timepicker|Material Timepicker Cancel Button Text" [color]="color"
-    (click)="cancelClickHandler()">{{cancelLabel}}</button>
-  <button mat-button i18n="mat-timepicker|Material Timepicker Ok Button Text" [disabled]="invalidSelection"
-    [color]="color" (click)="okClickHandler()">{{okLabel}}</button>
+  <button mat-button [color]="color" (click)="cancelClickHandler()">{{cancelLabel}}</button>
+  <button mat-button [disabled]="invalidSelection" [color]="color" (click)="okClickHandler()">{{okLabel}}</button>
 </mat-dialog-actions>

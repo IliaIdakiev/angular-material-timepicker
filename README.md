@@ -108,6 +108,28 @@ export class YourModule { }
 
 ---
 
+## i18n (v5.0.0+)
+In versions before v5.0.0 putting `import '@angular/localize/init';` inside polyfills.ts was mandatory. From v5.0.0 it is no longer mandatory (which is useful for users that are not using i18n). In order to use i18n you have to use the inputs: okLabel, cancelLabel.
+
+**Please note that you need to provide both the input attribute and the value (e.g okLabel="Ok") and the i18n attribute (e.g i18n-okLabel="<meaning>|<description>@@<id>")** for more info check out [this](https://angular.io/guide/i18n#mark-element-attributes-for-translations)
+
+Example: 
+```html
+<div>
+  <mat-form-field appearance="fill">
+    <mat-label i18n="Timepicker 1 Title">24 TIMEPICKER</mat-label>
+    <input matTimepicker #t1="matTimepicker" i18n-okLabel="Timepicker 1 Ok Label" okLabel="Ok"
+      i18n-cancelLabel="Timepicker 1 Cancel Label" cancelLabel="Cancel" #time1="ngModel" [minDate]="minValue"
+      [maxDate]="maxValue" id="timepicker-example-1" mode="24h" ngModel placeholder="Please select time..."
+      name="time-1" required>
+    <mat-icon matSuffix (click)="t1.showDialog()">access_time</mat-icon>
+    <mat-error *ngIf="time1.touched && time1.invalid">Invalid Date</mat-error>
+  </mat-form-field>
+</div>
+```
+
+---
+
 Dialog View
 
 Hour Select (24h): 
