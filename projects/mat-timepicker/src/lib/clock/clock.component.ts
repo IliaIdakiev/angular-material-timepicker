@@ -149,7 +149,7 @@ export class ClockComponent implements OnChanges {
 
   handleMouseMove(e: any) {
     // MouseEvent.which is deprecated, but MouseEvent.buttons is not supported in Safari
-    if (e.buttons === 1 || e.which === 1) {
+    if ((e.buttons === 1 || e.which === 1) && this.touching) {
       const rect = e.target.getBoundingClientRect();
       this.movePointer(e.clientX - rect.left, e.clientY - rect.top);
     }
