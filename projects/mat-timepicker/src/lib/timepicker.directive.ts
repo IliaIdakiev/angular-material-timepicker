@@ -15,7 +15,8 @@ import {
   HostBinding,
   Self,
   Output,
-  HostListener
+  HostListener,
+  TemplateRef
 } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldControl, MatFormField } from '@angular/material/form-field';
@@ -28,6 +29,11 @@ import { FocusMonitor } from '@angular/cdk/a11y';
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
 import { ErrorStateMatcher } from '@angular/material/core';
 import { Platform } from '@angular/cdk/platform';
+
+export interface MatTimepickerButtonTemplateContext {
+  $implicit: () => void;
+  label: string;
+}
 
 @Directive({
   selector: 'input[matTimepicker]',
@@ -152,6 +158,11 @@ export class MatTimepickerDirective implements
   private allowed12HourMap: IAllowed12HourMap = null;
 
   private isInputFocused = false;
+
+  /* Use a custom template for the ok button */
+  @Input() okButtonTemplate: TemplateRef<MatTimepickerButtonTemplateContext> | null = null;
+  /* Use a custom template for the cancel button */
+  @Input() cancelButtonTemplate: TemplateRef<MatTimepickerButtonTemplateContext> | null = null;
 
   /** Override the label of the ok button. */
   @Input() okLabel = 'Ok';
@@ -504,6 +515,8 @@ export class MatTimepickerDirective implements
       value: this.currentValue,
       okLabel: this.okLabel,
       cancelLabel: this.cancelLabel,
+      okButtonTemplate: this.okButtonTemplate,
+      cancelButtonTemplate: this.cancelButtonTemplate,
       anteMeridiemAbbreviation: this.anteMeridiemAbbreviation,
       postMeridiemAbbreviation: this.postMeridiemAbbreviation,
       color: this.color,
@@ -560,6 +573,8 @@ export class MatTimepickerDirective implements
         value: this.currentValue,
         okLabel: this.okLabel,
         cancelLabel: this.cancelLabel,
+        okButtonTemplate: this.okButtonTemplate,
+        cancelButtonTemplate: this.cancelButtonTemplate,
         anteMeridiemAbbreviation: this.anteMeridiemAbbreviation,
         postMeridiemAbbreviation: this.postMeridiemAbbreviation,
         color: this.color,

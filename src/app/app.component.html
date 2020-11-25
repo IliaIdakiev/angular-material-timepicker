@@ -97,6 +97,25 @@
         dates are different we will always be in an error state)</p>
     </div>
   </fieldset>
+  <fieldset>
+    <legend>Timepickers with custom ok and cancel buttons</legend>
+    <ng-template #myOkButton let-okClickHandler let-label="label">
+      <button (click)="okClickHandler()">OKK! {{label}}</button>
+    </ng-template>
+    <ng-template #myCancelButton let-cancelClickHandler let-label="label">
+      <button (click)="cancelClickHandler()">CANCEL! {{label}}</button>
+    </ng-template>
+    <div>
+      <mat-form-field appearance="fill">
+        <mat-label>24 TIMEPICKER</mat-label>
+        <input matTimepicker [okButtonTemplate]="myOkButton" [cancelButtonTemplate]="myCancelButton" #t9="matTimepicker"
+          #time9="ngModel" [minDate]="minValue" [maxDate]="maxValue" id="timepicker-example-1" mode="24h" ngModel
+          placeholder="Please select time..." name="time-1" required>
+        <mat-icon matSuffix (click)="t9.showDialog()">access_time</mat-icon>
+        <mat-error *ngIf="time9.touched && time9.invalid">Invalid Date</mat-error>
+      </mat-form-field>
+    </div>
+  </fieldset>
   <div>Template Form Value: {{f.value | json}}</div>
 </form>
 <h1>Reactive Form</h1>

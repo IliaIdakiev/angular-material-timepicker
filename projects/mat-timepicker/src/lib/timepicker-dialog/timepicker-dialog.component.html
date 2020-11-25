@@ -1,3 +1,10 @@
+<ng-template #defaultCancelButtonTemplate>
+  <button mat-button [color]="color" (click)="cancelClickHandler()">{{cancelLabel}}</button>
+</ng-template>
+<ng-template #defaultOkButtonTemplate>
+  <button mat-button [disabled]="invalidSelection" [color]="color" (click)="okClickHandler()">{{okLabel}}</button>
+</ng-template>
+
 <mat-dialog-content>
   <div class="root">
     <mat-toolbar [color]="color" class="header">
@@ -39,6 +46,10 @@
   </div>
 </mat-dialog-content>
 <mat-dialog-actions>
-  <button mat-button [color]="color" (click)="cancelClickHandler()">{{cancelLabel}}</button>
-  <button mat-button [disabled]="invalidSelection" [color]="color" (click)="okClickHandler()">{{okLabel}}</button>
+  <ng-container
+    *ngTemplateOutlet="cancelButtonTemplate || defaultCancelButtonTemplate; context: { label: cancelLabel, $implicit: cancelClickHandler }">
+  </ng-container>
+  <ng-container
+    *ngTemplateOutlet="okButtonTemplate || defaultOkButtonTemplate; context: { label: okLabel, $implicit: okClickHandler }">
+  </ng-container>
 </mat-dialog-actions>

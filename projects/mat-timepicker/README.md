@@ -59,6 +59,18 @@ export class YourModule { }
 @Input() disabled = false;
 @Input() placeholder = null;
 
+/* Use a custom template for the ok button */
+@Input() okButtonTemplate: TemplateRef<MatTimepickerButtonTemplateContext> | null = null;
+/* Use a custom template for the cancel button */
+@Input() cancelButtonTemplate: TemplateRef<MatTimepickerButtonTemplateContext> | null = null;
+/* Where:
+  export interface MatTimepickerButtonTemplateContext {
+    $implicit: () => void; <--- The click handler for each the button (either okClickHandler/closeClickHandler)
+    label: string; <--- The label that was provided to the mat-timepicker directive (either okLabel/cancelLabel)
+  }
+  In order to use this check out the bottom of the template driven form inside the example app
+*/
+
 /* Override the label of the ok button. */
 @Input() okLabel = 'Ok';
 

@@ -1,7 +1,8 @@
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Component, EventEmitter, Output, Inject, DoCheck } from '@angular/core';
+import { Component, EventEmitter, Output, Inject, DoCheck, TemplateRef } from '@angular/core';
 import { ClockViewType, ClockMode, IAllowed24HourMap, IAllowed12HourMap } from '../interfaces-and-types';
 import { twoDigits, convertHoursForMode } from '../util';
+import { MatTimepickerButtonTemplateContext } from '../timepicker.directive';
 
 @Component({
   selector: 'mat-timepicker-dialog',
@@ -23,6 +24,9 @@ export class MatTimepickerComponentDialogComponent implements DoCheck {
 
   okLabel: string;
   cancelLabel: string;
+
+  okButtonTemplate: TemplateRef<MatTimepickerButtonTemplateContext>;
+  cancelButtonTemplate: TemplateRef<MatTimepickerButtonTemplateContext>;
 
   anteMeridiemAbbreviation: string;
   postMeridiemAbbreviation: string;
@@ -71,6 +75,8 @@ export class MatTimepickerComponentDialogComponent implements DoCheck {
     this.mode = data.mode;
     this.okLabel = data.okLabel;
     this.cancelLabel = data.cancelLabel;
+    this.okButtonTemplate = data.okButtonTemplate;
+    this.cancelButtonTemplate = data.cancelButtonTemplate;
     this.anteMeridiemAbbreviation = data.anteMeridiemAbbreviation;
     this.postMeridiemAbbreviation = data.postMeridiemAbbreviation;
     this.color = data.color;
@@ -189,7 +195,7 @@ export class MatTimepickerComponentDialogComponent implements DoCheck {
     this.meridiemChange(this.hours);
   }
 
-  okClickHandler() {
+  okClickHandler = () => {
     if (this.hasInvalidMeridiem) {
       this.isPm = !this.isPm;
       this.hasInvalidMeridiem = false;
@@ -197,7 +203,7 @@ export class MatTimepickerComponentDialogComponent implements DoCheck {
     this.okClickEvent.emit(this.value);
   }
 
-  cancelClickHandler() {
+  cancelClickHandler = () => {
     this.cancelClickEvent.emit();
   }
 
