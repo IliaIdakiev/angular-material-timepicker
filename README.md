@@ -45,7 +45,9 @@ export class YourModule { }
     (timeChange)="timeChangeHandler($event)" (invalidInput)="invalidInputHandler()">
 
   <!-- An icon for the timepicker input that will open the timepicker dialog when clicked -->
-  <mat-icon matSuffix (click)="t.showDialog()">access_time</mat-icon>
+  <mat-timepicker-toggle matSuffix [for]="t">
+    <mat-icon matTimepickerToggleIcon>keyboard_arrow_down</mat-icon>
+  </mat-timepicker-toggle>
 
   <!-- Error that will be shown when the input date is invalid -->
   <mat-error *ngIf="time.touched && time.invalid">Invalid Date</mat-error>
