@@ -275,12 +275,12 @@ export class MatTimepickerDirective implements
 
     if (hours < 12 && meridiem && meridiem.toLowerCase() === 'pm') {
       hours += 12;
-    } else if (hours > 12 && meridiem && meridiem.toLowerCase() === 'am') {
+    } else if (hours >= 12 && meridiem && meridiem.toLowerCase() === 'am') {
       hours -= 12;
     }
 
-    if (this.mode === '12h' && +hours < 1) {
-      hours = '1';
+    if (this.mode === '12h' && +hours < 0) {
+      hours = '0';
     } else {
       if (+hours > 24) {
         hours = '24';
