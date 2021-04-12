@@ -124,7 +124,7 @@ export class MatTimepickerDirective implements
   stateChanges = new Subject<void>();
 
   // tslint:disable-next-line:variable-name
-  protected _uid = `mat-input-${MatTimepickerDirective.nextId++}`;
+  protected _uid = `mat-time-picker-${MatTimepickerDirective.nextId++}`;
   @HostBinding('class.floating') get shouldLabelFloat() { return this.focused || !this.empty; }
   @HostBinding('attr.aria-describedby') describedBy = '';
 
