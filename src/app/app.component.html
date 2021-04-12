@@ -4,8 +4,9 @@
     <div>
       <mat-form-field appearance="fill">
         <mat-label>24 TIMEPICKER</mat-label>
-        <input matTimepicker #t1="matTimepicker" #time1="ngModel" [minDate]="minValue" [maxDate]="maxValue"
-          id="timepicker-example-1" mode="24h" ngModel placeholder="Please select time..." name="time-1" required>
+        <input matTimepicker #t1="matTimepicker" #time1="ngModel" color="accent" [minDate]="minValue"
+          [maxDate]="maxValue" id="timepicker-example-1" mode="24h" ngModel placeholder="Please select time..."
+          name="time-1" required>
         <mat-icon matSuffix (click)="t1.showDialog()">access_time</mat-icon>
         <mat-error *ngIf="time1.touched && time1.invalid">Invalid Date</mat-error>
       </mat-form-field>

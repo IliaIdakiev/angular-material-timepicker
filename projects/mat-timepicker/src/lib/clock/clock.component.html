@@ -21,7 +21,7 @@
       </button>
     </ng-container>
     <ng-container *ngFor="let digit of numbers;">
-      <button mat-mini-fab [color]="color" class="number"
+      <button mat-mini-fab class="number"
         [ngClass]="{ 'selected': formattedValue === digit.display || (digit.display === 60 && formattedValue === 0), 'disabled': !isAvailable(digit.display === 60 ? 0 : digit.display)}"
         [style.transform]="'translate(' + digit.translateX + 'px, ' + digit.translateY + 'px)'">
         <ng-template #hoursTemplate>{{ digit.display }}</ng-template>
@@ -31,7 +31,7 @@
 
     </ng-container>
     <ng-container *ngFor="let digit of secondaryNumbers;">
-      <button mat-mini-fab [color]="color" class="number small-number"
+      <button mat-mini-fab class="number small-number"
         [ngClass]="{ 'selected': formattedValue === digit.display || (digit.display === 24 && formattedValue === 0), 'disabled': !isAvailable(digit.display === 24 ? 0 : digit.display)}"
         [style.transform]="'translate(' + digit.translateX + 'px, ' + digit.translateY + 'px)'">
         {{ digit.display === 24 ? '00' : digit.display }}

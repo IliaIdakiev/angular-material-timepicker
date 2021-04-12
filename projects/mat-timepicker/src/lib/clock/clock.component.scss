@@ -29,7 +29,8 @@
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  background-color: transparent;
+  background-color: transparent !important;
+  background: transparent !important;
   box-shadow: none;
 
   &.disabled {
