@@ -16,6 +16,7 @@
 .number {
   width: 32px;
   height: 32px;
+  border: 0px;
   left: calc(50% - 16px);
   top: calc(50% - 16px);
   position: absolute;
@@ -31,7 +32,9 @@
   flex-direction: column;
   background-color: transparent !important;
   background: transparent !important;
-  box-shadow: none;
+  box-shadow: 0px -1px 5px -200px rgba(0,0,0,1) !important;
+  -webkit-box-shadow: 0px -1px 5px -200px rgba(0,0,0,1) !important;
+  -moz-box-shadow: 0px -1px 5px -200px rgba(0,0,0,1) !important;
 
   &.disabled {
     color: rgba(1,1,1,.1);
@@ -92,7 +95,12 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  box-shadow: none;
+  box-shadow: 0px 3px 5px -1px rgb(0 0 0 / 0%), 0px 6px 10px 0px rgb(0 0 0 / 0%), 0px 1px 18px 0px rgb(0 0 0 / 0%) !important;
+  -webkit-box-shadow: 0px 3px 5px -1px rgb(0 0 0 / 0%), 0px 6px 10px 0px rgb(0 0 0 / 0%), 0px 1px 18px 0px rgb(0 0 0 / 0%) !important;
+  -moz-box-shadow: 0px 3px 5px -1px rgb(0 0 0 / 0%), 0px 6px 10px 0px rgb(0 0 0 / 0%), 0px 1px 18px 0px rgb(0 0 0 / 0%) !important;
+
+
+  
 }
 
 .outer-dot {
@@ -100,17 +108,21 @@
   height: 32px;
   position: absolute;
   right: -16px;
-  box-shadow: none;
   border-radius: 50%;
   box-sizing: content-box;
+  box-shadow: 0px 3px 5px -1px rgb(0 0 0 / 0%), 0px 6px 10px 0px rgb(0 0 0 / 0%), 0px 1px 18px 0px rgb(0 0 0 / 0%) !important;
+  -webkit-box-shadow: 0px 3px 5px -1px rgb(0 0 0 / 0%), 0px 6px 10px 0px rgb(0 0 0 / 0%), 0px 1px 18px 0px rgb(0 0 0 / 0%) !important;
+  -moz-box-shadow: 0px 3px 5px -1px rgb(0 0 0 / 0%), 0px 6px 10px 0px rgb(0 0 0 / 0%), 0px 1px 18px 0px rgb(0 0 0 / 0%) !important;
 }
 
 .outer-dot-odd {
-  box-shadow: none;
   width: 32px;
   height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: column;
+  box-shadow: 0px 3px 5px -1px rgb(0 0 0 / 0%), 0px 6px 10px 0px rgb(0 0 0 / 0%), 0px 1px 18px 0px rgb(0 0 0 / 0%) !important;
+  -webkit-box-shadow: 0px 3px 5px -1px rgb(0 0 0 / 0%), 0px 6px 10px 0px rgb(0 0 0 / 0%), 0px 1px 18px 0px rgb(0 0 0 / 0%) !important;
+  -moz-box-shadow: 0px 3px 5px -1px rgb(0 0 0 / 0%), 0px 6px 10px 0px rgb(0 0 0 / 0%), 0px 1px 18px 0px rgb(0 0 0 / 0%) !important;
 }
