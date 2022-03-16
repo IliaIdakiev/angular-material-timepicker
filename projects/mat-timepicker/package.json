@@ -1,6 +1,6 @@
 {
   "name": "mat-timepicker",
-  "version": "5.1.4",
+  "version": "5.1.5",
   "peerDependencies": {
     "@angular/cdk": "^11.2.12",
     "@angular/common": "^11.2.13",
