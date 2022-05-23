@@ -84,12 +84,7 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "angular-material-timepicker:build",
-            "sourceMap": {
-              "vendor": true,
-              "scripts": true,
-              "styles": true
-            }
+            "browserTarget": "angular-material-timepicker:build"
           },
           "configurations": {
             "production": {
@@ -122,19 +117,6 @@
               "src/styles.scss"
             ],
             "scripts": []
-          }
-        },
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
-          "options": {
-            "tsConfig": [
-              "tsconfig.app.json",
-              "tsconfig.spec.json",
-              "e2e/tsconfig.json"
-            ],
-            "exclude": [
-              "**/node_modules/**"
-            ]
           }
         },
         "e2e": {
@@ -175,18 +157,6 @@
             "main": "projects/mat-timepicker/src/test.ts",
             "tsConfig": "projects/mat-timepicker/tsconfig.spec.json",
             "karmaConfig": "projects/mat-timepicker/karma.conf.js"
-          }
-        },
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
-          "options": {
-            "tsConfig": [
-              "projects/mat-timepicker/tsconfig.lib.json",
-              "projects/mat-timepicker/tsconfig.spec.json"
-            ],
-            "exclude": [
-              "**/node_modules/**"
-            ]
           }
         }
       }
