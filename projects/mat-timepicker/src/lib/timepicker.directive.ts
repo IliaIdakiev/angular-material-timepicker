@@ -1,4 +1,4 @@
-import { ControlValueAccessor, NgForm, NgControl, FormGroupDirective, FormControl } from '@angular/forms';
+import { ControlValueAccessor, NgForm, NgControl, FormGroupDirective, UntypedFormControl } from '@angular/forms';
 import {
   Directive,
   OnInit,
@@ -79,7 +79,7 @@ export class MatTimepickerDirective implements
   get errorState() {
     const oldState = this._errorState;
     const parent = this._parentFormGroup || this._parentForm;
-    const control = this.ngControl ? this.ngControl.control as FormControl : null;
+    const control = this.ngControl ? this.ngControl.control as UntypedFormControl : null;
     const newState = this.errorStateMatcher ? this.errorStateMatcher.isErrorState(control, parent) : oldState;
 
     if (newState !== oldState) {

@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
 import { ShowOnDirtyErrorStateMatcher, ErrorStateMatcher } from '@angular/material/core';
-import { FormControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormControl, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 
 
 class CustomErrorStateMatcher implements ErrorStateMatcher {
-  isErrorState(control: FormControl | null) {
+  isErrorState(control: UntypedFormControl | null) {
     return control.invalid;
   }
 }
@@ -24,9 +24,9 @@ export class AppComponent {
   customErrorStateMatcher = new CustomErrorStateMatcher();
 
 
-  form: FormGroup;
+  form: UntypedFormGroup;
 
-  constructor(private formBuilder: FormBuilder) {
+  constructor(private formBuilder: UntypedFormBuilder) {
     const minValue = new Date();
     minValue.setHours(6);
     minValue.setMinutes(10);
