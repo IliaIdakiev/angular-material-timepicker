@@ -1,10 +1,17 @@
 import { Component } from '@angular/core';
-import { ShowOnDirtyErrorStateMatcher, ErrorStateMatcher } from '@angular/material/core';
-import { UntypedFormControl, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
-
+import {
+  ShowOnDirtyErrorStateMatcher,
+  ErrorStateMatcher,
+} from '@angular/material/core';
+import {
+  FormControl,
+  FormBuilder,
+  FormGroup,
+  Validators,
+} from '@angular/forms';
 
 class CustomErrorStateMatcher implements ErrorStateMatcher {
-  isErrorState(control: UntypedFormControl | null) {
+  isErrorState(control: FormControl | null) {
     return control.invalid;
   }
 }
@@ -12,7 +19,7 @@ class CustomErrorStateMatcher implements ErrorStateMatcher {
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
   title = 'angular-material-timepicker';
@@ -23,10 +30,9 @@ export class AppComponent {
   showOnDirtyErrorStateMatcher = new ShowOnDirtyErrorStateMatcher();
   customErrorStateMatcher = new CustomErrorStateMatcher();
 
+  form: FormGroup;
 
-  form: UntypedFormGroup;
-
-  constructor(private formBuilder: UntypedFormBuilder) {
+  constructor(private formBuilder: FormBuilder) {
     const minValue = new Date();
     minValue.setHours(6);
     minValue.setMinutes(10);
@@ -46,9 +52,8 @@ export class AppComponent {
     d.setMilliseconds(10);
     this.defaultValue = d;
 
-
     this.form = this.formBuilder.group({
-      time: [this.defaultValue, Validators.required]
+      time: [this.defaultValue, Validators.required],
     });
   }
 

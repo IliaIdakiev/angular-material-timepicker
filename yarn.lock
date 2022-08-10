@@ -118,17 +118,17 @@
     "ora" "5.4.1"
     "rxjs" "6.6.7"
 
-"@angular/animations@^13.0.0 || ^14.0.0-0", "@angular/animations@^14.1.1", "@angular/animations@14.1.1":
+"@angular/animations@^14.0.0 || ^15.0.0", "@angular/animations@^14.1.1", "@angular/animations@14.1.1":
   "integrity" "sha512-/fXzJzr8Pr7/xpwErX9PjbIc790RF818WgW7SUNev6pN6UUq3gvjmPjDTdZBZfiAZWY49nBLibPo2FvmyCP7tg=="
   "resolved" "https://registry.npmjs.org/@angular/animations/-/animations-14.1.1.tgz"
   "version" "14.1.1"
   dependencies:
     "tslib" "^2.3.0"
 
-"@angular/cdk@^13.3.7", "@angular/cdk@13.3.7":
-  "integrity" "sha512-HtGqlrt4+ikbpzooF0LT/uMW6fgRJxLRUoOwkTY1oHhfNXhQaE2p8XEUH2qshl28aCIF8r8zrb6jpd4VqC+tyg=="
-  "resolved" "https://registry.npmjs.org/@angular/cdk/-/cdk-13.3.7.tgz"
-  "version" "13.3.7"
+"@angular/cdk@^14.1.1", "@angular/cdk@14.1.1":
+  "integrity" "sha512-Um4d5aWp7ACHd7O2cF3B4IXbQrnzMVvKlUVoKIBI4+EcCF70vAJrfXrAJoXIzLpte3MCDa6wO3wUX7uIJ4VlAQ=="
+  "resolved" "https://registry.npmjs.org/@angular/cdk/-/cdk-14.1.1.tgz"
+  "version" "14.1.1"
   dependencies:
     "tslib" "^2.3.0"
   optionalDependencies:
@@ -160,7 +160,7 @@
     "uuid" "8.3.2"
     "yargs" "17.5.1"
 
-"@angular/common@^13.0.0 || ^14.0.0-0", "@angular/common@^14.1.1", "@angular/common@14.1.1":
+"@angular/common@^14.0.0 || ^15.0.0", "@angular/common@^14.1.1", "@angular/common@14.1.1":
   "integrity" "sha512-neFCnrIrGOuj3oOFBTLi4QrdI4fgKQprVLUEyL5LhCQ5R0K/F+gh61ovi7nT4XYnv41p4eqtG81YNMtVXH49pg=="
   "resolved" "https://registry.npmjs.org/@angular/common/-/common-14.1.1.tgz"
   "version" "14.1.1"
@@ -195,7 +195,7 @@
   "resolved" "https://registry.npmjs.org/@angular/compiler/-/compiler-9.0.0.tgz"
   "version" "9.0.0"
 
-"@angular/core@^13.0.0 || ^14.0.0-0", "@angular/core@^14.1.1", "@angular/core@14.1.1":
+"@angular/core@^14.0.0 || ^15.0.0", "@angular/core@^14.1.1", "@angular/core@14.1.1":
   "integrity" "sha512-l3ms6/jxIUIeuCkXhz5nhRb94KLQ6wv9+B4lE0aJXcgHTqOmhc/ZIacT51LCjvVcok/vczF3f7w71Ii8b10yKQ=="
   "resolved" "https://registry.npmjs.org/@angular/core/-/core-14.1.1.tgz"
   "version" "14.1.1"
@@ -207,7 +207,7 @@
   "resolved" "https://registry.npmjs.org/@angular/core/-/core-9.0.0.tgz"
   "version" "9.0.0"
 
-"@angular/forms@^13.0.0 || ^14.0.0-0", "@angular/forms@^14.1.1":
+"@angular/forms@^14.0.0 || ^15.0.0", "@angular/forms@^14.1.1":
   "integrity" "sha512-s4VuaivJ+s2hLlE8CMHLsAAmJNV/03EgBEJQV7rt1H0ogHs0jB/zlkzVw5K5bynCFkfIeDbwd6RvxzWhwE+ong=="
   "resolved" "https://registry.npmjs.org/@angular/forms/-/forms-14.1.1.tgz"
   "version" "14.1.1"
@@ -228,10 +228,10 @@
     "glob" "8.0.3"
     "yargs" "^17.2.1"
 
-"@angular/material@^13.3.7":
-  "integrity" "sha512-CXdLvohaxl3Nii6I70pEJX2FZRRkBPNiocUNP39hFHXf2PW/eNYCN8TS5DG2uOAaR2wyPwrXrU95mDjgvlqXqQ=="
-  "resolved" "https://registry.npmjs.org/@angular/material/-/material-13.3.7.tgz"
-  "version" "13.3.7"
+"@angular/material@^14.1.1":
+  "integrity" "sha512-HU83cgnAayItSXhyMdu1+edXj2DMjGXndvFicf300JtyliyjFmVzuM78O7hIJWLhT4Mohh/GkTlOSp4sc8xXhQ=="
+  "resolved" "https://registry.npmjs.org/@angular/material/-/material-14.1.1.tgz"
+  "version" "14.1.1"
   dependencies:
     "tslib" "^2.3.0"
 
@@ -242,7 +242,7 @@
   dependencies:
     "tslib" "^2.3.0"
 
-"@angular/platform-browser@^13.0.0 || ^14.0.0-0", "@angular/platform-browser@^14.1.1", "@angular/platform-browser@14.1.1":
+"@angular/platform-browser@^14.0.0 || ^15.0.0", "@angular/platform-browser@^14.1.1", "@angular/platform-browser@14.1.1":
   "integrity" "sha512-7yXr2GUiI1sD3kmKcWkHwlpmsRyA3WhwJqvjvMPQK4RD8ZeJ5LTOD6nQ4hz1kP19dfzpBDV/k9wusYDlmWtqcw=="
   "resolved" "https://registry.npmjs.org/@angular/platform-browser/-/platform-browser-14.1.1.tgz"
   "version" "14.1.1"
