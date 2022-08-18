@@ -1,4 +1,10 @@
-import { ControlValueAccessor, NgForm, NgControl, FormGroupDirective, FormControl } from '@angular/forms';
+import {
+  ControlValueAccessor,
+  NgForm,
+  NgControl,
+  FormGroupDirective,
+  FormControl,
+} from '@angular/forms';
 import {
   Directive,
   OnInit,
@@ -16,12 +22,25 @@ import {
   Self,
   Output,
   HostListener,
-  TemplateRef
+  TemplateRef,
 } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { MatFormFieldControl, MatFormField } from '@angular/material/form-field';
-import { ClockMode, IAllowed24HourMap, IAllowed12HourMap } from './interfaces-and-types';
-import { twoDigits, convertHoursForMode, isAllowed, isDateInRange, isTimeInRange } from './util';
+import {
+  MatFormFieldControl,
+  MatFormField,
+} from '@angular/material/form-field';
+import {
+  ClockMode,
+  IAllowed24HourMap,
+  IAllowed12HourMap,
+} from './interfaces-and-types';
+import {
+  twoDigits,
+  convertHoursForMode,
+  isAllowed,
+  isDateInRange,
+  isTimeInRange,
+} from './util';
 import { MatTimepickerComponentDialogComponent } from './timepicker-dialog/timepicker-dialog.component';
 import { Subject } from 'rxjs';
 import { takeUntil, first } from 'rxjs/operators';
@@ -38,7 +57,7 @@ export interface MatTimepickerButtonTemplateContext {
 @Directive({
   selector: 'input[matTimepicker]',
   providers: [
-    { provide: MatFormFieldControl, useExisting: MatTimepickerDirective }
+    { provide: MatFormFieldControl, useExisting: MatTimepickerDirective },
   ],
   // tslint:disable-next-line:no-host-metadata-property
   host: {
@@ -46,7 +65,7 @@ export interface MatTimepickerButtonTemplateContext {
      * @breaking-change 8.0.0 remove .mat-form-field-autofill-control in favor of AutofillMonitor.
      */
     // tslint:disable-next-line:object-literal-key-quotes
-    'class': 'mat-input-element mat-form-field-autofill-control',
+    class: 'mat-input-element mat-form-field-autofill-control',
     '[class.mat-input-server]': '_isServer',
     // Native input properties that are overwritten by Angular inputs need to be synced with
     // the native input element. Otherwise property bindings for those don't work.
@@ -58,15 +77,16 @@ export interface MatTimepickerButtonTemplateContext {
     '[attr.aria-invalid]': 'errorState',
     '[attr.aria-required]': 'required.toString()',
   },
-  exportAs: 'matTimepicker'
+  exportAs: 'matTimepicker',
 })
-export class MatTimepickerDirective implements
-  OnInit,
-  OnChanges,
-  AfterViewInit,
-  OnDestroy,
-  ControlValueAccessor,
-  MatFormFieldControl<any>
+export class MatTimepickerDirective
+  implements
+    OnInit,
+    OnChanges,
+    AfterViewInit,
+    OnDestroy,
+    ControlValueAccessor,
+    MatFormFieldControl<any>
 {
   static nextId = 0;
 
@@ -79,8 +99,12 @@ export class MatTimepickerDirective implements
   get errorState() {
     const oldState = this._errorState;
     const parent = this._parentFormGroup || this._parentForm;
-    const control = this.ngControl ? this.ngControl.control as FormControl : null;
-    const newState = this.errorStateMatcher ? this.errorStateMatcher.isErrorState(control, parent) : oldState;
+    const control = this.ngControl
+      ? (this.ngControl.control as FormControl)
+      : null;
+    const newState = this.errorStateMatcher
+      ? this.errorStateMatcher.isErrorState(control, parent)
+      : oldState;
 
     if (newState !== oldState) {
       this._errorState = newState;
@@ -110,13 +134,21 @@ export class MatTimepickerDirective implements
   // tslint:disable-next-line:variable-name
   protected _disabled = false;
 
-  @Input() get id(): string { return this._id; }
-  set id(value: string) { this._id = value || this._uid; }
+  @Input() get id(): string {
+    return this._id;
+  }
+  set id(value: string) {
+    this._id = value || this._uid;
+  }
   // tslint:disable-next-line:variable-name
   protected _id: string;
 
-  @Input() get readonly(): boolean { return this._readonly; }
-  set readonly(value: boolean) { this._readonly = coerceBooleanProperty(value); }
+  @Input() get readonly(): boolean {
+    return this._readonly;
+  }
+  set readonly(value: boolean) {
+    this._readonly = coerceBooleanProperty(value);
+  }
   // tslint:disable-next-line:variable-name
   private _readonly = false;
 
@@ -125,7 +157,9 @@ export class MatTimepickerDirective implements
 
   // tslint:disable-next-line:variable-name
   protected _uid = `mat-time-picker-${MatTimepickerDirective.nextId++}`;
-  @HostBinding('class.floating') get shouldLabelFloat() { return this.focused || !this.empty; }
+  @HostBinding('class.floating') get shouldLabelFloat() {
+    return this.focused || !this.empty;
+  }
   @HostBinding('attr.aria-describedby') describedBy = '';
 
   @Input() errorStateMatcher: ErrorStateMatcher;
@@ -160,9 +194,12 @@ export class MatTimepickerDirective implements
   private isInputFocused = false;
 
   /* Use a custom template for the ok button */
-  @Input() okButtonTemplate: TemplateRef<MatTimepickerButtonTemplateContext> | null = null;
+  @Input()
+  okButtonTemplate: TemplateRef<MatTimepickerButtonTemplateContext> | null = null;
   /* Use a custom template for the cancel button */
-  @Input() cancelButtonTemplate: TemplateRef<MatTimepickerButtonTemplateContext> | null = null;
+  @Input()
+  cancelButtonTemplate: TemplateRef<MatTimepickerButtonTemplateContext> | null =
+    null;
 
   /** Override the label of the ok button. */
   @Input() okLabel = 'Ok';
@@ -197,7 +234,9 @@ export class MatTimepickerDirective implements
   private _skipValueChangeEmission = true;
 
   @Input() set value(value: Date) {
-    if (value === this._value) { return; }
+    if (value === this._value) {
+      return;
+    }
     this._value = value;
     if (!value) {
       this._formattedValueString = null;
@@ -208,27 +247,40 @@ export class MatTimepickerDirective implements
 
     const { hour, isPm } = convertHoursForMode(value.getHours(), this.mode);
     this._isPm = isPm;
-    this._formattedValueString = this.mode === '12h' ?
-      `${hour}:${twoDigits(value.getMinutes())} ${isPm ? this.postMeridiemAbbreviation : this.anteMeridiemAbbreviation}` :
-      `${twoDigits(value.getHours())}:${twoDigits(value.getMinutes())}`;
+    this._formattedValueString =
+      this.mode === '12h'
+        ? `${hour}:${twoDigits(value.getMinutes())} ${
+            isPm ? this.postMeridiemAbbreviation : this.anteMeridiemAbbreviation
+          }`
+        : `${twoDigits(value.getHours())}:${twoDigits(value.getMinutes())}`;
 
-    if (!this.isInputFocused) { this.setInputElementValue(this.formattedValueString); }
+    if (!this.isInputFocused) {
+      this.setInputElementValue(this.formattedValueString);
+    }
     this.currentValue = value;
     this.stateChanges.next();
 
-    if (this._skipValueChangeEmission) { return; }
+    if (this._skipValueChangeEmission) {
+      return;
+    }
     this.timeChange.emit(this.currentValue);
   }
 
-  get value() { return this._value; }
+  get value() {
+    return this._value;
+  }
 
-  get isPm() { return this._isPm; }
+  get isPm() {
+    return this._isPm;
+  }
 
   get empty() {
     return !(this.currentValue instanceof Date);
   }
 
-  private get formattedValueString() { return this._formattedValueString; }
+  private get formattedValueString() {
+    return this._formattedValueString;
+  }
 
   private currentValue: Date;
   private modalRef: MatDialogRef<MatTimepickerComponentDialogComponent>;
@@ -245,7 +297,9 @@ export class MatTimepickerDirective implements
     const length = value.length;
     if (length === 0) {
       this.writeValue(null, true);
-      if (this.onChangeFn) { this.onChangeFn(null); }
+      if (this.onChangeFn) {
+        this.onChangeFn(null);
+      }
       return;
     }
 
@@ -256,21 +310,30 @@ export class MatTimepickerDirective implements
       [meridiem] = meridiemResult;
     }
     const valueHasColumn = value.includes(':');
-    let [hours, minutes]: any = length === 1 ? [value, 0] :
-      length === 2 && !valueHasColumn ? [value, 0] : valueHasColumn ? value.split(':') : value.split(/(\d\d)/).filter(v => v);
+    let [hours, minutes]: any =
+      length === 1
+        ? [value, 0]
+        : length === 2 && !valueHasColumn
+        ? [value, 0]
+        : valueHasColumn
+        ? value.split(':')
+        : value.split(/(\d\d)/).filter((v) => v);
 
     hours = +hours;
 
     if (/\s/.test(minutes)) {
       let other;
       [minutes, other] = minutes.split(/\s/);
-      if (other === 'pm' && !isNaN(hours) && hours < 12) { hours += 12; }
+      if (other === 'pm' && !isNaN(hours) && hours < 12) {
+        hours += 12;
+      }
     }
 
     minutes = +minutes;
 
     if (isNaN(hours) || isNaN(minutes)) {
-      this.writeValue(null, true); return;
+      this.writeValue(null, true);
+      return;
     }
 
     if (hours < 12 && meridiem && meridiem.toLowerCase() === 'pm') {
@@ -289,7 +352,6 @@ export class MatTimepickerDirective implements
       }
     }
 
-
     if (+minutes > 59) {
       minutes = '59';
     } else if (+minutes < 0) {
@@ -303,11 +365,14 @@ export class MatTimepickerDirective implements
     d.setMilliseconds(0);
 
     const isValueInRange = isDateInRange(this.minDate, this.maxDate, d);
-    if (!isValueInRange) { this.invalidInput.emit(); }
-
+    if (!isValueInRange) {
+      this.invalidInput.emit();
+    }
 
     this.writeValue(d, true);
-    if (this.onChangeFn) { this.onChangeFn(d); }
+    if (this.onChangeFn) {
+      this.onChangeFn(d);
+    }
   }
 
   @HostListener('keydown', ['$event']) keydownHandler(event: any) {
@@ -315,17 +380,23 @@ export class MatTimepickerDirective implements
       this.combination = this.combination.concat(event.code);
       return;
     }
-    if (!/^[0-9a-zA-Z\s]{0,1}$/.test(event.key)) { return; }
+    if (!/^[0-9a-zA-Z\s]{0,1}$/.test(event.key)) {
+      return;
+    }
     const target = event.target;
     const tValue = target.value;
-    const value = `${tValue.slice(0, target.selectionStart)}${event.key}${tValue.slice(target.selectionEnd)}`;
-    if (value.match(this.pattern) || this.combination.length > 0) { return true; }
+    const value = `${tValue.slice(0, target.selectionStart)}${
+      event.key
+    }${tValue.slice(target.selectionEnd)}`;
+    if (value.match(this.pattern) || this.combination.length > 0) {
+      return true;
+    }
     event.preventDefault();
     event.stopImmediatePropagation();
   }
 
   @HostListener('keyup', ['$event']) keyupHandler(event: any) {
-    this.combination = this.combination.filter(v => v !== event.code);
+    this.combination = this.combination.filter((v) => v !== event.code);
   }
 
   @HostListener('focus') focusHandler() {
@@ -335,7 +406,9 @@ export class MatTimepickerDirective implements
   @HostListener('focusout') focusoutHandler() {
     this.isInputFocused = false;
     this.setInputElementValue(this.formattedValueString);
-    if (this.onTouchedFn && !this.modalRef) { this.onTouchedFn(); }
+    if (this.onTouchedFn && !this.modalRef) {
+      this.onTouchedFn();
+    }
   }
 
   constructor(
@@ -355,12 +428,14 @@ export class MatTimepickerDirective implements
     // tslint:disable-next-line:variable-name
     @Optional() private _parentFormGroup: FormGroupDirective,
     // tslint:disable-next-line:variable-name
-    _defaultErrorStateMatcher: ErrorStateMatcher,
+    _defaultErrorStateMatcher: ErrorStateMatcher
   ) {
     this.id = this.id;
 
     this.errorStateMatcher = _defaultErrorStateMatcher;
-    if (this.ngControl != null) { this.ngControl.valueAccessor = this; }
+    if (this.ngControl != null) {
+      this.ngControl.valueAccessor = this;
+    }
 
     if (_platform.IOS) {
       ngZone.runOutsideAngular(() => {
@@ -392,7 +467,9 @@ export class MatTimepickerDirective implements
   }
 
   setInputElementValue(value: any) {
-    if (value === null || value === undefined) { value = ''; }
+    if (value === null || value === undefined) {
+      value = '';
+    }
     Promise.resolve().then(() => {
       this.zone.runOutsideAngular(() => {
         this.renderer.setProperty(this.elRef.nativeElement, 'value', value);
@@ -401,11 +478,13 @@ export class MatTimepickerDirective implements
   }
 
   validate() {
-    if (this.currentValue === null || this.currentValue === undefined) { return null; }
+    if (this.currentValue === null || this.currentValue === undefined) {
+      return null;
+    }
 
-    const isValueInRange = this.strict ?
-      isDateInRange(this.minDate, this.maxDate, this.currentValue) :
-      isTimeInRange(this.minDate, this.maxDate, this.currentValue);
+    const isValueInRange = this.strict
+      ? isDateInRange(this.minDate, this.maxDate, this.currentValue)
+      : isTimeInRange(this.minDate, this.maxDate, this.currentValue);
 
     return isValueInRange ? null : { dateRange: true };
   }
@@ -413,35 +492,54 @@ export class MatTimepickerDirective implements
   ngAfterViewInit() {
     this.listeners.push(
       this.renderer.listen(
-        this._matFormFiled ? this._matFormFiled._elementRef.nativeElement : this.elRef.nativeElement
-        , 'click', this.clickHandler)
+        this._matFormFiled
+          ? this._matFormFiled._elementRef.nativeElement
+          : this.elRef.nativeElement,
+        'click',
+        this.clickHandler
+      )
     );
   }
 
   clickHandler = (e: FocusEvent) => {
-    if ((this.modalRef && this.modalRef.componentInstance.isClosing) || this.disabled || this.disableDialogOpenOnClick) { return; }
-    if (!this.modalRef && !this.disableDialogOpenOnClick) { this.showDialog(); }
-  }
+    if (
+      (this.modalRef && this.modalRef.componentInstance.isClosing) ||
+      this.disabled ||
+      this.disableDialogOpenOnClick
+    ) {
+      return;
+    }
+    if (!this.modalRef && !this.disableDialogOpenOnClick) {
+      this.showDialog();
+    }
+  };
 
   ngOnInit() {
     if (this._platform.isBrowser) {
-      this.fm.monitor(this.elRef.nativeElement, true).subscribe(origin => {
+      this.fm.monitor(this.elRef.nativeElement, true).subscribe((origin) => {
         this.focused = !!origin;
         this.stateChanges.next();
       });
-
     }
 
     const hasMaxDate = !!this.maxDate;
     const hasMinDate = !!this.minDate;
 
     if (hasMinDate || hasMaxDate) {
-      if (hasMinDate) { this.minDate.setSeconds(0); this.minDate.setMilliseconds(0); }
-      if (hasMaxDate) { this.maxDate.setSeconds(0); this.maxDate.setMilliseconds(0); }
+      if (hasMinDate) {
+        this.minDate.setSeconds(0);
+        this.minDate.setMilliseconds(0);
+      }
+      if (hasMaxDate) {
+        this.maxDate.setSeconds(0);
+        this.maxDate.setMilliseconds(0);
+      }
       Promise.resolve().then(() => this.generateAllowedMap());
 
-      if (!(this.ngControl as any)._rawValidators.find(v => v === this)) {
-        this.ngControl.control.setValidators(((this.ngControl as any)._rawValidators as any[]).concat(this));
+      if (!(this.ngControl as any)._rawValidators.find((v) => v === this)) {
+        this.ngControl.control.setValidators(
+          ((this.ngControl as any)._rawValidators as any[]).concat(this)
+        );
         this.ngControl.control.updateValueAndValidity();
       }
     }
@@ -474,7 +572,7 @@ export class MatTimepickerDirective implements
       for (let h = 0; h < 24; h++) {
         const meridiem = h < 12 ? 'am' : 'pm';
         for (let m = 0; m < 60; m++) {
-          const hour = (h > 12 ? h - 12 : h === 0 ? 12 : h);
+          const hour = h > 12 ? h - 12 : h === 0 ? 12 : h;
           const hourMap = this.allowed12HourMap[meridiem][hour] || {};
           if (isStrictMode) {
             const currentDate = new Date(this.value.getTime());
@@ -493,22 +591,32 @@ export class MatTimepickerDirective implements
   }
 
   ngOnChanges(simpleChanges: SimpleChanges) {
-
-    this.pattern = this.mode === '24h' ? /^[0-9]{1,2}:?([0-9]{1,2})?$/ : /^[0-9]{1,2}:?([0-9]{1,2})?\s?(a|p)?m?$/;
+    this.pattern =
+      this.mode === '24h'
+        ? /^[0-9]{1,2}:?([0-9]{1,2})?$/
+        : /^[0-9]{1,2}:?([0-9]{1,2})?\s?(a|p)?m?$/;
 
     if (
-      (simpleChanges.minDate && !simpleChanges.minDate.isFirstChange() &&
-        +simpleChanges.minDate.currentValue !== simpleChanges.minDate.previousValue) ||
-      (simpleChanges.maxDate && !simpleChanges.maxDate.isFirstChange() &&
-        +simpleChanges.maxDate.currentValue !== simpleChanges.maxDate.previousValue) ||
-      (simpleChanges.disableLimitBase && !simpleChanges.disableLimitBase.isFirstChange() &&
-        +simpleChanges.disableLimitBase.currentValue !== simpleChanges.disableLimitBase.previousValue)
+      (simpleChanges.minDate &&
+        !simpleChanges.minDate.isFirstChange() &&
+        +simpleChanges.minDate.currentValue !==
+          simpleChanges.minDate.previousValue) ||
+      (simpleChanges.maxDate &&
+        !simpleChanges.maxDate.isFirstChange() &&
+        +simpleChanges.maxDate.currentValue !==
+          simpleChanges.maxDate.previousValue) ||
+      (simpleChanges.disableLimitBase &&
+        !simpleChanges.disableLimitBase.isFirstChange() &&
+        +simpleChanges.disableLimitBase.currentValue !==
+          simpleChanges.disableLimitBase.previousValue)
     ) {
       this.generateAllowedMap();
       this.ngControl.control.updateValueAndValidity();
     }
 
-    if (!this.modalRef || !this.modalRef.componentInstance) { return; }
+    if (!this.modalRef || !this.modalRef.componentInstance) {
+      return;
+    }
 
     this.modalRef.componentInstance.data = {
       mode: this.mode,
@@ -529,18 +637,26 @@ export class MatTimepickerDirective implements
   }
 
   checkValidity(value: Date) {
-    if (!value) { return false; }
+    if (!value) {
+      return false;
+    }
     const hour = value.getHours();
     const minutes = value.getMinutes();
     const meridiem = this.isPm ? 'PM' : 'AM';
-    return isAllowed(hour, minutes, this.minDate, this.maxDate, this.mode, meridiem);
+    return isAllowed(
+      hour,
+      minutes,
+      this.minDate,
+      this.maxDate,
+      this.mode,
+      meridiem
+    );
   }
 
   writeValue(value: Date, isInnerCall = false): void {
-
     if (!isInnerCall) {
       this._skipValueChangeEmission = true;
-      Promise.resolve().then(() => this._skipValueChangeEmission = false);
+      Promise.resolve().then(() => (this._skipValueChangeEmission = false));
     }
 
     if (value) {
@@ -548,7 +664,9 @@ export class MatTimepickerDirective implements
       value.setMilliseconds(0);
     }
 
-    if (+this.value !== +value) { this.value = value; }
+    if (+this.value !== +value) {
+      this.value = value;
+    }
   }
 
   registerOnChange(fn: any): void {
@@ -564,7 +682,9 @@ export class MatTimepickerDirective implements
   }
 
   showDialog() {
-    if (this.disabled) { return; }
+    if (this.disabled) {
+      return;
+    }
     this.isInputFocused = false;
     this.modalRef = this.dialog.open(MatTimepickerComponentDialogComponent, {
       autoFocus: false,
@@ -582,43 +702,64 @@ export class MatTimepickerDirective implements
         minDate: this.minDate,
         maxDate: this.maxDate,
         allowed12HourMap: this.allowed12HourMap,
-        allowed24HourMap: this.allowed24HourMap
-      }
+        allowed24HourMap: this.allowed24HourMap,
+      },
     });
     const instance = this.modalRef.componentInstance;
-    instance.changeEvent.pipe(takeUntil(this.isAlive)).subscribe(this.handleChange);
-    instance.okClickEvent.pipe(takeUntil(this.isAlive)).subscribe(this.handleOk);
-    instance.cancelClickEvent.pipe(takeUntil(this.isAlive)).subscribe(this.handleCancel);
-    this.modalRef.beforeClosed().pipe(first()).subscribe(() => instance.isClosing = true);
-    this.modalRef.afterClosed().pipe(first()).subscribe(() => {
-      if (this.onTouchedFn) { this.onTouchedFn(); }
-      this.modalRef = null;
-      this.elRef.nativeElement.focus();
-    });
+    instance.changeEvent
+      .pipe(takeUntil(this.isAlive))
+      .subscribe(this.handleChange);
+    instance.okClickEvent
+      .pipe(takeUntil(this.isAlive))
+      .subscribe(this.handleOk);
+    instance.cancelClickEvent
+      .pipe(takeUntil(this.isAlive))
+      .subscribe(this.handleCancel);
+    this.modalRef
+      .beforeClosed()
+      .pipe(first())
+      .subscribe(() => (instance.isClosing = true));
+    this.modalRef
+      .afterClosed()
+      .pipe(first())
+      .subscribe(() => {
+        if (this.onTouchedFn) {
+          this.onTouchedFn();
+        }
+        this.modalRef = null;
+        this.elRef.nativeElement.focus();
+      });
 
     this.currentValue = this.value as Date;
   }
 
   handleChange = (newValue) => {
-    if (!(newValue instanceof Date)) { return; }
-    const v = this.value instanceof Date ? new Date(this.value.getTime()) : new Date();
+    if (!(newValue instanceof Date)) {
+      return;
+    }
+    const v =
+      this.value instanceof Date ? new Date(this.value.getTime()) : new Date();
     v.setHours(newValue.getHours());
     v.setMinutes(newValue.getMinutes());
     v.setSeconds(0);
     v.setMilliseconds(0);
     this.currentValue = v;
-  }
+  };
 
   handleOk = (value) => {
-    if (!this.currentValue && value) { this.currentValue = value; }
-    if (this.onChangeFn) { this.onChangeFn(this.currentValue); }
+    if (!this.currentValue && value) {
+      this.currentValue = value;
+    }
+    if (this.onChangeFn) {
+      this.onChangeFn(this.currentValue);
+    }
     this.value = this.currentValue;
     this.modalRef.close();
-  }
+  };
 
   handleCancel = () => {
     this.modalRef.close();
-  }
+  };
 
   ngOnDestroy() {
     this.isAlive.next();
@@ -629,6 +770,6 @@ export class MatTimepickerDirective implements
       this.fm.stopMonitoring(this.elRef.nativeElement);
     }
 
-    this.listeners.forEach(l => l());
+    this.listeners.forEach((l) => l());
   }
 }
