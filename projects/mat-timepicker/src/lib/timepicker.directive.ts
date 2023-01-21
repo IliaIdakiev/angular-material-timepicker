@@ -4,6 +4,10 @@ import {
   NgControl,
   FormGroupDirective,
   FormControl,
+  FormControlName,
+  Validators,
+  FormGroup,
+  FormControlDirective,
 } from '@angular/forms';
 import {
   Directive,
@@ -81,12 +85,12 @@ export interface MatTimepickerButtonTemplateContext {
 })
 export class MatTimepickerDirective
   implements
-    OnInit,
-    OnChanges,
-    AfterViewInit,
-    OnDestroy,
-    ControlValueAccessor,
-    MatFormFieldControl<any>
+  OnInit,
+  OnChanges,
+  AfterViewInit,
+  OnDestroy,
+  ControlValueAccessor,
+  MatFormFieldControl<any>
 {
   static nextId = 0;
 
@@ -249,9 +253,8 @@ export class MatTimepickerDirective
     this._isPm = isPm;
     this._formattedValueString =
       this.mode === '12h'
-        ? `${hour}:${twoDigits(value.getMinutes())} ${
-            isPm ? this.postMeridiemAbbreviation : this.anteMeridiemAbbreviation
-          }`
+        ? `${hour}:${twoDigits(value.getMinutes())} ${isPm ? this.postMeridiemAbbreviation : this.anteMeridiemAbbreviation
+        }`
         : `${twoDigits(value.getHours())}:${twoDigits(value.getMinutes())}`;
 
     if (!this.isInputFocused) {
@@ -314,10 +317,10 @@ export class MatTimepickerDirective
       length === 1
         ? [value, 0]
         : length === 2 && !valueHasColumn
-        ? [value, 0]
-        : valueHasColumn
-        ? value.split(':')
-        : value.split(/(\d\d)/).filter((v) => v);
+          ? [value, 0]
+          : valueHasColumn
+            ? value.split(':')
+            : value.split(/(\d\d)/).filter((v) => v);
 
     hours = +hours;
 
@@ -385,9 +388,8 @@ export class MatTimepickerDirective
     }
     const target = event.target;
     const tValue = target.value;
-    const value = `${tValue.slice(0, target.selectionStart)}${
-      event.key
-    }${tValue.slice(target.selectionEnd)}`;
+    const value = `${tValue.slice(0, target.selectionStart)}${event.key
+      }${tValue.slice(target.selectionEnd)}`;
     if (value.match(this.pattern) || this.combination.length > 0) {
       return true;
     }
@@ -418,7 +420,6 @@ export class MatTimepickerDirective
     private zone: NgZone,
     private fm: FocusMonitor,
     private elRef: ElementRef<HTMLElement>,
-    private ngZone: NgZone,
     // tslint:disable-next-line:variable-name
     protected _platform: Platform,
     // tslint:disable-next-line:variable-name
@@ -437,8 +438,9 @@ export class MatTimepickerDirective
       this.ngControl.valueAccessor = this;
     }
 
+
     if (_platform.IOS) {
-      ngZone.runOutsideAngular(() => {
+      zone.runOutsideAngular(() => {
         elRef.nativeElement.addEventListener('keyup', (event: Event) => {
           const el = event.target as HTMLInputElement;
           if (!el.value && !el.selectionStart && !el.selectionEnd) {
@@ -515,6 +517,15 @@ export class MatTimepickerDirective
   };
 
   ngOnInit() {
+    if (this.ngControl && this.ngControl.control?.parent) {
+      const [key] = Object.entries(this.ngControl.control.parent.controls).find(([, c]) => c === this.ngControl.control);
+      const control = this.ngControl.control.parent.get(key);
+      this.required = !!control?.hasValidator(Validators.required);
+    } else if (this.ngControl) {
+      const control = (this.ngControl as FormControlName)?.formDirective?.control?.get(this.ngControl.path) || null;
+      this.required = !!control?.hasValidator(Validators.required);
+    }
+
     if (this._platform.isBrowser) {
       this.fm.monitor(this.elRef.nativeElement, true).subscribe((origin) => {
         this.focused = !!origin;
@@ -600,15 +611,15 @@ export class MatTimepickerDirective
       (simpleChanges.minDate &&
         !simpleChanges.minDate.isFirstChange() &&
         +simpleChanges.minDate.currentValue !==
-          simpleChanges.minDate.previousValue) ||
+        simpleChanges.minDate.previousValue) ||
       (simpleChanges.maxDate &&
         !simpleChanges.maxDate.isFirstChange() &&
         +simpleChanges.maxDate.currentValue !==
-          simpleChanges.maxDate.previousValue) ||
+        simpleChanges.maxDate.previousValue) ||
       (simpleChanges.disableLimitBase &&
         !simpleChanges.disableLimitBase.isFirstChange() &&
         +simpleChanges.disableLimitBase.currentValue !==
-          simpleChanges.disableLimitBase.previousValue)
+        simpleChanges.disableLimitBase.previousValue)
     ) {
       this.generateAllowedMap();
       this.ngControl.control.updateValueAndValidity();
