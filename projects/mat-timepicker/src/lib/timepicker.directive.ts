@@ -8,6 +8,7 @@ import {
   Validators,
   FormGroup,
   FormControlDirective,
+  AbstractControl,
 } from '@angular/forms';
 import {
   Directive,
@@ -145,7 +146,7 @@ export class MatTimepickerDirective
     this._id = value || this._uid;
   }
   // tslint:disable-next-line:variable-name
-  protected _id: string;
+  protected _id!: string;
 
   @Input() get readonly(): boolean {
     return this._readonly;
@@ -187,13 +188,13 @@ export class MatTimepickerDirective
     this.stateChanges.next();
   }
   // tslint:disable-next-line:variable-name
-  private _placeholder: string;
+  private _placeholder!: string;
 
   focused = false;
-  private pattern: RegExp;
+  private pattern!: RegExp;
 
-  private allowed24HourMap: IAllowed24HourMap = null;
-  private allowed12HourMap: IAllowed12HourMap = null;
+  private allowed24HourMap: IAllowed24HourMap | null = null;
+  private allowed12HourMap: IAllowed12HourMap | null = null;
 
   private isInputFocused = false;
 
@@ -224,15 +225,15 @@ export class MatTimepickerDirective
 
   private listeners: (() => void)[] = [];
 
-  @Input() minDate: Date;
-  @Input() maxDate: Date;
+  @Input() minDate!: Date;
+  @Input() maxDate!: Date;
 
   // tslint:disable-next-line:variable-name
-  private _isPm: boolean;
+  private _isPm!: boolean;
   // tslint:disable-next-line:variable-name
-  private _value: Date;
+  private _value!: Date;
   // tslint:disable-next-line:variable-name
-  private _formattedValueString: string;
+  private _formattedValueString!: string | null;
 
   // tslint:disable-next-line:variable-name
   private _skipValueChangeEmission = true;
@@ -285,8 +286,8 @@ export class MatTimepickerDirective
     return this._formattedValueString;
   }
 
-  private currentValue: Date;
-  private modalRef: MatDialogRef<MatTimepickerComponentDialogComponent>;
+  private currentValue!: Date;
+  private modalRef!: MatDialogRef<MatTimepickerComponentDialogComponent> | null;
 
   private onChangeFn: any;
   private onTouchedFn: any;
@@ -378,7 +379,7 @@ export class MatTimepickerDirective
     }
   }
 
-  @HostListener('keydown', ['$event']) keydownHandler(event: any) {
+  @HostListener('keydown', ['$event']) keydownHandler({ event }: { event: any; }): true | undefined {
     if (event.metaKey || event.ctrlKey || event.altKey) {
       this.combination = this.combination.concat(event.code);
       return;
@@ -395,6 +396,7 @@ export class MatTimepickerDirective
     }
     event.preventDefault();
     event.stopImmediatePropagation();
+    return undefined;
   }
 
   @HostListener('keyup', ['$event']) keyupHandler(event: any) {
@@ -518,7 +520,7 @@ export class MatTimepickerDirective
 
   ngOnInit() {
     if (this.ngControl && this.ngControl.control?.parent) {
-      const [key] = Object.entries(this.ngControl.control.parent.controls).find(([, c]) => c === this.ngControl.control);
+      const [key] = Object.entries(this.ngControl.control.parent.controls).find(([, c]) => c === this.ngControl.control) as [string, AbstractControl];
       const control = this.ngControl.control.parent.get(key);
       this.required = !!control?.hasValidator(Validators.required);
     } else if (this.ngControl) {
@@ -547,11 +549,11 @@ export class MatTimepickerDirective
       }
       Promise.resolve().then(() => this.generateAllowedMap());
 
-      if (!(this.ngControl as any)._rawValidators.find((v) => v === this)) {
-        this.ngControl.control.setValidators(
+      if (this.ngControl && !(this.ngControl as any)._rawValidators.find((v: any) => v === this)) {
+        this.ngControl.control?.setValidators(
           ((this.ngControl as any)._rawValidators as any[]).concat(this)
         );
-        this.ngControl.control.updateValueAndValidity();
+        this.ngControl.control?.updateValueAndValidity();
       }
     }
 
@@ -608,21 +610,21 @@ export class MatTimepickerDirective
         : /^[0-9]{1,2}:?([0-9]{1,2})?\s?(a|p)?m?$/;
 
     if (
-      (simpleChanges.minDate &&
-        !simpleChanges.minDate.isFirstChange() &&
-        +simpleChanges.minDate.currentValue !==
-        simpleChanges.minDate.previousValue) ||
-      (simpleChanges.maxDate &&
-        !simpleChanges.maxDate.isFirstChange() &&
-        +simpleChanges.maxDate.currentValue !==
-        simpleChanges.maxDate.previousValue) ||
-      (simpleChanges.disableLimitBase &&
-        !simpleChanges.disableLimitBase.isFirstChange() &&
-        +simpleChanges.disableLimitBase.currentValue !==
-        simpleChanges.disableLimitBase.previousValue)
+      (simpleChanges['minDate'] &&
+        !simpleChanges['minDate'].isFirstChange() &&
+        +simpleChanges['minDate'].currentValue !==
+        simpleChanges['minDate'].previousValue) ||
+      (simpleChanges['maxDate'] &&
+        !simpleChanges['maxDate'].isFirstChange() &&
+        +simpleChanges['maxDate'].currentValue !==
+        simpleChanges['maxDate'].previousValue) ||
+      (simpleChanges['disableLimitBase'] &&
+        !simpleChanges['disableLimitBase'].isFirstChange() &&
+        +simpleChanges['disableLimitBase'].currentValue !==
+        simpleChanges['disableLimitBase'].previousValue)
     ) {
       this.generateAllowedMap();
-      this.ngControl.control.updateValueAndValidity();
+      this.ngControl.control?.updateValueAndValidity();
     }
 
     if (!this.modalRef || !this.modalRef.componentInstance) {
@@ -664,7 +666,7 @@ export class MatTimepickerDirective
     );
   }
 
-  writeValue(value: Date, isInnerCall = false): void {
+  writeValue(value: Date | null, isInnerCall = false): void {
     if (!isInnerCall) {
       this._skipValueChangeEmission = true;
       Promise.resolve().then(() => (this._skipValueChangeEmission = false));
@@ -675,7 +677,7 @@ export class MatTimepickerDirective
       value.setMilliseconds(0);
     }
 
-    if (+this.value !== +value) {
+    if (value && +this.value !== +value) {
       this.value = value;
     }
   }
@@ -744,7 +746,7 @@ export class MatTimepickerDirective
     this.currentValue = this.value as Date;
   }
 
-  handleChange = (newValue) => {
+  handleChange = (newValue: any) => {
     if (!(newValue instanceof Date)) {
       return;
     }
@@ -757,7 +759,7 @@ export class MatTimepickerDirective
     this.currentValue = v;
   };
 
-  handleOk = (value) => {
+  handleOk = (value: any) => {
     if (!this.currentValue && value) {
       this.currentValue = value;
     }
@@ -765,15 +767,15 @@ export class MatTimepickerDirective
       this.onChangeFn(this.currentValue);
     }
     this.value = this.currentValue;
-    this.modalRef.close();
+    this.modalRef?.close();
   };
 
   handleCancel = () => {
-    this.modalRef.close();
+    this.modalRef?.close();
   };
 
   ngOnDestroy() {
-    this.isAlive.next();
+    this.isAlive.next(null);
     this.isAlive.complete();
     this.stateChanges.complete();
 

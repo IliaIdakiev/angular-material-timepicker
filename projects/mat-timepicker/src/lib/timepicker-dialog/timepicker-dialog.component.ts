@@ -17,19 +17,19 @@ export class MatTimepickerComponentDialogComponent implements DoCheck {
   @Output() okClickEvent: EventEmitter<any> = new EventEmitter<Date>();
   @Output() cancelClickEvent: EventEmitter<any> = new EventEmitter<any>();
 
-  allowed24HourMap: IAllowed24HourMap = null;
-  allowed12HourMap: IAllowed12HourMap = null;
+  allowed24HourMap: IAllowed24HourMap | null = null;
+  allowed12HourMap: IAllowed12HourMap | null = null;
 
   invalidSelection = false;
 
-  okLabel: string;
-  cancelLabel: string;
+  okLabel!: string;
+  cancelLabel!: string;
 
-  okButtonTemplate: TemplateRef<MatTimepickerButtonTemplateContext>;
-  cancelButtonTemplate: TemplateRef<MatTimepickerButtonTemplateContext>;
+  okButtonTemplate!: TemplateRef<MatTimepickerButtonTemplateContext>;
+  cancelButtonTemplate!: TemplateRef<MatTimepickerButtonTemplateContext>;
 
-  anteMeridiemAbbreviation: string;
-  postMeridiemAbbreviation: string;
+  anteMeridiemAbbreviation!: string;
+  postMeridiemAbbreviation!: string;
 
   set value(value: any) {
     value = value || this.minDate || this.maxDate || new Date();
@@ -40,28 +40,28 @@ export class MatTimepickerComponentDialogComponent implements DoCheck {
 
   get value() { return this._value; }
 
-  mode: ClockMode;
+  mode!: ClockMode;
   viewType: ClockViewType = 'hours';
 
   minutes: any;
-  color: string;
+  color!: string;
   isPm = false;
   skipMinuteAutoSwitch = false;
-  autoSwitchID = null;
-  invalidMedianID = null;
+  autoSwitchID: number | null = null;
+  invalidMedianID: number | null = null;
   hasInvalidMeridiem = false;
   editHoursClicked = false;
   isClosing = false;
 
-  minDate: Date;
-  maxDate: Date;
+  minDate!: Date;
+  maxDate!: Date;
 
   // tslint:disable-next-line:variable-name
   _formattedHour: any;
   // tslint:disable-next-line:variable-name
   _hours: any;
   // tslint:disable-next-line:variable-name
-  _value: Date;
+  _value!: Date;
 
   set hours(value: any) {
     this._hours = value;
@@ -86,7 +86,7 @@ export class MatTimepickerComponentDialogComponent implements DoCheck {
     this.allowed24HourMap = data.allowed24HourMap;
   }
 
-  constructor(@Inject(MAT_DIALOG_DATA) public data) {
+  constructor(@Inject(MAT_DIALOG_DATA) public data: any) {
     this.isPm = data.isPm;
     this.bindData(data);
     // keep this always at the bottom
@@ -124,17 +124,17 @@ export class MatTimepickerComponentDialogComponent implements DoCheck {
   }
 
   handleUnavailableSelection() {
-    clearTimeout(this.autoSwitchID);
+    clearTimeout(this.autoSwitchID!);
   }
 
-  handleClockChangeDone(e) {
+  handleClockChangeDone(e: Event) {
     e.preventDefault(); // prevent mouseUp after touchEnd
 
     if (this.viewType === 'hours' && !this.skipMinuteAutoSwitch) {
       this.autoSwitchID = setTimeout(() => {
         this.editMinutes();
         this.autoSwitchID = null;
-      }, 300);
+      }, 300) as unknown as number;
     }
   }
 
@@ -152,7 +152,7 @@ export class MatTimepickerComponentDialogComponent implements DoCheck {
     this.viewType = 'minutes';
   }
 
-  invalidSelectionHandler(value) {
+  invalidSelectionHandler(value: any) {
     this.invalidSelection = value;
   }
 
@@ -163,13 +163,13 @@ export class MatTimepickerComponentDialogComponent implements DoCheck {
       this.invalidMedianID = setTimeout(() => {
         this.isPm = !this.isPm;
         this.hasInvalidMeridiem = false;
-      }, 0);
+      }, 0) as unknown as number;
       return;
     }
     this.hasInvalidMeridiem = true;
   }
 
-  meridiemChange(hours) {
+  meridiemChange(hours: any) {
     const changeData = {
       type: this.viewType,
       value: this.viewType === 'hours' ? hours : this.value.getMinutes()
