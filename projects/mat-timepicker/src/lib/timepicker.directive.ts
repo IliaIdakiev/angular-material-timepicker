@@ -6,8 +6,6 @@ import {
   FormControl,
   FormControlName,
   Validators,
-  FormGroup,
-  FormControlDirective,
   AbstractControl,
 } from '@angular/forms';
 import {
@@ -28,11 +26,13 @@ import {
   Output,
   HostListener,
   TemplateRef,
+  Inject,
 } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import {
   MatFormFieldControl,
   MatFormField,
+  MAT_FORM_FIELD,
 } from '@angular/material/form-field';
 import {
   ClockMode,
@@ -64,23 +64,33 @@ export interface MatTimepickerButtonTemplateContext {
   providers: [
     { provide: MatFormFieldControl, useExisting: MatTimepickerDirective },
   ],
-  // tslint:disable-next-line:no-host-metadata-property
   host: {
-    /**
-     * @breaking-change 8.0.0 remove .mat-form-field-autofill-control in favor of AutofillMonitor.
-     */
-    // tslint:disable-next-line:object-literal-key-quotes
-    class: 'mat-input-element mat-form-field-autofill-control',
+    'class': 'mat-mdc-input-element',
+    // The BaseMatInput parent class adds `mat-input-element`, `mat-form-field-control` and
+    // `mat-form-field-autofill-control` to the CSS class list, but this should not be added for
+    // this MDC equivalent input.
     '[class.mat-input-server]': '_isServer',
+    '[class.mat-mdc-form-field-textarea-control]': '_isInFormField && _isTextarea',
+    '[class.mat-mdc-form-field-input-control]': '_isInFormField',
+    '[class.mdc-text-field__input]': '_isInFormField',
+    '[class.mat-mdc-native-select-inline]': '_isInlineSelect()',
+    // Native input properties that are overwritten by Angular inputs need to be synced with
+    // the native input element. Otherwise property bindings for those don't work.
+    '[id]': 'id',
+    '[disabled]': 'disabled',
+    '[required]': 'required',
+    '[attr.name]': 'name || null',
+    '[attr.readonly]': 'readonly && !_isNativeSelect || null',
+    // Only mark the input as invalid for assistive technology if it has a value since the
+    // state usually overlaps with `aria-required` when the input is empty and can be redundant.
+    '[attr.aria-invalid]': '(empty && required) ? null : errorState',
+    '[attr.aria-required]': 'required',
     // Native input properties that are overwritten by Angular inputs need to be synced with
     // the native input element. Otherwise property bindings for those don't work.
     '[attr.id]': 'id',
-    '[attr.placeholder]': 'placeholder',
-    '[disabled]': 'disabled',
-    '[required]': 'required',
-    '[attr.readonly]': 'readonly || null',
-    '[attr.aria-invalid]': 'errorState',
-    '[attr.aria-required]': 'required.toString()',
+    '(focus)': '_focusChanged(true)',
+    '(blur)': '_focusChanged(false)',
+    '(input)': '_onInput()',
   },
   exportAs: 'matTimepicker',
 })
@@ -94,10 +104,117 @@ export class MatTimepickerDirective
   MatFormFieldControl<any>
 {
   static nextId = 0;
+  protected _previousNativeValue: any;
+  private _inputValueAccessor!: { value: any };
+  private _previousPlaceholder!: string | null;
 
   /** Whether the component is being rendered on the server. */
-  // tslint:disable-next-line:variable-name
   readonly _isServer: boolean;
+
+  /** Whether the component is a native html select. */
+  readonly _isNativeSelect: boolean;
+
+  /** Whether the component is a textarea. */
+  readonly _isTextarea: boolean;
+
+  /** Whether the input is inside of a form field. */
+  readonly _isInFormField: boolean;
+
+  /**
+ * Implemented as part of MatFormFieldControl.
+ * @docs-private
+ */
+  focused: boolean = false;
+
+  /**
+   * Implemented as part of MatFormFieldControl.
+   * @docs-private
+   */
+  stateChanges: Subject<void> = new Subject<void>();
+
+  /**
+   * Implemented as part of MatFormFieldControl.
+   * @docs-private
+   */
+  autofilled = false;
+
+  /**
+   * Implemented as part of MatFormFieldControl.
+   * @docs-private
+   */
+
+
+  /** Callback for the cases where the focused state of the input changes. */
+  _focusChanged(isFocused: boolean) {
+    if (isFocused !== this.focused) {
+      this.focused = isFocused;
+      this.stateChanges.next();
+    }
+  }
+  _onInput() {
+    // This is a noop function and is used to let Angular know whenever the value changes.
+    // Angular will run a new change detection each time the `input` event has been dispatched.
+    // It's necessary that Angular recognizes the value change, because when floatingLabel
+    // is set to false and Angular forms aren't used, the placeholder won't recognize the
+    // value changes and will not disappear.
+    // Listening to the input event wouldn't be necessary when the input is using the
+    // FormsModule or ReactiveFormsModule, because Angular forms also listens to input events.
+  }
+
+  @Input()
+  get disabled(): boolean {
+    return this._disabled;
+  }
+  set disabled(value: Boolean) {
+    this._disabled = coerceBooleanProperty(value);
+
+    // Browsers may not fire the blur event if the input is disabled too quickly.
+    // Reset from here to ensure that the element doesn't become stuck.
+    if (this.focused) {
+      this.focused = false;
+      this.stateChanges.next();
+    }
+  }
+  protected _disabled = false;
+
+  /**
+   * Implemented as part of MatFormFieldControl.
+   * @docs-private
+   */
+  @Input()
+  get id(): string {
+    return this._id;
+  }
+  set id(value: string) {
+    this._id = value || this._uid;
+  }
+  protected _id!: string;
+
+  /**
+  * Implemented as part of MatFormFieldControl.
+  * @docs-private
+  */
+  @Input() placeholder!: string;
+
+  /**
+   * Name of the input.
+   * @docs-private
+   */
+  @Input() name!: string;
+
+  /**
+   * Implemented as part of MatFormFieldControl.
+   * @docs-private
+   */
+  @Input()
+  get required(): boolean {
+    return this._required ?? this.ngControl?.control?.hasValidator(Validators.required) ?? false;
+  }
+  set required(value: Boolean) {
+    this._required = coerceBooleanProperty(value);
+  }
+  protected _required: boolean | undefined;
+  @Input('aria-describedby') userAriaDescribedBy: string = '';
 
   // tslint:disable-next-line:variable-name
   _errorState = false;
@@ -119,35 +236,6 @@ export class MatTimepickerDirective
     return newState;
   }
 
-  @Input()
-  get disabled(): boolean {
-    if (this.ngControl && this.ngControl.disabled !== null) {
-      return this.ngControl.disabled;
-    }
-    return this._disabled;
-  }
-  set disabled(value: boolean) {
-    this._disabled = coerceBooleanProperty(value);
-
-    // Browsers may not fire the blur event if the input is disabled too quickly.
-    // Reset from here to ensure that the element doesn't become stuck.
-    if (this.focused) {
-      this.focused = false;
-      this.stateChanges.next();
-    }
-  }
-  // tslint:disable-next-line:variable-name
-  protected _disabled = false;
-
-  @Input() get id(): string {
-    return this._id;
-  }
-  set id(value: string) {
-    this._id = value || this._uid;
-  }
-  // tslint:disable-next-line:variable-name
-  protected _id!: string;
-
   @Input() get readonly(): boolean {
     return this._readonly;
   }
@@ -158,39 +246,14 @@ export class MatTimepickerDirective
   private _readonly = false;
 
   private isAlive: Subject<any> = new Subject<any>();
-  stateChanges = new Subject<void>();
 
   // tslint:disable-next-line:variable-name
   protected _uid = `mat-time-picker-${MatTimepickerDirective.nextId++}`;
-  @HostBinding('class.floating') get shouldLabelFloat() {
-    return this.focused || !this.empty;
-  }
+
   @HostBinding('attr.aria-describedby') describedBy = '';
 
   @Input() errorStateMatcher: ErrorStateMatcher;
 
-  @Input() get required() {
-    return this._required;
-  }
-
-  set required(req) {
-    this._required = coerceBooleanProperty(req);
-    this.stateChanges.next();
-  }
-  // tslint:disable-next-line:variable-name
-  private _required = false;
-
-  @Input() get placeholder() {
-    return this._placeholder;
-  }
-  set placeholder(plh) {
-    this._placeholder = plh;
-    this.stateChanges.next();
-  }
-  // tslint:disable-next-line:variable-name
-  private _placeholder!: string;
-
-  focused = false;
   private pattern!: RegExp;
 
   private allowed24HourMap: IAllowed24HourMap | null = null;
@@ -431,43 +494,119 @@ export class MatTimepickerDirective
     // tslint:disable-next-line:variable-name
     @Optional() private _parentFormGroup: FormGroupDirective,
     // tslint:disable-next-line:variable-name
-    _defaultErrorStateMatcher: ErrorStateMatcher
+    _defaultErrorStateMatcher: ErrorStateMatcher,
+    @Optional() @Inject(MAT_FORM_FIELD) protected _formField?: MatFormField,
   ) {
     this.id = this.id;
 
     this.errorStateMatcher = _defaultErrorStateMatcher;
-    if (this.ngControl != null) {
-      this.ngControl.valueAccessor = this;
-    }
+    const element = this.elRef.nativeElement;
+    const nodeName = element.nodeName.toLowerCase();
 
+    this._previousNativeValue = this.value;
 
+    // Force setter to be called in case id was not specified.
+    this.id = this.id;
+
+    // On some versions of iOS the caret gets stuck in the wrong place when holding down the delete
+    // key. In order to get around this we need to "jiggle" the caret loose. Since this bug only
+    // exists on iOS, we only bother to install the listener on iOS.
     if (_platform.IOS) {
       zone.runOutsideAngular(() => {
-        elRef.nativeElement.addEventListener('keyup', (event: Event) => {
-          const el = event.target as HTMLInputElement;
-          if (!el.value && !el.selectionStart && !el.selectionEnd) {
-            // Note: Just setting `0, 0` doesn't fix the issue. Setting
-            // `1, 1` fixes it for the first time that you type text and
-            // then hold delete. Toggling to `1, 1` and then back to
-            // `0, 0` seems to completely fix it.
-            el.setSelectionRange(1, 1);
-            el.setSelectionRange(0, 0);
-          }
-        });
+        elRef.nativeElement.addEventListener('keyup', this._iOSKeyupListener);
       });
+    }
+
+    this._isServer = !this._platform.isBrowser;
+    this._isNativeSelect = nodeName === 'select';
+    this._isTextarea = nodeName === 'textarea';
+    this._isInFormField = !!_formField;
+
+    if (this._isNativeSelect) {
+      this.controlType = (element as HTMLSelectElement).multiple
+        ? 'mat-native-select-multiple'
+        : 'mat-native-select';
     }
 
     this._isServer = !this._platform.isBrowser;
   }
 
+  /**
+  * Implemented as part of MatFormFieldControl.
+  * @docs-private
+  */
+  get shouldLabelFloat(): boolean {
+    if (this._isNativeSelect) {
+      // For a single-selection `<select>`, the label should float when the selected option has
+      // a non-empty display value. For a `<select multiple>`, the label *always* floats to avoid
+      // overlapping the label with the options.
+      const selectElement = this.elRef.nativeElement as HTMLSelectElement;
+      const firstOption: HTMLOptionElement | undefined = selectElement.options[0];
+
+      // On most browsers the `selectedIndex` will always be 0, however on IE and Edge it'll be
+      // -1 if the `value` is set to something, that isn't in the list of options, at a later point.
+      return (
+        this.focused ||
+        selectElement.multiple ||
+        !this.empty ||
+        !!(selectElement.selectedIndex > -1 && firstOption && firstOption.label)
+      );
+    } else {
+      return this.focused || !this.empty;
+    }
+  }
+
+  private _iOSKeyupListener = (event: Event): void => {
+    const el = event.target as HTMLInputElement;
+
+    // Note: We specifically check for 0, rather than `!el.selectionStart`, because the two
+    // indicate different things. If the value is 0, it means that the caret is at the start
+    // of the input, whereas a value of `null` means that the input doesn't support
+    // manipulating the selection range. Inputs that don't support setting the selection range
+    // will throw an error so we want to avoid calling `setSelectionRange` on them. See:
+    // https://html.spec.whatwg.org/multipage/input.html#do-not-apply
+    if (!el.value && el.selectionStart === 0 && el.selectionEnd === 0) {
+      // Note: Just setting `0, 0` doesn't fix the issue. Setting
+      // `1, 1` fixes it for the first time that you type text and
+      // then hold delete. Toggling to `1, 1` and then back to
+      // `0, 0` seems to completely fix it.
+      el.setSelectionRange(1, 1);
+      el.setSelectionRange(0, 0);
+    }
+  };
+
+  /**
+  * Implemented as part of MatFormFieldControl.
+  * @docs-private
+  */
   setDescribedByIds(ids: string[]) {
-    this.describedBy = ids.join(' ');
+    if (ids.length) {
+      this.elRef.nativeElement.setAttribute('aria-describedby', ids.join(' '));
+    } else {
+      this.elRef.nativeElement.removeAttribute('aria-describedby');
+    }
   }
 
   onContainerClick(event: MouseEvent) {
-    if ((event.target as Element).tagName.toLowerCase() !== 'input') {
-      this.elRef.nativeElement.focus();
+    // Do not re-focus the input element if the element is already focused. Otherwise it can happen
+    // that someone clicks on a time input and the cursor resets to the "hours" field while the
+    // "minutes" field was actually clicked. See: https://github.com/angular/components/issues/12849
+    if (!this.focused) {
+      if ((event.target as Element).tagName.toLowerCase() !== 'input') {
+        this.focus();
+      }
     }
+  }
+
+  focus(options?: FocusOptions) {
+    this.elRef.nativeElement.focus();
+  }
+
+
+  /** Whether the form control is a native select that is displayed inline. */
+  _isInlineSelect(): boolean {
+    const element = this.elRef.nativeElement as HTMLSelectElement;
+    return this._isNativeSelect && (element.multiple || element.size > 1);
   }
 
   setInputElementValue(value: any) {

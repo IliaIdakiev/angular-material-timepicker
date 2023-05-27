@@ -1,14 +1,11 @@
 mat-dialog-content {
   min-height: 395px;
-  padding: 0px;
-  margin-top: -24px;
+  padding: 0 !important;
   overflow: hidden;
 }
 
 mat-dialog-actions {
   justify-content: flex-end;
-  margin-right: -8px;
-  margin-left: -8px;
 }
 
 .root {
