@@ -1,6 +1,6 @@
-import { ITimeData, ClockViewType, ClockMode } from './interfaces-and-types';
+import { ITimeData, ClockViewType, ClockMode, IAllowed12HourMap, IAllowed24HourMap } from './interfaces-and-types';
 
-export function twoDigits(n) {
+export function twoDigits(n: number) {
   return n < 10 ? `0${n}` : `${n}`;
 }
 
@@ -22,11 +22,11 @@ export function convertHoursForMode(hour: number, mode: ClockMode) {
   return { hour: hour - 12, isPm };
 }
 
-function mod(a, b) {
+function mod(a: number, b: number) {
   return a - Math.floor(a / b) * b;
 }
 
-export function getShortestAngle(from, to) {
+export function getShortestAngle(from: number, to: number) {
   const difference = to - from;
   return from + mod(difference + 180, 360) - 180;
 }
@@ -95,7 +95,7 @@ export function isAllowed(
 
 // used by the clock component to visually disable the not allowed values
 
-export function getIsAvailabeFn(allowed12HourMap, allowed24HourMap, mode: ClockMode) {
+export function getIsAvailableFn(allowed12HourMap: IAllowed12HourMap, allowed24HourMap: IAllowed24HourMap, mode: ClockMode) {
   return (value: number, viewType: ClockViewType, isPm: boolean, h?: number) => {
     const isHourCheck = viewType === 'hours';
     const [hour, minutes] = isHourCheck ? [value, null] : [h, value];
@@ -104,16 +104,16 @@ export function getIsAvailabeFn(allowed12HourMap, allowed24HourMap, mode: ClockM
       if (!allowed12HourMap) { return true; }
       const meridiem = isPm ? 'pm' : 'am';
       if (isHourCheck) {
-        return !!Object.values(allowed12HourMap[meridiem][hour]).find(v => v === true);
+        return !!Object.values(allowed12HourMap[meridiem][hour!]).find(v => v === true);
       }
-      return allowed12HourMap[meridiem][hour][minutes];
+      return allowed12HourMap[meridiem][hour!][minutes!];
     }
 
     if (!allowed24HourMap) { return true; }
 
     if (isHourCheck) {
-      return !!Object.values(allowed24HourMap[hour]).find(v => v === true);
+      return !!Object.values(allowed24HourMap[hour!]).find(v => v === true);
     }
-    return allowed24HourMap[hour][minutes];
+    return allowed24HourMap[hour!][minutes!];
   };
 }

@@ -1,4 +1,3 @@
-/* You can add global styles to this file, and also import other style files */
 @use '@angular/material' as mat;
 @include mat.core();
 
@@ -8,6 +7,7 @@ $my-app-accent:  mat.define-palette(mat.$pink-palette, 500, 900, A100);
 $my-app-warn:    mat.define-palette(mat.$deep-orange-palette);
 $my-app-theme: mat.define-light-theme($my-app-primary, $my-app-accent, $my-app-warn);
 @include mat.all-component-themes($my-app-theme);
+
 .alternate-theme {
   $alternate-primary: mat.define-palette(mat.$light-blue-palette);
   $alternate-accent:  mat.define-palette(mat.$yellow-palette, 400);

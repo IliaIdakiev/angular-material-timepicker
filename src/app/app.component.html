@@ -6,7 +6,7 @@
         <mat-label>24 TIMEPICKER</mat-label>
         <input matTimepicker #t1="matTimepicker" #time1="ngModel" color="accent" [minDate]="minValue"
           [maxDate]="maxValue" id="timepicker-example-1" mode="24h" ngModel placeholder="Please select time..."
-          name="time-1" required>
+          name="time-1" [required]="true">
         <mat-icon matSuffix (click)="t1.showDialog()">access_time</mat-icon>
         <mat-error *ngIf="time1.touched && time1.invalid">Invalid Date</mat-error>
       </mat-form-field>
@@ -28,7 +28,7 @@
         <mat-label>24 TIMEPICKER</mat-label>
         <input matTimepicker #t3="matTimepicker" #time3="ngModel" [minDate]="minValue" [maxDate]="maxValue"
           id="timepicker-example-3" mode="24h" ngModel placeholder="Please select time..." name="time-3"
-          [disableDialogOpenOnClick]="true" required>
+          [disableDialogOpenOnClick]="true" [required]="true">
         <mat-icon matSuffix (click)="t3.showDialog()">access_time</mat-icon>
         <mat-error *ngIf="time3.touched && time3.invalid">Invalid Date</mat-error>
       </mat-form-field>
@@ -51,7 +51,7 @@
         <mat-label>24 TIMEPICKER</mat-label>
         <input matTimepicker #t5="matTimepicker" #time5="ngModel" [minDate]="minValue" [maxDate]="maxValue"
           id="timepicker-example-5" mode="24h" ngModel placeholder="Please select time..." name="time-5"
-          [errorStateMatcher]="showOnDirtyErrorStateMatcher" required>
+          [errorStateMatcher]="showOnDirtyErrorStateMatcher" [required]="true">
         <mat-icon matSuffix (click)="t5.showDialog()">access_time</mat-icon>
         <mat-error *ngIf="time5.touched && time5.invalid">Invalid Date</mat-error>
       </mat-form-field>
@@ -77,8 +77,8 @@
         <mat-label>24 TIMEPICKER</mat-label>
         <input matTimepicker #t7="matTimepicker" #time7="ngModel" [minDate]="minValue" [maxDate]="maxValue"
           [strict]="false" id="timepicker-example-7" mode="24h" [ngModel]="defaultValue"
-          placeholder="Please select time..." name="time-7" [errorStateMatcher]="customErrorStateMatcher" required
-          (timeChange)="timeChangeHandler($event)" (invalidInput)="invalidInputHandler()">
+          placeholder="Please select time..." name="time-7" [errorStateMatcher]="customErrorStateMatcher"
+          [required]="true" (timeChange)="timeChangeHandler($event)" (invalidInput)="invalidInputHandler()">
         <mat-icon matSuffix (click)="t7.showDialog()">access_time</mat-icon>
         <mat-error *ngIf="time7.touched && time7.invalid">Invalid Date</mat-error>
       </mat-form-field>
@@ -111,7 +111,7 @@
         <mat-label>24 TIMEPICKER</mat-label>
         <input matTimepicker [okButtonTemplate]="myOkButton" [cancelButtonTemplate]="myCancelButton" #t9="matTimepicker"
           #time9="ngModel" [minDate]="minValue" [maxDate]="maxValue" id="timepicker-example-1" mode="24h" ngModel
-          placeholder="Please select time..." name="time-1" required>
+          placeholder="Please select time..." name="time-1" [required]="true">
         <mat-icon matSuffix (click)="t9.showDialog()">access_time</mat-icon>
         <mat-error *ngIf="time9.touched && time9.invalid">Invalid Date</mat-error>
       </mat-form-field>
@@ -126,6 +126,6 @@
     <input formControlName="time" matTimepicker [minDate]="minValue" [maxDate]="maxValue" [strict]="false">
   </mat-form-field>
   <div>Reactive Form Value: {{form.value | json}}</div>
-  {{form.get('time').errors | json}}
+  {{form.get('time')?.errors | json}}
   <button (click)="changeMaxValue()">Change Max Value</button>
 </form>
