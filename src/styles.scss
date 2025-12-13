@@ -2,21 +2,25 @@
 @include mat.core();
 
 
-$my-app-primary: mat.define-palette(mat.$blue-grey-palette);
-$my-app-accent: mat.define-palette(mat.$pink-palette, 500, 900, A100);
-$my-app-warn: mat.define-palette(mat.$deep-orange-palette);
-$my-app-theme: mat.define-light-theme((color: (primary: $my-app-primary,
+$my-app-primary: mat.m2-define-palette(mat.$m2-blue-grey-palette);
+$my-app-accent: mat.m2-define-palette(mat.$m2-pink-palette, 500, 900, A100);
+$my-app-warn: mat.m2-define-palette(mat.$m2-deep-orange-palette);
+
+$my-app-theme: mat.m2-define-light-theme((color: (primary: $my-app-primary,
         accent: $my-app-accent,
         warn: $my-app-warn,
       )));
+
 @include mat.all-component-themes($my-app-theme);
 
 .alternate-theme {
-  $alternate-primary: mat.define-palette(mat.$light-blue-palette);
-  $alternate-accent: mat.define-palette(mat.$yellow-palette, 400);
-  $alternate-theme: mat.define-light-theme((color: (primary: $alternate-primary,
+  $alternate-primary: mat.m2-define-palette(mat.$m2-light-blue-palette);
+  $alternate-accent: mat.m2-define-palette(mat.$m2-yellow-palette, 400);
+
+  $alternate-theme: mat.m2-define-light-theme((color: (primary: $alternate-primary,
           accent: $alternate-accent,
         )));
+
   @include mat.all-component-colors($alternate-theme);
 }
 
