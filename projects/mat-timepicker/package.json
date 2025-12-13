@@ -1,7 +1,10 @@
 {
   "name": "mat-timepicker",
-  "version": "5.2.0",
+  "version": "5.2.1",
   "description": "Angular Material timepicker component with clock view dialog, min/max validation, and support for both 12h/24h formats",
+  "publishConfig": {
+    "access": "public"
+  },
   "peerDependencies": {
     "@angular/animations": "^15.0.0",
     "@angular/cdk": "^15.0.0",
