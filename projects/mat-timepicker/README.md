@@ -32,16 +32,34 @@
 
 **Keep in mind that the selector for the timepicker directive is _`input[matTimepicker]`_**
 
-your.module.ts
+### Standalone Components (Angular 19+, recommended)
+
+You can import the `MatTimepickerModule` or import the directives directly:
+
+```typescript
+import { Component } from "@angular/core";
+import { MatTimepickerDirective, MatTimepickerToggleDirective } from "mat-timepicker";
+
+@Component({
+  selector: "app-example",
+  standalone: true,
+  imports: [MatTimepickerDirective, MatTimepickerToggleDirective],
+  template: `
+    <input matTimepicker #t="matTimepicker" />
+    <mat-icon [matTimepickerToggle]="t">access_time</mat-icon>
+  `,
+})
+export class ExampleComponent {}
+```
+
+### NgModule (traditional approach)
 
 ```typescript
 import { MatTimepickerModule } from 'mat-timepicker';
 
 @NgModule({
   declarations: [...],
-  imports: [
-    MatTimepickerModule
-  ],
+  imports: [MatTimepickerModule],
   ...
 })
 export class YourModule { }
