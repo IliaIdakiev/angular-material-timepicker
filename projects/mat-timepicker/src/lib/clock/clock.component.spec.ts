@@ -9,8 +9,7 @@ describe('ClockComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ClockComponent],
-      imports: [MatToolbarModule, MatButtonModule],
+      imports: [ClockComponent],
     }).compileComponents();
   }));
 

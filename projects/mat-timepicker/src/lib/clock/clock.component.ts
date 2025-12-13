@@ -7,6 +7,9 @@ import {
   SimpleChanges,
   ChangeDetectionStrategy,
 } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatButtonModule } from '@angular/material/button';
 import {
   ClockViewType,
   ClockNumber,
@@ -21,6 +24,8 @@ import { getIsAvailableFn } from '../util';
   templateUrl: './clock.component.html',
   styleUrls: ['./clock.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: true,
+  imports: [CommonModule, MatToolbarModule, MatButtonModule],
 })
 export class ClockComponent implements OnChanges {
   @Input() mode!: ClockMode;

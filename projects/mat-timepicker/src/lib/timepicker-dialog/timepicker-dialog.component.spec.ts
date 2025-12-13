@@ -20,8 +20,7 @@ describe('MatTimepickerDialogComponent', () => {
     testDate = new Date(2025, 0, 1, 14, 30, 0);
 
     TestBed.configureTestingModule({
-      declarations: [MatTimepickerComponentDialogComponent, ClockComponent],
-      imports: [MatToolbarModule, MatButtonModule, MatDialogModule],
+      imports: [MatTimepickerComponentDialogComponent],
       providers: [
         {
           provide: MAT_DIALOG_DATA,

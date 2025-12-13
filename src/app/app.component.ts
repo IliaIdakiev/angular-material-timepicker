@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import {
   ShowOnDirtyErrorStateMatcher,
   ErrorStateMatcher,
@@ -8,7 +9,14 @@ import {
   FormBuilder,
   FormGroup,
   Validators,
+  FormsModule,
+  ReactiveFormsModule,
 } from '@angular/forms';
+import { MatTimepickerModule } from 'mat-timepicker';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatInputModule } from '@angular/material/input';
 
 class CustomErrorStateMatcher implements ErrorStateMatcher {
   isErrorState(control: FormControl | null): any {
@@ -20,6 +28,17 @@ class CustomErrorStateMatcher implements ErrorStateMatcher {
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
+  standalone: true,
+  imports: [
+    FormsModule,
+    ReactiveFormsModule,
+    MatTimepickerModule,
+    MatFormFieldModule,
+    MatIconModule,
+    MatButtonModule,
+    MatInputModule,
+    CommonModule,
+  ],
 })
 export class AppComponent {
   title = 'angular-material-timepicker';

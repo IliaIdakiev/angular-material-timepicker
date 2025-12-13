@@ -84,7 +84,9 @@ export interface MatTimepickerButtonTemplateContext {
     '(input)': '_onInput()',
   },
   exportAs: 'matTimepicker',
+  standalone: true,
 })
+
 /**
  * Directive that adds time picker functionality to an input element.
  * Implements both ControlValueAccessor for form integration and MatFormFieldControl
