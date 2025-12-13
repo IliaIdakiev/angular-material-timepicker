@@ -1,41 +1,120 @@
 <div class="root">
-  <div class="circle" (touchmove)="handleTouchMove($event)" (mousemove)="handleMouseMove($event)"
-    (touchstart)="disableAnimatedPointer()" (mousedown)="disableAnimatedPointer()" (touchend)="handleTouchEnd($event)"
-    (mouseup)="enableAnimatedPointer()" (click)="handleClick($event)">
-    <div class="pointer-container"
-      [ngClass]="{ 'small-pointer': mode === '24h' && viewType === 'hours' && (formattedValue === 0 || formattedValue > 12), 'animated-pointer': !touching }"
-      [style.transform]="'rotate(' + angle + 'deg)'">
+  <div
+    class="circle"
+    (touchmove)="handleTouchMove($event)"
+    (mousemove)="handleMouseMove($event)"
+    (touchstart)="disableAnimatedPointer()"
+    (mousedown)="disableAnimatedPointer()"
+    (touchend)="handleTouchEnd($event)"
+    (mouseup)="enableAnimatedPointer()"
+    (click)="handleClick($event)"
+  >
+    <div
+      class="pointer-container"
+      [ngClass]="{
+        'small-pointer':
+          mode === '24h' &&
+          viewType === 'hours' &&
+          (formattedValue === 0 || formattedValue > 12),
+        'animated-pointer': !touching
+      }"
+      [style.transform]="'rotate(' + angle + 'deg)'"
+    >
       <button mat-mini-fab [color]="color" class="inner-dot"></button>
       <mat-toolbar [color]="color" class="pointer">
-        <button mat-mini-fab [color]="color" class="outer-dot"
-          [ngClass]=" { 'outer-dot-odd': viewType === 'minutes' && formattedValue % 5 !== 0 }">
-          <ng-container *ngIf="viewType === 'minutes' && formattedValue % 5 !== 0">·</ng-container>
+        <button
+          mat-mini-fab
+          [color]="color"
+          class="outer-dot"
+          [ngClass]="{
+            'outer-dot-odd': viewType === 'minutes' && formattedValue % 5 !== 0
+          }"
+        >
+          <ng-container
+            *ngIf="viewType === 'minutes' && formattedValue % 5 !== 0"
+            >·</ng-container
+          >
         </button>
       </mat-toolbar>
     </div>
-    <ng-container *ngFor="let digit of minuteDots;">
-      <button class="number minute-dot"
-        [ngClass]="{ 'selected': formattedValue === digit.display || (digit.display === 0 && formattedValue === 0), 'disabled': !isAvailable(digit.display === 60 ? 0 : digit.display)}"
-        [style.transform]="'translate(' + digit.translateX + 'px, ' + digit.translateY + 'px)'">
+    <ng-container *ngFor="let digit of minuteDots">
+      <button
+        class="number minute-dot"
+        [ngClass]="{
+          selected:
+            formattedValue === digit.display ||
+            (digit.display === 0 && formattedValue === 0),
+          disabled: !isAvailable(digit.display === 60 ? 0 : digit.display)
+        }"
+        [style.transform]="
+          'translate(' + digit.translateX + 'px, ' + digit.translateY + 'px)'
+        "
+        (keydown.enter)="
+          selectTime(digit.display, true); $event.preventDefault()
+        "
+        (keydown.space)="
+          selectTime(digit.display, true); $event.preventDefault()
+        "
+        [disabled]="!isAvailable(digit.display === 60 ? 0 : digit.display)"
+      >
         <ng-container *ngIf="digit.display % 5 !== 0">·</ng-container>
       </button>
     </ng-container>
-    <ng-container *ngFor="let digit of numbers;">
-      <button class="number"
-        [ngClass]="{ 'selected': formattedValue === digit.display || (digit.display === 60 && formattedValue === 0), 'disabled': !isAvailable(digit.display === 60 ? 0 : digit.display)}"
-        [style.transform]="'translate(' + digit.translateX + 'px, ' + digit.translateY + 'px)'">
+    <ng-container *ngFor="let digit of numbers">
+      <button
+        class="number"
+        [ngClass]="{
+          selected:
+            formattedValue === digit.display ||
+            (digit.display === 60 && formattedValue === 0),
+          disabled: !isAvailable(digit.display === 60 ? 0 : digit.display)
+        }"
+        [style.transform]="
+          'translate(' + digit.translateX + 'px, ' + digit.translateY + 'px)'
+        "
+        (keydown.enter)="
+          selectTime(digit.display, true); $event.preventDefault()
+        "
+        (keydown.space)="
+          selectTime(digit.display, true); $event.preventDefault()
+        "
+        [disabled]="!isAvailable(digit.display === 60 ? 0 : digit.display)"
+      >
         <ng-template #hoursTemplate>{{ digit.display }}</ng-template>
-        <ng-template #minutesTemplate>{{ digit.display === 60 ? '00' : digit.display }}</ng-template>
-        <ng-container *ngIf="viewType === 'minutes' then minutesTemplate else hoursTemplate;"></ng-container>
+        <ng-template #minutesTemplate>{{
+          digit.display === 60 ? "00" : digit.display
+        }}</ng-template>
+        <ng-container
+          *ngIf="
+            viewType === 'minutes';
+            then minutesTemplate;
+            else hoursTemplate
+          "
+        ></ng-container>
       </button>
-
     </ng-container>
-    <ng-container *ngFor="let digit of secondaryNumbers;">
-      <button class="number small-number"
-        [ngClass]="{ 'selected': formattedValue === digit.display || (digit.display === 24 && formattedValue === 0), 'disabled': !isAvailable(digit.display === 24 ? 0 : digit.display)}"
-        [style.transform]="'translate(' + digit.translateX + 'px, ' + digit.translateY + 'px)'">
-        {{ digit.display === 24 ? '00' : digit.display }}
+    <ng-container *ngFor="let digit of secondaryNumbers">
+      <button
+        class="number small-number"
+        [ngClass]="{
+          selected:
+            formattedValue === digit.display ||
+            (digit.display === 24 && formattedValue === 0),
+          disabled: !isAvailable(digit.display === 24 ? 0 : digit.display)
+        }"
+        [style.transform]="
+          'translate(' + digit.translateX + 'px, ' + digit.translateY + 'px)'
+        "
+        (keydown.enter)="
+          selectTime(digit.display, true); $event.preventDefault()
+        "
+        (keydown.space)="
+          selectTime(digit.display, true); $event.preventDefault()
+        "
+        [disabled]="!isAvailable(digit.display === 24 ? 0 : digit.display)"
+      >
+        {{ digit.display === 24 ? "00" : digit.display }}
       </button>
-
     </ng-container>
   </div>
+</div>

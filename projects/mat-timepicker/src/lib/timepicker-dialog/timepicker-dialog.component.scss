@@ -1,14 +1,11 @@
 mat-dialog-content {
   min-height: 395px;
-  padding: 0px;
-  margin-top: -24px;
+  padding: 0 !important;
   overflow: hidden;
 }
 
 mat-dialog-actions {
   justify-content: flex-end;
-  margin-right: -8px;
-  margin-left: -8px;
 }
 
 .root {
@@ -39,10 +36,27 @@ mat-dialog-actions {
 .time {
   transition: all 200ms ease-out;
   cursor: pointer;
+  background: none;
+  border: none;
+  color: inherit;
+  padding: 0;
+  font: inherit;
+  outline: inherit;
+
   &:not(.select) {
     opacity: .6;
   }
+
+  &:focus-visible {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    opacity: 1;
+    outline: none;
+  }
+
+
 }
+
 
 .placeholder {
   flex: 1;
@@ -55,8 +69,14 @@ mat-dialog-actions {
   font-size: 14px;
   line-height: 20px;
   margin-left: 16px;
+  margin-right: 16px;
   font-weight: 700px;
+
+  .time {
+    padding: 0 4px;
+  }
 }
+
 
 .select {
   color: white;

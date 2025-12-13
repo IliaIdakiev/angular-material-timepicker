@@ -9,23 +9,24 @@ import { CommonModule } from '@angular/common';
 import { ClockComponent } from './clock/clock.component';
 import { MatTimepickerComponentDialogComponent } from './timepicker-dialog/timepicker-dialog.component';
 import { MatTimepickerDirective } from './timepicker.directive';
+import { MatTimepickerToggleDirective } from './timepicker-toggle.directive';
 
 @NgModule({
-    declarations: [
-        ClockComponent,
-        MatTimepickerDirective,
-        MatTimepickerComponentDialogComponent
-    ],
-    imports: [
-        CommonModule,
-        MatDialogModule,
-        MatButtonModule,
-        MatToolbarModule,
-        MatIconModule,
-        MatInputModule
-    ],
-    exports: [
-        MatTimepickerDirective
-    ]
+  declarations: [
+    ClockComponent,
+    MatTimepickerDirective,
+    MatTimepickerComponentDialogComponent,
+    MatTimepickerToggleDirective,
+  ],
+
+  imports: [
+    CommonModule,
+    MatDialogModule,
+    MatButtonModule,
+    MatToolbarModule,
+    MatIconModule,
+    MatInputModule,
+  ],
+  exports: [MatTimepickerDirective, MatTimepickerToggleDirective],
 })
-export class MatTimepickerModule { }
+export class MatTimepickerModule {}

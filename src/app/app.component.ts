@@ -11,8 +11,8 @@ import {
 } from '@angular/forms';
 
 class CustomErrorStateMatcher implements ErrorStateMatcher {
-  isErrorState(control: FormControl | null) {
-    return control.invalid;
+  isErrorState(control: FormControl | null): any {
+    return control?.invalid;
   }
 }
 
@@ -57,7 +57,7 @@ export class AppComponent {
     });
   }
 
-  timeChangeHandler(data) {
+  timeChangeHandler(data: any) {
     console.log('time changed to', data);
   }
 
