@@ -1,16 +1,27 @@
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Component, EventEmitter, Output, Inject, DoCheck, TemplateRef } from '@angular/core';
-import { ClockViewType, ClockMode, IAllowed24HourMap, IAllowed12HourMap } from '../interfaces-and-types';
+import {
+  Component,
+  EventEmitter,
+  Output,
+  Inject,
+  DoCheck,
+  TemplateRef,
+} from '@angular/core';
+import {
+  ClockViewType,
+  ClockMode,
+  IAllowed24HourMap,
+  IAllowed12HourMap,
+} from '../interfaces-and-types';
 import { twoDigits, convertHoursForMode } from '../util';
 import { MatTimepickerButtonTemplateContext } from '../timepicker.directive';
 
 @Component({
   selector: 'mat-timepicker-dialog',
   templateUrl: './timepicker-dialog.component.html',
-  styleUrls: ['./timepicker-dialog.component.scss']
+  styleUrls: ['./timepicker-dialog.component.scss'],
 })
 export class MatTimepickerComponentDialogComponent implements DoCheck {
-
   twoDigits = twoDigits;
 
   @Output() changeEvent: EventEmitter<any> = new EventEmitter<any>();
@@ -38,7 +49,9 @@ export class MatTimepickerComponentDialogComponent implements DoCheck {
     this._value = value;
   }
 
-  get value() { return this._value; }
+  get value() {
+    return this._value;
+  }
 
   mode!: ClockMode;
   viewType: ClockViewType = 'hours';
@@ -56,20 +69,21 @@ export class MatTimepickerComponentDialogComponent implements DoCheck {
   minDate!: Date;
   maxDate!: Date;
 
-  // tslint:disable-next-line:variable-name
   _formattedHour: any;
-  // tslint:disable-next-line:variable-name
   _hours: any;
-  // tslint:disable-next-line:variable-name
   _value!: Date;
 
   set hours(value: any) {
     this._hours = value;
     this._formattedHour = convertHoursForMode(this.hours, this.mode).hour;
   }
-  get hours() { return this._hours; }
+  get hours() {
+    return this._hours;
+  }
 
-  get formattedHours() { return this._formattedHour; }
+  get formattedHours() {
+    return this._formattedHour;
+  }
 
   bindData(data: any) {
     this.mode = data.mode;
@@ -89,28 +103,49 @@ export class MatTimepickerComponentDialogComponent implements DoCheck {
   constructor(@Inject(MAT_DIALOG_DATA) public data: any) {
     this.isPm = data.isPm;
     this.bindData(data);
-    // keep this always at the bottom
     this.value = data.value;
   }
 
-  ngDoCheck() { this.bindData(this.data); }
+  ngDoCheck() {
+    this.bindData(this.data);
+  }
 
-  handleClockChange({ value, type }: { value: number, type: 'minutes' | 'hours' }) {
-    const is24hoursAutoMeridiemChange = this.mode === '24h' && type === 'hours' && (
-      (this.hours >= 12 && value < 12) || (this.hours < 12 && value >= 12));
-    if ((this.hasInvalidMeridiem && this.mode === '12h') || is24hoursAutoMeridiemChange) {
+  handleClockChange({
+    value,
+    type,
+  }: {
+    value: number;
+    type: 'minutes' | 'hours';
+  }) {
+    const is24hoursAutoMeridiemChange =
+      this.mode === '24h' &&
+      type === 'hours' &&
+      ((this.hours >= 12 && value < 12) || (this.hours < 12 && value >= 12));
+    if (
+      (this.hasInvalidMeridiem && this.mode === '12h') ||
+      is24hoursAutoMeridiemChange
+    ) {
       this.isPm = !this.isPm;
       this.hasInvalidMeridiem = false;
     }
 
     if ((type && type === 'hours') || (!type && this.viewType === 'hours')) {
       this.hours = value;
-    } else if ((type && type === 'minutes') || (!type && this.viewType === 'minutes')) {
+    } else if (
+      (type && type === 'minutes') ||
+      (!type && this.viewType === 'minutes')
+    ) {
       this.minutes = value;
     }
 
     const newValue = new Date();
-    const hours = this.isPm ? this.hours < 12 ? this.hours + 12 : this.hours : this.hours === 12 ? 0 : this.hours;
+    const hours = this.isPm
+      ? this.hours < 12
+        ? this.hours + 12
+        : this.hours
+      : this.hours === 12
+      ? 0
+      : this.hours;
     newValue.setHours(hours);
     newValue.setMinutes(this.minutes);
     newValue.setSeconds(0);
@@ -127,8 +162,10 @@ export class MatTimepickerComponentDialogComponent implements DoCheck {
     clearTimeout(this.autoSwitchID!);
   }
 
-  handleClockChangeDone(e: Event) {
-    e.preventDefault(); // prevent mouseUp after touchEnd
+  handleClockChangeDone(e: Event | null) {
+    if (e) {
+      e.preventDefault();
+    }
 
     if (this.viewType === 'hours' && !this.skipMinuteAutoSwitch) {
       this.autoSwitchID = setTimeout(() => {
@@ -141,7 +178,9 @@ export class MatTimepickerComponentDialogComponent implements DoCheck {
   editHours() {
     this.viewType = 'hours';
     this.editHoursClicked = true;
-    setTimeout(() => { this.editHoursClicked = false; }, 0);
+    setTimeout(() => {
+      this.editHoursClicked = false;
+    }, 0);
   }
 
   editMinutes() {
@@ -156,10 +195,11 @@ export class MatTimepickerComponentDialogComponent implements DoCheck {
     this.invalidSelection = value;
   }
 
-
   invalidMeridiem() {
     if (this.viewType !== 'minutes' && this.editHoursClicked) {
-      if (this.invalidMedianID) { return; }
+      if (this.invalidMedianID) {
+        return;
+      }
       this.invalidMedianID = setTimeout(() => {
         this.isPm = !this.isPm;
         this.hasInvalidMeridiem = false;
@@ -172,11 +212,10 @@ export class MatTimepickerComponentDialogComponent implements DoCheck {
   meridiemChange(hours: any) {
     const changeData = {
       type: this.viewType,
-      value: this.viewType === 'hours' ? hours : this.value.getMinutes()
+      value: this.viewType === 'hours' ? hours : this.value.getMinutes(),
     };
     this.handleClockChange(changeData);
   }
-
 
   setAm() {
     if (this.hours >= 12) {
@@ -201,10 +240,9 @@ export class MatTimepickerComponentDialogComponent implements DoCheck {
       this.hasInvalidMeridiem = false;
     }
     this.okClickEvent.emit(this.value);
-  }
+  };
 
   cancelClickHandler = () => {
     this.cancelClickEvent.emit();
-  }
-
+  };
 }

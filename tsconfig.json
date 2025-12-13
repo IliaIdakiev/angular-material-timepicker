@@ -10,9 +10,7 @@
     "noPropertyAccessFromIndexSignature": true,
     "noImplicitReturns": true,
     "paths": {
-      "mat-timepicker": [
-        "dist/mat-timepicker"
-      ]
+      "mat-timepicker": ["projects/mat-timepicker/src/public-api.ts"]
     },
     "noFallthroughCasesInSwitch": true,
     "sourceMap": true,
@@ -24,10 +22,7 @@
     "target": "ES2022",
     "module": "ES2022",
     "useDefineForClassFields": false,
-    "lib": [
-      "ES2022",
-      "dom"
-    ]
+    "lib": ["ES2022", "dom"]
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,

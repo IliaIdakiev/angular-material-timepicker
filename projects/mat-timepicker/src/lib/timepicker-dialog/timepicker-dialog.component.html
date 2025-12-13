@@ -1,8 +1,17 @@
 <ng-template #defaultCancelButtonTemplate>
-  <button mat-button [color]="color" (click)="cancelClickHandler()">{{cancelLabel}}</button>
+  <button mat-button [color]="color" (click)="cancelClickHandler()">
+    {{ cancelLabel }}
+  </button>
 </ng-template>
 <ng-template #defaultOkButtonTemplate>
-  <button mat-button [disabled]="invalidSelection" [color]="color" (click)="okClickHandler()">{{okLabel}}</button>
+  <button
+    mat-button
+    [disabled]="invalidSelection"
+    [color]="color"
+    (click)="okClickHandler()"
+  >
+    {{ okLabel }}
+  </button>
 </ng-template>
 
 <mat-dialog-content>
@@ -10,46 +19,77 @@
     <mat-toolbar [color]="color" class="header">
       <div class="placeholder"></div>
       <div class="time-frame">
-        <span class="time fixed-font-size" [ngClass]="{'select': this.viewType === 'hours' && 'active' }"
-          (click)="editHours()">
+        <span
+          class="time fixed-font-size"
+          [ngClass]="{ select: this.viewType === 'hours' && 'active' }"
+          (click)="editHours()"
+        >
           {{ twoDigits(formattedHours) }}
         </span>
         <span class="fixed-font-size">:</span>
-        <span class="time fixed-font-size" [ngClass]="{ 'select': this.viewType === 'minutes' && 'active' }"
-          (click)="editMinutes()">
+        <span
+          class="time fixed-font-size"
+          [ngClass]="{ select: this.viewType === 'minutes' && 'active' }"
+          (click)="editMinutes()"
+        >
           {{ twoDigits(minutes) }}
         </span>
       </div>
-      <ng-container *ngIf="mode === '12h' then ampm else normal"></ng-container>
+      <ng-container
+        *ngIf="mode === '12h'; then ampm; else normal"
+      ></ng-container>
       <ng-template #normal>
         <div class="placeholder"></div>
       </ng-template>
       <ng-template #ampm>
         <div class="ampm">
-          <span class="time" [ngClass]="{ 'select': isPm }" (click)="setPm()">{{postMeridiemAbbreviation | uppercase
-            }}</span>
-          <span class="time" [ngClass]="{ 'select': !isPm }" (click)="setAm()">{{anteMeridiemAbbreviation | uppercase
-            }}</span>
+          <button class="time" [ngClass]="{ select: isPm }" (click)="setPm()">
+            {{ postMeridiemAbbreviation | uppercase }}
+          </button>
+          <button class="time" [ngClass]="{ select: !isPm }" (click)="setAm()">
+            {{ anteMeridiemAbbreviation | uppercase }}
+          </button>
         </div>
       </ng-template>
     </mat-toolbar>
     <div class="body">
-      <mat-clock [allowed12HourMap]="allowed12HourMap" [allowed24HourMap]="allowed24HourMap" [minDate]="minDate"
-        [maxDate]="maxDate" [color]="color" [viewType]="viewType" [mode]="mode" [formattedHours]="formattedHours"
-        [minutes]="minutes" (changeEvent)="handleClockChange($event)"
+      <mat-clock
+        [allowed12HourMap]="allowed12HourMap"
+        [allowed24HourMap]="allowed24HourMap"
+        [minDate]="minDate"
+        [maxDate]="maxDate"
+        [color]="color"
+        [viewType]="viewType"
+        [mode]="mode"
+        [formattedHours]="formattedHours"
+        [minutes]="minutes"
+        (changeEvent)="handleClockChange($event)"
         (unavailableSelection)="handleUnavailableSelection()"
-        [formattedValue]="viewType === 'minutes' ? minutes : formattedHours" [isPm]="isPm"
-        (invalidMeridiem)="invalidMeridiem()" (mouseup)="handleClockChangeDone($event)"
-        (clearInvalidMeridiem)="clearInvalidMeridiem()" (touchend)="handleClockChangeDone($event)"
-        (invalidSelection)="invalidSelectionHandler($event)"></mat-clock>
+        (selectionChangeDone)="handleClockChangeDone(null)"
+        [formattedValue]="viewType === 'minutes' ? minutes : formattedHours"
+        [isPm]="isPm"
+        (invalidMeridiem)="invalidMeridiem()"
+        (mouseup)="handleClockChangeDone($event)"
+        (clearInvalidMeridiem)="clearInvalidMeridiem()"
+        (touchend)="handleClockChangeDone($event)"
+        (invalidSelection)="invalidSelectionHandler($event)"
+      ></mat-clock>
     </div>
   </div>
 </mat-dialog-content>
 <mat-dialog-actions>
   <ng-container
-    *ngTemplateOutlet="cancelButtonTemplate || defaultCancelButtonTemplate; context: { label: cancelLabel, $implicit: cancelClickHandler }">
+    *ngTemplateOutlet="
+      cancelButtonTemplate || defaultCancelButtonTemplate;
+      context: { label: cancelLabel, $implicit: cancelClickHandler }
+    "
+  >
   </ng-container>
   <ng-container
-    *ngTemplateOutlet="okButtonTemplate || defaultOkButtonTemplate; context: { label: okLabel, $implicit: okClickHandler }">
+    *ngTemplateOutlet="
+      okButtonTemplate || defaultOkButtonTemplate;
+      context: { label: okLabel, $implicit: okClickHandler }
+    "
+  >
   </ng-container>
 </mat-dialog-actions>

@@ -65,48 +65,42 @@ export interface MatTimepickerButtonTemplateContext {
     { provide: MatFormFieldControl, useExisting: MatTimepickerDirective },
   ],
   host: {
-    'class': 'mat-mdc-input-element',
-    // The BaseMatInput parent class adds `mat-input-element`, `mat-form-field-control` and
-    // `mat-form-field-autofill-control` to the CSS class list, but this should not be added for
-    // this MDC equivalent input.
+    class: 'mat-mdc-input-element',
     '[class.mat-input-server]': '_isServer',
-    '[class.mat-mdc-form-field-textarea-control]': '_isInFormField && _isTextarea',
+    '[class.mat-mdc-form-field-textarea-control]':
+      '_isInFormField && _isTextarea',
     '[class.mat-mdc-form-field-input-control]': '_isInFormField',
     '[class.mdc-text-field__input]': '_isInFormField',
     '[class.mat-mdc-native-select-inline]': '_isInlineSelect()',
-    // Native input properties that are overwritten by Angular inputs need to be synced with
-    // the native input element. Otherwise property bindings for those don't work.
     '[id]': 'id',
     '[disabled]': 'disabled',
     '[required]': 'required',
     '[attr.name]': 'name || null',
     '[attr.readonly]': 'readonly && !_isNativeSelect || null',
-    // Only mark the input as invalid for assistive technology if it has a value since the
-    // state usually overlaps with `aria-required` when the input is empty and can be redundant.
     '[attr.aria-invalid]': '(empty && required) ? null : errorState',
     '[attr.aria-required]': 'required',
-    // Native input properties that are overwritten by Angular inputs need to be synced with
-    // the native input element. Otherwise property bindings for those don't work.
-    '[attr.id]': 'id',
     '(focus)': '_focusChanged(true)',
     '(blur)': '_focusChanged(false)',
     '(input)': '_onInput()',
   },
   exportAs: 'matTimepicker',
 })
+/**
+ * Directive that adds time picker functionality to an input element.
+ * Implements both ControlValueAccessor for form integration and MatFormFieldControl
+ * for Material form field integration.
+ */
 export class MatTimepickerDirective
   implements
-  OnInit,
-  OnChanges,
-  AfterViewInit,
-  OnDestroy,
-  ControlValueAccessor,
-  MatFormFieldControl<any>
+    OnInit,
+    OnChanges,
+    AfterViewInit,
+    OnDestroy,
+    ControlValueAccessor,
+    MatFormFieldControl<any>
 {
+  /** Unique ID generator for instances. */
   static nextId = 0;
-  protected _previousNativeValue: any;
-  private _inputValueAccessor!: { value: any };
-  private _previousPlaceholder!: string | null;
 
   /** Whether the component is being rendered on the server. */
   readonly _isServer: boolean;
@@ -121,9 +115,9 @@ export class MatTimepickerDirective
   readonly _isInFormField: boolean;
 
   /**
- * Implemented as part of MatFormFieldControl.
- * @docs-private
- */
+   * Implemented as part of MatFormFieldControl.
+   * @docs-private
+   */
   focused: boolean = false;
 
   /**
@@ -138,12 +132,6 @@ export class MatTimepickerDirective
    */
   autofilled = false;
 
-  /**
-   * Implemented as part of MatFormFieldControl.
-   * @docs-private
-   */
-
-
   /** Callback for the cases where the focused state of the input changes. */
   _focusChanged(isFocused: boolean) {
     if (isFocused !== this.focused) {
@@ -152,13 +140,7 @@ export class MatTimepickerDirective
     }
   }
   _onInput() {
-    // This is a noop function and is used to let Angular know whenever the value changes.
-    // Angular will run a new change detection each time the `input` event has been dispatched.
-    // It's necessary that Angular recognizes the value change, because when floatingLabel
-    // is set to false and Angular forms aren't used, the placeholder won't recognize the
-    // value changes and will not disappear.
-    // Listening to the input event wouldn't be necessary when the input is using the
-    // FormsModule or ReactiveFormsModule, because Angular forms also listens to input events.
+    // Noop function to trigger Angular change detection for non-form scenarios
   }
 
   @Input()
@@ -168,8 +150,6 @@ export class MatTimepickerDirective
   set disabled(value: Boolean) {
     this._disabled = coerceBooleanProperty(value);
 
-    // Browsers may not fire the blur event if the input is disabled too quickly.
-    // Reset from here to ensure that the element doesn't become stuck.
     if (this.focused) {
       this.focused = false;
       this.stateChanges.next();
@@ -191,9 +171,9 @@ export class MatTimepickerDirective
   protected _id!: string;
 
   /**
-  * Implemented as part of MatFormFieldControl.
-  * @docs-private
-  */
+   * Implemented as part of MatFormFieldControl.
+   * @docs-private
+   */
   @Input() placeholder!: string;
 
   /**
@@ -208,7 +188,11 @@ export class MatTimepickerDirective
    */
   @Input()
   get required(): boolean {
-    return this._required ?? this.ngControl?.control?.hasValidator(Validators.required) ?? false;
+    return (
+      this._required ??
+      this.ngControl?.control?.hasValidator(Validators.required) ??
+      false
+    );
   }
   set required(value: Boolean) {
     this._required = coerceBooleanProperty(value);
@@ -216,7 +200,7 @@ export class MatTimepickerDirective
   protected _required: boolean | undefined;
   @Input('aria-describedby') userAriaDescribedBy: string = '';
 
-  // tslint:disable-next-line:variable-name
+  /** @internal */
   _errorState = false;
   get errorState() {
     const oldState = this._errorState;
@@ -242,12 +226,11 @@ export class MatTimepickerDirective
   set readonly(value: boolean) {
     this._readonly = coerceBooleanProperty(value);
   }
-  // tslint:disable-next-line:variable-name
   private _readonly = false;
 
   private isAlive: Subject<any> = new Subject<any>();
 
-  // tslint:disable-next-line:variable-name
+  /** Unique ID for this instance. */
   protected _uid = `mat-time-picker-${MatTimepickerDirective.nextId++}`;
 
   @HostBinding('attr.aria-describedby') describedBy = '';
@@ -255,16 +238,16 @@ export class MatTimepickerDirective
   @Input() errorStateMatcher: ErrorStateMatcher;
 
   private pattern!: RegExp;
-
   private allowed24HourMap: IAllowed24HourMap | null = null;
   private allowed12HourMap: IAllowed12HourMap | null = null;
-
   private isInputFocused = false;
 
-  /* Use a custom template for the ok button */
+  /** Use a custom template for the ok button. */
   @Input()
-  okButtonTemplate: TemplateRef<MatTimepickerButtonTemplateContext> | null = null;
-  /* Use a custom template for the cancel button */
+  okButtonTemplate: TemplateRef<MatTimepickerButtonTemplateContext> | null =
+    null;
+
+  /** Use a custom template for the cancel button. */
   @Input()
   cancelButtonTemplate: TemplateRef<MatTimepickerButtonTemplateContext> | null =
     null;
@@ -280,25 +263,29 @@ export class MatTimepickerDirective
 
   /** Sets the clock mode, 12-hour or 24-hour clocks are supported. */
   @Input() mode: ClockMode = '24h';
+
+  /** Color theme for the time picker dialog. */
   @Input() color = 'primary';
+
+  /** Disable opening the dialog on click. */
   @Input() disableDialogOpenOnClick = false;
+
+  /** Use strict date validation (entire date) vs time-only validation. */
   @Input() strict = true;
 
+  /** Type identifier for form field CSS. */
   controlType = 'angular-material-timepicker';
 
-  private listeners: (() => void)[] = [];
-
+  /** Minimum allowed date/time. */
   @Input() minDate!: Date;
+
+  /** Maximum allowed date/time. */
   @Input() maxDate!: Date;
 
-  // tslint:disable-next-line:variable-name
+  private listeners: (() => void)[] = [];
   private _isPm!: boolean;
-  // tslint:disable-next-line:variable-name
   private _value!: Date;
-  // tslint:disable-next-line:variable-name
   private _formattedValueString!: string | null;
-
-  // tslint:disable-next-line:variable-name
   private _skipValueChangeEmission = true;
 
   @Input() set value(value: Date) {
@@ -317,8 +304,9 @@ export class MatTimepickerDirective
     this._isPm = isPm;
     this._formattedValueString =
       this.mode === '12h'
-        ? `${hour}:${twoDigits(value.getMinutes())} ${isPm ? this.postMeridiemAbbreviation : this.anteMeridiemAbbreviation
-        }`
+        ? `${hour}:${twoDigits(value.getMinutes())} ${
+            isPm ? this.postMeridiemAbbreviation : this.anteMeridiemAbbreviation
+          }`
         : `${twoDigits(value.getHours())}:${twoDigits(value.getMinutes())}`;
 
     if (!this.isInputFocused) {
@@ -351,12 +339,15 @@ export class MatTimepickerDirective
 
   private currentValue!: Date;
   private modalRef!: MatDialogRef<MatTimepickerComponentDialogComponent> | null;
+  private combination: string[] = [];
 
   private onChangeFn: any;
   private onTouchedFn: any;
-  private combination: string[] = [];
 
+  /** Emitted when the time value changes. */
   @Output() timeChange: EventEmitter<any> = new EventEmitter<any>();
+
+  /** Emitted when invalid input is entered. */
   @Output() invalidInput: EventEmitter<any> = new EventEmitter<any>();
 
   @HostListener('input') inputHandler() {
@@ -381,18 +372,18 @@ export class MatTimepickerDirective
       length === 1
         ? [value, 0]
         : length === 2 && !valueHasColumn
-          ? [value, 0]
-          : valueHasColumn
-            ? value.split(':')
-            : value.split(/(\d\d)/).filter((v) => v);
+        ? [value, 0]
+        : valueHasColumn
+        ? value.split(':')
+        : value.split(/(\d\d)/).filter((v) => v);
 
     hours = +hours;
 
     if (/\s/.test(minutes)) {
       let other;
       [minutes, other] = minutes.split(/\s/);
-      if (other === 'pm' && !isNaN(hours) && hours < 12) {
-        hours += 12;
+      if (other && /am|pm/i.test(other)) {
+        meridiem = other;
       }
     }
 
@@ -403,26 +394,25 @@ export class MatTimepickerDirective
       return;
     }
 
-    if (hours < 12 && meridiem && meridiem.toLowerCase() === 'pm') {
-      hours += 12;
-    } else if (hours >= 12 && meridiem && meridiem.toLowerCase() === 'am') {
-      hours -= 12;
-    }
-
-    if (this.mode === '12h' && +hours < 0) {
-      hours = '0';
-    } else {
-      if (+hours > 24) {
-        hours = '24';
-      } else if (+hours < 0) {
-        hours = '0';
+    if (meridiem) {
+      const isPm = meridiem.toLowerCase() === 'pm';
+      if (isPm && hours < 12) {
+        hours += 12;
+      } else if (!isPm && hours === 12) {
+        hours = 0;
       }
     }
 
-    if (+minutes > 59) {
-      minutes = '59';
-    } else if (+minutes < 0) {
-      minutes = '0';
+    if (+hours < 0) {
+      hours = 0;
+    } else if (+hours > 23) {
+      hours = 23;
+    }
+
+    if (+minutes < 0) {
+      minutes = 0;
+    } else if (+minutes > 59) {
+      minutes = 59;
     }
 
     const d = this.value ? new Date(this.value.getTime()) : new Date();
@@ -434,6 +424,7 @@ export class MatTimepickerDirective
     const isValueInRange = isDateInRange(this.minDate, this.maxDate, d);
     if (!isValueInRange) {
       this.invalidInput.emit();
+      return;
     }
 
     this.writeValue(d, true);
@@ -442,7 +433,9 @@ export class MatTimepickerDirective
     }
   }
 
-  @HostListener('keydown', ['$event']) keydownHandler({ event }: { event: any; }): true | undefined {
+  @HostListener('keydown', ['$event']) keydownHandler(
+    event: any
+  ): true | undefined {
     if (event.metaKey || event.ctrlKey || event.altKey) {
       this.combination = this.combination.concat(event.code);
       return;
@@ -452,8 +445,9 @@ export class MatTimepickerDirective
     }
     const target = event.target;
     const tValue = target.value;
-    const value = `${tValue.slice(0, target.selectionStart)}${event.key
-      }${tValue.slice(target.selectionEnd)}`;
+    const value = `${tValue.slice(0, target.selectionStart)}${
+      event.key
+    }${tValue.slice(target.selectionEnd)}`;
     if (value.match(this.pattern) || this.combination.length > 0) {
       return true;
     }
@@ -485,37 +479,26 @@ export class MatTimepickerDirective
     private zone: NgZone,
     private fm: FocusMonitor,
     private elRef: ElementRef<HTMLElement>,
-    // tslint:disable-next-line:variable-name
     protected _platform: Platform,
-    // tslint:disable-next-line:variable-name
     @Optional() private _parentForm: NgForm,
-    // tslint:disable-next-line:variable-name
     @Optional() private _matFormFiled: MatFormField,
-    // tslint:disable-next-line:variable-name
     @Optional() private _parentFormGroup: FormGroupDirective,
-    // tslint:disable-next-line:variable-name
     _defaultErrorStateMatcher: ErrorStateMatcher,
-    @Optional() @Inject(MAT_FORM_FIELD) protected _formField?: MatFormField,
+    @Optional() @Inject(MAT_FORM_FIELD) protected _formField?: MatFormField
   ) {
-    this.id = this.id;
-
     this.errorStateMatcher = _defaultErrorStateMatcher;
+
+    if (this.ngControl != null) {
+      this.ngControl.valueAccessor = this;
+    }
+
+    this.pattern =
+      this.mode === '24h'
+        ? /^[0-9]{1,2}:?([0-9]{1,2})?$/
+        : /^[0-9]{1,2}:?([0-9]{1,2})?\s?(a|p)?m?$/;
+
     const element = this.elRef.nativeElement;
     const nodeName = element.nodeName.toLowerCase();
-
-    this._previousNativeValue = this.value;
-
-    // Force setter to be called in case id was not specified.
-    this.id = this.id;
-
-    // On some versions of iOS the caret gets stuck in the wrong place when holding down the delete
-    // key. In order to get around this we need to "jiggle" the caret loose. Since this bug only
-    // exists on iOS, we only bother to install the listener on iOS.
-    if (_platform.IOS) {
-      zone.runOutsideAngular(() => {
-        elRef.nativeElement.addEventListener('keyup', this._iOSKeyupListener);
-      });
-    }
 
     this._isServer = !this._platform.isBrowser;
     this._isNativeSelect = nodeName === 'select';
@@ -528,23 +511,23 @@ export class MatTimepickerDirective
         : 'mat-native-select';
     }
 
-    this._isServer = !this._platform.isBrowser;
+    if (_platform.IOS) {
+      zone.runOutsideAngular(() => {
+        elRef.nativeElement.addEventListener('keyup', this._iOSKeyupListener);
+      });
+    }
   }
 
   /**
-  * Implemented as part of MatFormFieldControl.
-  * @docs-private
-  */
+   * Implemented as part of MatFormFieldControl.
+   * @docs-private
+   */
   get shouldLabelFloat(): boolean {
     if (this._isNativeSelect) {
-      // For a single-selection `<select>`, the label should float when the selected option has
-      // a non-empty display value. For a `<select multiple>`, the label *always* floats to avoid
-      // overlapping the label with the options.
       const selectElement = this.elRef.nativeElement as HTMLSelectElement;
-      const firstOption: HTMLOptionElement | undefined = selectElement.options[0];
+      const firstOption: HTMLOptionElement | undefined =
+        selectElement.options[0];
 
-      // On most browsers the `selectedIndex` will always be 0, however on IE and Edge it'll be
-      // -1 if the `value` is set to something, that isn't in the list of options, at a later point.
       return (
         this.focused ||
         selectElement.multiple ||
@@ -559,26 +542,16 @@ export class MatTimepickerDirective
   private _iOSKeyupListener = (event: Event): void => {
     const el = event.target as HTMLInputElement;
 
-    // Note: We specifically check for 0, rather than `!el.selectionStart`, because the two
-    // indicate different things. If the value is 0, it means that the caret is at the start
-    // of the input, whereas a value of `null` means that the input doesn't support
-    // manipulating the selection range. Inputs that don't support setting the selection range
-    // will throw an error so we want to avoid calling `setSelectionRange` on them. See:
-    // https://html.spec.whatwg.org/multipage/input.html#do-not-apply
     if (!el.value && el.selectionStart === 0 && el.selectionEnd === 0) {
-      // Note: Just setting `0, 0` doesn't fix the issue. Setting
-      // `1, 1` fixes it for the first time that you type text and
-      // then hold delete. Toggling to `1, 1` and then back to
-      // `0, 0` seems to completely fix it.
       el.setSelectionRange(1, 1);
       el.setSelectionRange(0, 0);
     }
   };
 
   /**
-  * Implemented as part of MatFormFieldControl.
-  * @docs-private
-  */
+   * Implemented as part of MatFormFieldControl.
+   * @docs-private
+   */
   setDescribedByIds(ids: string[]) {
     if (ids.length) {
       this.elRef.nativeElement.setAttribute('aria-describedby', ids.join(' '));
@@ -588,9 +561,6 @@ export class MatTimepickerDirective
   }
 
   onContainerClick(event: MouseEvent) {
-    // Do not re-focus the input element if the element is already focused. Otherwise it can happen
-    // that someone clicks on a time input and the cursor resets to the "hours" field while the
-    // "minutes" field was actually clicked. See: https://github.com/angular/components/issues/12849
     if (!this.focused) {
       if ((event.target as Element).tagName.toLowerCase() !== 'input') {
         this.focus();
@@ -601,7 +571,6 @@ export class MatTimepickerDirective
   focus(options?: FocusOptions) {
     this.elRef.nativeElement.focus();
   }
-
 
   /** Whether the form control is a native select that is displayed inline. */
   _isInlineSelect(): boolean {
@@ -659,11 +628,16 @@ export class MatTimepickerDirective
 
   ngOnInit() {
     if (this.ngControl && this.ngControl.control?.parent) {
-      const [key] = Object.entries(this.ngControl.control.parent.controls).find(([, c]) => c === this.ngControl.control) as [string, AbstractControl];
+      const [key] = Object.entries(this.ngControl.control.parent.controls).find(
+        ([, c]) => c === this.ngControl?.control
+      ) as [string, AbstractControl];
       const control = this.ngControl.control.parent.get(key);
       this.required = !!control?.hasValidator(Validators.required);
     } else if (this.ngControl) {
-      const control = (this.ngControl as FormControlName)?.formDirective?.control?.get(this.ngControl.path) || null;
+      const control =
+        (this.ngControl as FormControlName)?.formDirective?.control?.get(
+          this.ngControl.path
+        ) || null;
       this.required = !!control?.hasValidator(Validators.required);
     }
 
@@ -688,7 +662,10 @@ export class MatTimepickerDirective
       }
       Promise.resolve().then(() => this.generateAllowedMap());
 
-      if (this.ngControl && !(this.ngControl as any)._rawValidators.find((v: any) => v === this)) {
+      if (
+        this.ngControl &&
+        !(this.ngControl as any)._rawValidators.find((v: any) => v === this)
+      ) {
         this.ngControl.control?.setValidators(
           ((this.ngControl as any)._rawValidators as any[]).concat(this)
         );
@@ -752,18 +729,18 @@ export class MatTimepickerDirective
       (simpleChanges['minDate'] &&
         !simpleChanges['minDate'].isFirstChange() &&
         +simpleChanges['minDate'].currentValue !==
-        simpleChanges['minDate'].previousValue) ||
+          simpleChanges['minDate'].previousValue) ||
       (simpleChanges['maxDate'] &&
         !simpleChanges['maxDate'].isFirstChange() &&
         +simpleChanges['maxDate'].currentValue !==
-        simpleChanges['maxDate'].previousValue) ||
+          simpleChanges['maxDate'].previousValue) ||
       (simpleChanges['disableLimitBase'] &&
         !simpleChanges['disableLimitBase'].isFirstChange() &&
         +simpleChanges['disableLimitBase'].currentValue !==
-        simpleChanges['disableLimitBase'].previousValue)
+          simpleChanges['disableLimitBase'].previousValue)
     ) {
       this.generateAllowedMap();
-      this.ngControl.control?.updateValueAndValidity();
+      this.ngControl?.control?.updateValueAndValidity();
     }
 
     if (!this.modalRef || !this.modalRef.componentInstance) {
@@ -786,23 +763,6 @@ export class MatTimepickerDirective
       allowed12HourMap: this.allowed12HourMap,
       allowed24HourMap: this.allowed24HourMap,
     };
-  }
-
-  checkValidity(value: Date) {
-    if (!value) {
-      return false;
-    }
-    const hour = value.getHours();
-    const minutes = value.getMinutes();
-    const meridiem = this.isPm ? 'PM' : 'AM';
-    return isAllowed(
-      hour,
-      minutes,
-      this.minDate,
-      this.maxDate,
-      this.mode,
-      meridiem
-    );
   }
 
   writeValue(value: Date | null, isInnerCall = false): void {

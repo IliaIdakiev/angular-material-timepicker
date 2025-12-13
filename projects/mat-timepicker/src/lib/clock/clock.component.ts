@@ -1,15 +1,28 @@
-import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, ChangeDetectionStrategy } from '@angular/core';
-import { ClockViewType, ClockNumber, ITimeData, ClockMode, IAllowed12HourMap, IAllowed24HourMap } from '../interfaces-and-types';
-import { isAllowed, getIsAvailableFn } from '../util';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  OnChanges,
+  SimpleChanges,
+  ChangeDetectionStrategy,
+} from '@angular/core';
+import {
+  ClockViewType,
+  ClockNumber,
+  ClockMode,
+  IAllowed12HourMap,
+  IAllowed24HourMap,
+} from '../interfaces-and-types';
+import { getIsAvailableFn } from '../util';
 
 @Component({
   selector: 'mat-clock',
   templateUrl: './clock.component.html',
   styleUrls: ['./clock.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ClockComponent implements OnChanges {
-
   @Input() mode!: ClockMode;
   @Input() viewType!: ClockViewType;
   @Input() color = 'primary';
@@ -24,6 +37,7 @@ export class ClockComponent implements OnChanges {
   @Output() invalidMeridiem: EventEmitter<any> = new EventEmitter<any>();
   @Output() invalidSelection: EventEmitter<any> = new EventEmitter<any>();
   @Output() clearInvalidMeridiem: EventEmitter<any> = new EventEmitter<any>();
+  @Output() selectionChangeDone: EventEmitter<any> = new EventEmitter<any>();
 
   @Input() allowed12HourMap: IAllowed12HourMap | null = null;
   @Input() allowed24HourMap: IAllowed24HourMap | null = null;
@@ -41,16 +55,23 @@ export class ClockComponent implements OnChanges {
   invalidMeridiemEmitted = true;
 
   initIsAllowedFn() {
-    if (!this.allowed12HourMap && !this.allowed24HourMap) { return; }
-    this.isAvailableFn = getIsAvailableFn(this.allowed12HourMap!, this.allowed24HourMap!, this.mode);
+    if (!this.allowed12HourMap && !this.allowed24HourMap) {
+      return;
+    }
+    this.isAvailableFn = getIsAvailableFn(
+      this.allowed12HourMap!,
+      this.allowed24HourMap!,
+      this.mode
+    );
   }
 
   isAvailable(value: number) {
-    return this.isAvailableFn ? this.isAvailableFn(value, this.viewType, this.isPm, this.formattedHours) : true;
+    return this.isAvailableFn
+      ? this.isAvailableFn(value, this.viewType, this.isPm, this.formattedHours)
+      : true;
   }
 
   ngOnChanges(simpleChanges: SimpleChanges) {
-
     if (
       simpleChanges['allowed12HourMap'] ||
       simpleChanges['allowed24HourMap'] ||
@@ -63,24 +84,22 @@ export class ClockComponent implements OnChanges {
     this.setNumbers();
     this.meridiem = this.isPm ? 'PM' : 'AM';
 
-    if (simpleChanges['formattedValue'] && (this.allowed12HourMap || this.allowed24HourMap)) {
+    if (
+      simpleChanges['formattedValue'] &&
+      (this.allowed12HourMap || this.allowed24HourMap)
+    ) {
       this.isFormattedValueAllowed = this.isAvailable(this.formattedValue);
     }
 
-    const isSelectedTimeAvailable = (this.isAvailableFn) ?
-      // when calling isAvailableFn here we should always set the viewType to minutes because we want to check the hours and the minutes
-      this.isAvailableFn(this.minutes, 'minutes', this.isPm, this.formattedHours) : true;
-
-    // if (this.mode === '24h' && this.viewType === 'minutes' && this.isAvailableFn) {
-    //   const areMinitesAvailable = this.isAvailableFn(this.minutes, 'minutes', this.isPm, this.formattedHours);
-    //   if (!areMinitesAvailable) {
-    //     if (this.minDate && this.minDate.getMinutes() > this.minutes) {
-    //       setTimeout(() => { this.changeEvent.emit({ value: this.minDate.getMinutes(), type: 'minutes' }); });
-    //     } else {
-    //       setTimeout(() => { this.changeEvent.emit({ value: this.maxDate.getMinutes(), type: 'minutes' }); });
-    //     }
-    //   }
-    // }
+    const isSelectedTimeAvailable = this.isAvailableFn
+      ? // when calling isAvailableFn here we should always set the viewType to minutes because we want to check the hours and the minutes
+        this.isAvailableFn(
+          this.minutes,
+          'minutes',
+          this.isPm,
+          this.formattedHours
+        )
+      : true;
 
     if (isSelectedTimeAvailable && this.invalidMeridiemEmitted) {
       this.clearInvalidMeridiem.emit();
@@ -98,32 +117,47 @@ export class ClockComponent implements OnChanges {
     if (this.viewType === 'hours') {
       if (this.mode === '12h') {
         const meridiem = this.isPm ? 'pm' : 'am';
-        const isAllowedFn = this.allowed12HourMap ? (num: number) => this.allowed12HourMap![meridiem][num + 1][0] : undefined;
+        const isAllowedFn = this.allowed12HourMap
+          ? (num: number) => this.allowed12HourMap![meridiem][num + 1][0]
+          : undefined;
         this.numbers = this.getNumbers(12, { size: 256 }, isAllowedFn);
         this.secondaryNumbers = [];
         this.minuteDots = [];
       } else if (this.mode === '24h') {
-        const isAllowedFn = this.allowed24HourMap ? (num: number) => this.allowed24HourMap![num][0] : undefined;
+        const isAllowedFn = this.allowed24HourMap
+          ? (num: number) => this.allowed24HourMap![num][0]
+          : undefined;
         this.numbers = this.getNumbers(12, { size: 256 }, isAllowedFn);
-        this.secondaryNumbers = this.getNumbers(12, { size: 256 - 64, start: 13 }, isAllowedFn);
+        this.secondaryNumbers = this.getNumbers(
+          12,
+          { size: 256 - 64, start: 13 },
+          isAllowedFn
+        );
         this.minuteDots = [];
       }
     } else {
       const meridiem = this.isPm ? 'pm' : 'am';
-      const isAllowedFn =
-        !!this.allowed12HourMap ? (num: number) => this.allowed12HourMap![meridiem][this.formattedHours][num] :
-          !!this.allowed24HourMap ? (num: number) => this.allowed24HourMap![this.formattedHours][num] : undefined;
+      const isAllowedFn = !!this.allowed12HourMap
+        ? (num: number) =>
+            this.allowed12HourMap![meridiem][this.formattedHours][num]
+        : !!this.allowed24HourMap
+        ? (num: number) => this.allowed24HourMap![this.formattedHours][num]
+        : undefined;
 
-      this.numbers = this.getNumbers(12, { size: 256, start: 5, step: 5 }, isAllowedFn);
-      this.minuteDots = this.getNumbers(60, { size: 256, start: 13 }).map(digit => {
-        if (digit.display <= 59) {
-          digit.allowed = isAllowedFn ? isAllowedFn(digit.display) : true;
-          return digit;
-        }
-        digit.display = digit.display - 60;
+      this.numbers = this.getNumbers(
+        12,
+        { size: 256, start: 5, step: 5 },
+        isAllowedFn
+      );
+      this.minuteDots = this.getNumbers(60, {
+        size: 256,
+        start: 0,
+        shift: 15,
+      }).map((digit) => {
         digit.allowed = isAllowedFn ? isAllowedFn(digit.display) : true;
         return digit;
       });
+
       this.secondaryNumbers = [];
     }
   }
@@ -139,8 +173,11 @@ export class ClockComponent implements OnChanges {
   handleTouchMove = (e: any) => {
     e.preventDefault(); // prevent scrolling behind the clock on iOS
     const rect = e.target.getBoundingClientRect();
-    this.movePointer(e.changedTouches[0].clientX - rect.left, e.changedTouches[0].clientY - rect.top);
-  }
+    this.movePointer(
+      e.changedTouches[0].clientX - rect.left,
+      e.changedTouches[0].clientY - rect.top
+    );
+  };
 
   handleTouchEnd(e: any) {
     this.handleTouchMove(e);
@@ -148,7 +185,6 @@ export class ClockComponent implements OnChanges {
   }
 
   handleMouseMove(e: any) {
-    // MouseEvent.which is deprecated, but MouseEvent.buttons is not supported in Safari
     if ((e.buttons === 1 || e.which === 1) && this.touching) {
       const rect = e.target.getBoundingClientRect();
       this.movePointer(e.clientX - rect.left, e.clientY - rect.top);
@@ -162,6 +198,10 @@ export class ClockComponent implements OnChanges {
 
   movePointer(x: number, y: number) {
     const value = this.getPointerValue(x, y, 256);
+    this.selectTime(value);
+  }
+
+  selectTime(value: number, autoSwitch = false) {
     if (!this.isAvailable(value)) {
       this.unavailableSelection.emit();
       return;
@@ -170,55 +210,76 @@ export class ClockComponent implements OnChanges {
       this.changeEvent.emit({ value, type: this.viewType });
       if (this.viewType !== 'minutes') {
         if (!this.isAvailable(value)) {
-          if (this.minDate && this.isAvailable(value)
-          ) {
-            this.changeEvent.emit({ value: this.minDate.getMinutes(), type: 'minutes' });
+          if (this.minDate && this.isAvailable(value)) {
+            this.changeEvent.emit({
+              value: this.minDate.getMinutes(),
+              type: 'minutes',
+            });
           } else if (this.maxDate && this.isAvailable(value)) {
-            this.changeEvent.emit({ value: this.maxDate.getMinutes(), type: 'minutes' });
+            this.changeEvent.emit({
+              value: this.maxDate.getMinutes(),
+              type: 'minutes',
+            });
           }
         }
       }
     }
+    if (autoSwitch) {
+      this.selectionChangeDone.emit();
+    }
   }
 
-  getNumbers(count: number, { size = 1, start = 1, step = 1 }, isAllowedFn?: (num: number) => boolean) {
+  getNumbers(
+    count: number,
+    { size = 1, start = 1, step = 1, shift = 2 },
+    isAllowedFn?: (num: number) => boolean
+  ) {
     return Array.apply(null, Array(count)).map((_, i) => ({
       display: i * step + start,
-      translateX: (size / 2 - 20) * Math.cos(2 * Math.PI * (i - 2) / count),
-      translateY: (size / 2 - 20) * Math.sin(2 * Math.PI * (i - 2) / count),
-      allowed: isAllowedFn ? isAllowedFn(i) : true
+      translateX:
+        (size / 2 - 20) * Math.cos((2 * Math.PI * (i - shift)) / count),
+      translateY:
+        (size / 2 - 20) * Math.sin((2 * Math.PI * (i - shift)) / count),
+      allowed: isAllowedFn ? isAllowedFn(i) : true,
     }));
   }
 
   getPointerAngle(value: number) {
     if (this.viewType === 'hours') {
-      return this.mode === '12h' ? 360 / 12 * (value - 3) : 360 / 12 * (value % 12 - 3);
+      return this.mode === '12h'
+        ? (360 / 12) * (value - 3)
+        : (360 / 12) * ((value % 12) - 3);
     }
-    return 360 / 60 * (value - 15);
+    return (360 / 60) * (value - 15);
   }
 
   getPointerValue(x: number, y: number, size: number) {
     let value;
-    let angle = Math.atan2(size / 2 - x, size / 2 - y) / Math.PI * 180;
+    let angle = (Math.atan2(size / 2 - x, size / 2 - y) / Math.PI) * 180;
     if (angle < 0) {
       angle = 360 + angle;
     }
 
     if (this.viewType === 'hours') {
       if (this.mode === '12h') {
-        value = 12 - Math.round(angle * 12 / 360);
+        value = 12 - Math.round((angle * 12) / 360);
         return value === 0 ? 12 : value;
       }
 
-      const radius = Math.sqrt(Math.pow(size / 2 - x, 2) + Math.pow(size / 2 - y, 2));
-      value = 12 - Math.round(angle * 12 / 360);
-      if (value === 0) { value = 12; }
-      if (radius < size / 2 - 32) { value = value === 12 ? 0 : value + 12; }
+      const radius = Math.sqrt(
+        Math.pow(size / 2 - x, 2) + Math.pow(size / 2 - y, 2)
+      );
+      value = 12 - Math.round((angle * 12) / 360);
+      if (value === 0) {
+        value = 12;
+      }
+      if (radius < size / 2 - 32) {
+        value = value === 12 ? 0 : value + 12;
+      }
       return value;
-
     }
 
-    value = Math.round(60 - 60 * angle / 360);
+    value = Math.round(60 - (60 * angle) / 360);
     return value === 60 ? 0 : value;
   }
 }
