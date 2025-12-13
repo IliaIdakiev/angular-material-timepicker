@@ -3,6 +3,7 @@ import { MatTimepickerDirective } from './timepicker.directive';
 
 @Directive({
   selector: '[matTimepickerToggle]',
+  standalone: true,
 })
 export class MatTimepickerToggleDirective {
   @Input('matTimepickerToggle') timepicker!: MatTimepickerDirective;

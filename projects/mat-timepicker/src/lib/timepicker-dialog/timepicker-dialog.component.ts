@@ -1,4 +1,4 @@
-import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import {
   Component,
   EventEmitter,
@@ -15,11 +15,23 @@ import {
 } from '../interfaces-and-types';
 import { twoDigits, convertHoursForMode } from '../util';
 import { MatTimepickerButtonTemplateContext } from '../timepicker.directive';
+import { CommonModule } from '@angular/common';
+import { MatButtonModule } from '@angular/material/button';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { ClockComponent } from '../clock/clock.component';
 
 @Component({
   selector: 'mat-timepicker-dialog',
   templateUrl: './timepicker-dialog.component.html',
   styleUrls: ['./timepicker-dialog.component.scss'],
+  standalone: true,
+  imports: [
+    CommonModule,
+    MatButtonModule,
+    MatToolbarModule,
+    ClockComponent,
+    MatDialogModule,
+  ],
 })
 export class MatTimepickerComponentDialogComponent implements DoCheck {
   twoDigits = twoDigits;

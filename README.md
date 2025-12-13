@@ -1,26 +1,46 @@
 # Angular Material Timepicker
 
+[![npm version](https://img.shields.io/npm/v/mat-timepicker.svg)](https://www.npmjs.com/package/mat-timepicker)
+[![npm downloads](https://img.shields.io/npm/dm/mat-timepicker.svg)](https://www.npmjs.com/package/mat-timepicker)
+[![license](https://img.shields.io/npm/l/mat-timepicker.svg)](https://github.com/IliaIdakiev/angular-material-timepicker/blob/master/LICENSE)
+[![Angular](https://img.shields.io/badge/Angular-19-dd0031.svg)](https://angular.dev)
+[![Tests](https://github.com/IliaIdakiev/angular-material-timepicker/actions/workflows/ci.yml/badge.svg)](https://github.com/IliaIdakiev/angular-material-timepicker/actions/workflows/ci.yml)
+
+## Version Compatibility
+
+| mat-timepicker | Angular | Notes                                            |
+| -------------- | ------- | ------------------------------------------------ |
+| 5.5.x          | 19.x    | Standalone components                            |
+| 5.4.x          | 18.x    |                                                  |
+| 5.3.x          | 17.x    |                                                  |
+| 5.2.x          | 16.x    | Added `matTimepickerToggle` directive            |
+| 5.1.x          | 15.x    |                                                  |
+| 5.0.x          | 14.x    | i18n no longer requires `@angular/localize/init` |
+
 ## Installation
-  *  `npm install mat-timepicker` || ` yarn add mat-timepicker`
+
+- `npm install mat-timepicker` || ` yarn add mat-timepicker`
 
 ## Features:
 
-  * Clock view dialog for selecting hour and minutes and options for dialog toggle customizations.
-  * Input time editing.
-  * Validations: minDate / maxDate (options: strict - datetime check / non-strict - time check).
-  * The timepicker can be used with template and reactive forms.
+- Clock view dialog for selecting hour and minutes and options for dialog toggle customizations.
+- Input time editing.
+- Validations: minDate / maxDate (options: strict - datetime check / non-strict - time check).
+- The timepicker can be used with template and reactive forms.
 
 ## Configuration and usage
-**Keep in mind that the selector for the timepicker directive is *`input[matTimepicker]`***
+
+**Keep in mind that the selector for the timepicker directive is _`input[matTimepicker]`_**
 
 your.module.ts
+
 ```typescript
 import { MatTimepickerModule } from 'mat-timepicker';
 
 @NgModule({
   declarations: [...],
   imports: [
-    MatTimepickerModule 
+    MatTimepickerModule
   ],
   ...
 })
@@ -30,7 +50,7 @@ export class YourModule { }
 ## Simple Case
 
 ```html
-<input matTimepicker>
+<input matTimepicker />
 ```
 
 ### With Toggle Button (v5.2.0+)
@@ -40,20 +60,18 @@ Using the new `matTimepickerToggle` directive for cleaner syntax:
 ```html
 <mat-form-field appearance="fill">
   <mat-label>TIMEPICKER</mat-label>
-  <input matTimepicker #t="matTimepicker" mode="24h" placeholder="Select time...">
+  <input matTimepicker #t="matTimepicker" mode="24h" placeholder="Select time..." />
   <mat-icon matSuffix [matTimepickerToggle]="t">access_time</mat-icon>
 </mat-form-field>
 ```
 
 ### More Complex Case
+
 ```html
 <mat-form-field appearance="fill">
   <mat-label>TIMEPICKER</mat-label>
 
-  <input matTimepicker #t="matTimepicker" #time="ngModel" [minDate]="minValue" [maxDate]="maxValue"
-    [strict]="false" id="timepicker-example" mode="24h" [ngModel]="defaultValue"
-    placeholder="Please select time..." name="time" [errorStateMatcher]="customErrorStateMatcher" required
-    (timeChange)="timeChangeHandler($event)" (invalidInput)="invalidInputHandler()">
+  <input matTimepicker #t="matTimepicker" #time="ngModel" [minDate]="minValue" [maxDate]="maxValue" [strict]="false" id="timepicker-example" mode="24h" [ngModel]="defaultValue" placeholder="Please select time..." name="time" [errorStateMatcher]="customErrorStateMatcher" required (timeChange)="timeChangeHandler($event)" (invalidInput)="invalidInputHandler()" />
 
   <!-- Option 1: Using the toggle directive (v5.2.0+) -->
   <mat-icon matSuffix [matTimepickerToggle]="t">access_time</mat-icon>
@@ -76,6 +94,7 @@ The `matTimepickerToggle` directive provides a simple way to open the timepicker
 ```
 
 This automatically:
+
 - Opens the timepicker dialog on click
 - Sets cursor to pointer
 - Stops event propagation
@@ -119,7 +138,7 @@ This automatically:
 
 /* Set the value of the timepicker control */
 /* ⚠️(when using template driven forms then you should use [ngModel]="someValue")⚠️ */
-@Input() value: Date = new Date(); 
+@Input() value: Date = new Date();
 
 /* Minimum time to pick from */
 @Input() minDate: Date;
@@ -159,19 +178,18 @@ This automatically:
 ---
 
 ## i18n (v5.0.0+)
+
 In versions before v5.0.0 putting `import '@angular/localize/init';` inside polyfills.ts was mandatory. From v5.0.0 it is no longer mandatory (which is useful for users that are not using i18n). In order to use i18n you have to use the inputs: okLabel, cancelLabel.
 
 **Please note that you need to provide both the input attribute and the value (e.g. okLabel="Ok") and the i18n attribute (e.g. i18n-okLabel="<meaning>|<description>@@<id>")** for more info check out [this](https://angular.io/guide/i18n#mark-element-attributes-for-translations)
 
-Example: 
+Example:
+
 ```html
 <div>
   <mat-form-field appearance="fill">
     <mat-label i18n="Timepicker 1 Title">24 TIMEPICKER</mat-label>
-    <input matTimepicker #t1="matTimepicker" i18n-okLabel="Timepicker 1 Ok Label" okLabel="Ok"
-      i18n-cancelLabel="Timepicker 1 Cancel Label" cancelLabel="Cancel" #time1="ngModel" [minDate]="minValue"
-      [maxDate]="maxValue" id="timepicker-example-1" mode="24h" ngModel placeholder="Please select time..."
-      name="time-1" required>
+    <input matTimepicker #t1="matTimepicker" i18n-okLabel="Timepicker 1 Ok Label" okLabel="Ok" i18n-cancelLabel="Timepicker 1 Cancel Label" cancelLabel="Cancel" #time1="ngModel" [minDate]="minValue" [maxDate]="maxValue" id="timepicker-example-1" mode="24h" ngModel placeholder="Please select time..." name="time-1" required />
     <mat-icon matSuffix [matTimepickerToggle]="t1">access_time</mat-icon>
     <mat-error *ngIf="time1.touched && time1.invalid">Invalid Date</mat-error>
   </mat-form-field>
@@ -182,10 +200,10 @@ Example:
 
 ## Dialog View
 
-**Hour Select (24h):** 
+**Hour Select (24h):**
 
 ![alt text](https://github.com/IliaIdakiev/angular-material-timepicker/blob/master/timepicker-hours.png?raw=true "Hour Select (24h)")
 
-**Minutes Select:** 
+**Minutes Select:**
 
 ![alt text](https://github.com/IliaIdakiev/angular-material-timepicker/blob/master/timepicker-min.png?raw=true "Hour Select (24h)")

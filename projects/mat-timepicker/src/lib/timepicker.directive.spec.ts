@@ -36,6 +36,13 @@ import { By } from '@angular/platform-browser';
       />
     </mat-form-field>
   `,
+  standalone: true,
+  imports: [
+    FormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatTimepickerModule,
+  ],
 })
 class TestNgModelComponent {
   timeValue: Date | null = null;
@@ -69,6 +76,13 @@ class TestNgModelComponent {
       />
     </mat-form-field>
   `,
+  standalone: true,
+  imports: [
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatTimepickerModule,
+  ],
 })
 class TestReactiveFormComponent {
   timeControl = new FormControl<Date | null>(null);
@@ -86,14 +100,7 @@ describe('MatTimepickerDirective', () => {
 
     beforeEach(waitForAsync(() => {
       TestBed.configureTestingModule({
-        declarations: [TestNgModelComponent],
-        imports: [
-          FormsModule,
-          MatTimepickerModule,
-          BrowserAnimationsModule,
-          MatFormFieldModule,
-          MatInputModule,
-        ],
+        imports: [TestNgModelComponent, BrowserAnimationsModule],
       }).compileComponents();
     }));
 
@@ -362,14 +369,7 @@ describe('MatTimepickerDirective', () => {
 
     beforeEach(waitForAsync(() => {
       TestBed.configureTestingModule({
-        declarations: [TestReactiveFormComponent],
-        imports: [
-          ReactiveFormsModule,
-          MatTimepickerModule,
-          BrowserAnimationsModule,
-          MatFormFieldModule,
-          MatInputModule,
-        ],
+        imports: [TestReactiveFormComponent, BrowserAnimationsModule],
       }).compileComponents();
     }));
 
@@ -474,14 +474,7 @@ describe('MatTimepickerDirective', () => {
 
     beforeEach(waitForAsync(() => {
       TestBed.configureTestingModule({
-        declarations: [TestReactiveFormComponent],
-        imports: [
-          ReactiveFormsModule,
-          MatTimepickerModule,
-          BrowserAnimationsModule,
-          MatFormFieldModule,
-          MatInputModule,
-        ],
+        imports: [TestReactiveFormComponent, BrowserAnimationsModule],
       }).compileComponents();
     }));
 
@@ -548,14 +541,7 @@ describe('MatTimepickerDirective', () => {
 
     beforeEach(waitForAsync(() => {
       TestBed.configureTestingModule({
-        declarations: [TestNgModelComponent],
-        imports: [
-          FormsModule,
-          MatTimepickerModule,
-          BrowserAnimationsModule,
-          MatFormFieldModule,
-          MatInputModule,
-        ],
+        imports: [TestNgModelComponent, BrowserAnimationsModule],
       }).compileComponents();
     }));
 
@@ -639,14 +625,7 @@ describe('MatTimepickerDirective', () => {
 
     beforeEach(waitForAsync(() => {
       TestBed.configureTestingModule({
-        declarations: [TestNgModelComponent],
-        imports: [
-          FormsModule,
-          MatTimepickerModule,
-          BrowserAnimationsModule,
-          MatFormFieldModule,
-          MatInputModule,
-        ],
+        imports: [TestNgModelComponent, BrowserAnimationsModule],
       }).compileComponents();
     }));
 
@@ -715,14 +694,7 @@ describe('MatTimepickerDirective', () => {
 
     beforeEach(waitForAsync(() => {
       TestBed.configureTestingModule({
-        declarations: [TestNgModelComponent],
-        imports: [
-          FormsModule,
-          MatTimepickerModule,
-          BrowserAnimationsModule,
-          MatFormFieldModule,
-          MatInputModule,
-        ],
+        imports: [TestNgModelComponent, BrowserAnimationsModule],
       }).compileComponents();
     }));
 

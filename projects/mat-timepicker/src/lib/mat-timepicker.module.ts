@@ -12,13 +12,6 @@ import { MatTimepickerDirective } from './timepicker.directive';
 import { MatTimepickerToggleDirective } from './timepicker-toggle.directive';
 
 @NgModule({
-  declarations: [
-    ClockComponent,
-    MatTimepickerDirective,
-    MatTimepickerComponentDialogComponent,
-    MatTimepickerToggleDirective,
-  ],
-
   imports: [
     CommonModule,
     MatDialogModule,
@@ -26,6 +19,11 @@ import { MatTimepickerToggleDirective } from './timepicker-toggle.directive';
     MatToolbarModule,
     MatIconModule,
     MatInputModule,
+    // Components
+    ClockComponent,
+    MatTimepickerDirective,
+    MatTimepickerComponentDialogComponent,
+    MatTimepickerToggleDirective,
   ],
   exports: [MatTimepickerDirective, MatTimepickerToggleDirective],
 })
