@@ -10,16 +10,7 @@ import { MatInputModule } from '@angular/material/input';
 describe('AppComponent', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [AppComponent],
-      imports: [
-        FormsModule,
-        ReactiveFormsModule,
-        MatTimepickerModule,
-        BrowserAnimationsModule,
-        MatFormFieldModule,
-        MatIconModule,
-        MatInputModule,
-      ],
+      imports: [AppComponent, BrowserAnimationsModule],
     }).compileComponents();
   }));
 
