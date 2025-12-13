@@ -423,6 +423,7 @@ export class MatTimepickerDirective
 
     const isValueInRange = isDateInRange(this.minDate, this.maxDate, d);
     if (!isValueInRange) {
+      this.currentValue = d;
       this.invalidInput.emit();
       return;
     }
