@@ -152,6 +152,11 @@ export class MatTimepickerDirective
   set disabled(value: Boolean) {
     this._disabled = coerceBooleanProperty(value);
 
+    if (this._disabled && this.modalRef) {
+      this.currentValue = this.value as Date;
+      this.modalRef.close();
+    }
+
     if (this.focused) {
       this.focused = false;
       this.stateChanges.next();
@@ -842,14 +847,16 @@ export class MatTimepickerDirective
           this.onTouchedFn();
         }
         this.modalRef = null;
-        this.elRef.nativeElement.focus();
+        if (!this.disabled) {
+          this.elRef.nativeElement.focus();
+        }
       });
 
     this.currentValue = this.value as Date;
   }
 
   handleChange = (newValue: any) => {
-    if (!(newValue instanceof Date)) {
+    if (this.disabled || !(newValue instanceof Date)) {
       return;
     }
     const v =
@@ -862,6 +869,9 @@ export class MatTimepickerDirective
   };
 
   handleOk = (value: any) => {
+    if (this.disabled) {
+      return;
+    }
     if (!this.currentValue && value) {
       this.currentValue = value;
     }
